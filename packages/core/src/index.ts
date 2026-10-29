@@ -6,6 +6,7 @@ export * from "./checkpoint.js";
 export * from "./compaction.js";
 export * from "./config.js";
 export * from "./cost.js";
+export * from "./credentials.js";
 export * from "./doctor.js";
 export * from "./economy.js";
 export * from "./errors.js";

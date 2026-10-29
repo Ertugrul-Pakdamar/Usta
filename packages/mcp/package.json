@@ -1,6 +1,6 @@
 {
   "name": "@usta/mcp",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "MCP connector client for usta (work in progress).",
   "type": "module",
   "license": "Apache-2.0",

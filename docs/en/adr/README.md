@@ -14,5 +14,6 @@ _Turkish originals: [docs/adr](../../adr/README.md)._
 | [0006](0006-localization.md)           | Localization: user-facing versus model-facing text    | Accepted |
 | [0007](0007-subagents.md)              | Subagents: isolated context, shared permission gate   | Accepted |
 | [0008](0008-auto-mode.md)              | Auto mode: the classifier sits below the rules        | Accepted |
+| [0011](0011-single-file-binary.md)     | Single-file binary: Node SEA + an esbuild bundle      | Accepted |
 | [0010](0010-plugins-and-stop-hooks.md) | Plugins, module hooks, continuing on Stop             | Accepted |
 | [0009](0009-mcp.md)                    | MCP: same gate, configuration behind the trust gate   | Accepted |

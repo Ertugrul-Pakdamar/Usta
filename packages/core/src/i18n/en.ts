@@ -18,9 +18,9 @@ export const en = {
   "unit.requests": { one: "{count} request", other: "{count} requests" },
 
   // --- errors
-  "error.noApiKey": "EVREN_API_KEY is not set.",
+  "error.noApiKey": "EVREN_API_KEY is not set. Run `usta login` to save it.",
   "error.noBaseUrl":
-    "EVREN_BASE_URL is not set. Add the gateway address to your .env file (see .env.example).",
+    "EVREN_BASE_URL is not set. Run `usta login`, or add the gateway address to your .env file (see .env.example).",
   "error.termsNotAccepted":
     "The terms of use are not accepted. Run `usta terms` to read them and `usta terms accept` to accept.",
   "error.contentGuard": "The content safety layer rejected the request: {message}",
@@ -83,10 +83,10 @@ export const en = {
   // --- doctor
   "doctor.apiKey.name": "API key",
   "doctor.apiKey.ok": "EVREN_API_KEY is set",
-  "doctor.apiKey.missing": "EVREN_API_KEY is not set",
+  "doctor.apiKey.missing": "EVREN_API_KEY is not set (run `usta login`)",
   "doctor.baseUrl.name": "Gateway address",
   "doctor.baseUrl.ok": "EVREN_BASE_URL is set",
-  "doctor.baseUrl.missing": "EVREN_BASE_URL is not set (see .env.example)",
+  "doctor.baseUrl.missing": "EVREN_BASE_URL is not set (run `usta login`)",
   "doctor.terms.name": "Terms of use",
   "doctor.terms.notAccepted":
     "Not accepted. Read them with `usta terms`, accept with `usta terms accept`",
@@ -338,6 +338,28 @@ export const en = {
   "tui.attached": "Attached: {files}",
   "cli.opt.disableTools":
     "Leave tools out of this session, e.g. --disable-tools Script Task (used by the evaluation suite)",
+  "login.intro": "Sign in to the EVREN gateway. The values are saved privately in {file}.",
+  "login.baseUrl": "Gateway address (EVREN_BASE_URL)",
+  "login.apiKey": "API key (EVREN_API_KEY, hidden)",
+  "login.keepKey": " [Enter keeps {key}]",
+  "login.invalidUrl": "That is not a valid address; it should look like https://host/v1",
+  "login.insecure": "This address uses plain http: the API key would travel unencrypted.",
+  "login.insecureConfirm": "Use it anyway? (yes/no)",
+  "login.cancelled": "Nothing saved.",
+  "login.saved": "Saved to {file} (key {key}). Run `usta doctor` any time to check the connection.",
+  "login.needed": "usta is not configured yet (gateway address and API key). Let's set it up.",
+  "login.loggedOut": "Signed out: the saved credentials were removed.",
+  "login.nothingToRemove": "There were no saved credentials.",
+  "login.termsHint":
+    "The gateway terms of use are not accepted yet: read them with `usta terms` and accept with `usta terms accept`.",
+  "cli.cmd.login": "Save the gateway address and API key (asked interactively; never echoed)",
+  "cli.cmd.logout": "Remove the saved API key (--all: the address and defaults too)",
+  "cli.opt.loginBaseUrl": "Gateway address, instead of being asked",
+  "cli.opt.loginKeyStdin": "Read the API key from standard input (for scripts)",
+  "cli.opt.loginModel": "Save a default model (EVREN_DEFAULT_MODEL)",
+  "cli.opt.loginMaxTokens": "Save a default output limit (EVREN_DEFAULT_MAX_TOKENS)",
+  "cli.opt.logoutAll": "Also remove the gateway address and defaults",
+  "cli.needTerminal": "This needs a terminal, or --key-stdin to read the key from standard input.",
   "slash.desc.tasks": "Subagent tasks: /tasks, /tasks show <id>, /tasks stop <id>",
   "tasks.none": "No tasks.",
   "tasks.line": "{id}  {status}  {agent}: {description} · {elapsed}",

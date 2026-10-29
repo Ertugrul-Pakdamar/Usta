@@ -1,57 +1,53 @@
 # Getting started
 
-## Requirements
-
-| Requirement                  | Why                                                                     |
-| ---------------------------- | ----------------------------------------------------------------------- |
-| Node.js ≥ 22                 | Runtime (pinned by `.nvmrc`)                                            |
-| [pnpm](https://pnpm.io) 12   | Monorepo management (pinned in the `packageManager` field)              |
-| An EVREN LLM Gateway account | Access to the model: an API key and the gateway address                 |
-| `python3` _(optional)_       | The `Script` tool runs python scripts (Node is enough for node scripts) |
-| `rg` (ripgrep) _(optional)_  | `Grep` uses it when installed, otherwise a pure-JS fallback runs        |
-
 ## Installation
+
+**1. One file (recommended).** From the [Releases](https://github.com/Ertugrul-Pakdamar/Usta/releases) page download the archive for your platform (`usta-linux-x64`, `usta-linux-arm64`, `usta-macos-arm64`, `usta-windows-x64`), verify it and put it in a directory on your PATH. **No Node.js or pnpm needed**; the Node runtime is inside the file (about 130 MB, ~40 MB in the archive).
+
+```sh
+sha256sum -c usta-linux-x64.sha256        # on macOS: shasum -a 256 -c …
+tar -xzf usta-linux-x64.tar.gz
+sudo mv usta /usr/local/bin/              # or ~/.local/bin
+usta --version
+```
+
+On the first run the bundle is unpacked once into `~/.usta/cache` (later starts are fast; the files of an older version are removed).
+
+**2. From source** (for development). Needs Node.js ≥ 22 and [pnpm](https://pnpm.io) 12:
 
 ```sh
 git clone git@github.com:Ertugrul-Pakdamar/Usta.git
 cd Usta
 pnpm install
 pnpm build
+pnpm usta --version             # from the repository root; or: cd packages/cli && npm link
 ```
 
-There are two ways to run it:
+To build your own binary from the same source use an official Node.js and run `pnpm build:binary` (output in `dist-bin/`; the Node shipped by some distributions lacks the part this needs).
+
+Optional tools: `python3` (for python scripts in `Script`), `rg` (ripgrep; `Grep` uses it when present, otherwise a pure-JS fallback runs).
+
+## Signing in: gateway address and API key
+
+If usta is not configured the first time you start it, it **asks you step by step**; you can also run, any time:
 
 ```sh
-pnpm usta --version            # from the repository root (easiest for development)
-
-cd packages/cli && npm link    # makes the `usta` command available everywhere
-usta --version
+usta login
 ```
 
-> `npm link` puts a symlink into your global npm directory (`npm prefix -g`); remove it with `npm unlink -g @usta/cli`.
-
-## Configuration
-
-usta reads a few environment variables (full list: [Configuration](configuration.md)):
-
-```sh
-cp .env.example .env
+```text
+Gateway address (EVREN_BASE_URL): https://<gateway>/v1
+API key (EVREN_API_KEY, hidden): ••••••••        ← not echoed
+Saved to ~/.usta/credentials (key sk-…9a3f).
+✓ API key ✓ Gateway address ✓ Terms of use …    ← connection check
 ```
 
-```ini
-EVREN_API_KEY=...                         # API key of your gateway account
-EVREN_BASE_URL=https://<gateway>/v1       # gateway address (ends with /v1); there is no default
-EVREN_DEFAULT_MODEL=qwen3-vl-30b          # optional
-```
+- The values are written to `~/.usta/credentials` so that **only you can read them** (0600); the key is never shown in full anywhere.
+- For scripts/CI: `echo "$KEY" | usta login --base-url https://<gateway>/v1 --key-stdin` (or, without writing any file, the `EVREN_API_KEY` and `EVREN_BASE_URL` environment variables).
+- `--model` and `--max-tokens` save defaults too. To sign out: `usta logout` (removes only the key) or `usta logout --all`.
+- A plain `http://` address (except on your own machine) needs an explicit yes: the key would travel unencrypted.
 
-Variables are looked up in this order (first found wins): real environment variables → `.env` in the working directory → `~/.usta/credentials`.
-If you use `usta` from different directories, put the key once into `~/.usta/credentials`:
-
-```sh
-mkdir -p ~/.usta && cp .env ~/.usta/credentials && chmod 600 ~/.usta/credentials
-```
-
-`.env` is kept out of git by `.gitignore`; **never commit it**.
+When developing from source you can still use `.env` (`cp .env.example .env`). Variables are looked up in this order (first found wins): real environment variables → `.env` in the working directory → `~/.usta/credentials`. `.env` is kept out of git by `.gitignore`; **never commit it**.
 
 The interface language follows your system locale (Turkish or English). To change it use `usta --lang en`, `export USTA_LANG=en`, or `/lang en` inside a session ([details](configuration.md#language)).
 

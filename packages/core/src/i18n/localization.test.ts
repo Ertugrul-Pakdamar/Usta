@@ -20,12 +20,12 @@ describe("user-facing messages follow the language", () => {
     setLanguage("en");
     const en = await runDoctor(config);
     expect(en.map((c) => c.detail)).toEqual([
-      "EVREN_API_KEY is not set",
-      "EVREN_BASE_URL is not set (see .env.example)",
+      "EVREN_API_KEY is not set (run `usta login`)",
+      "EVREN_BASE_URL is not set (run `usta login`)",
     ]);
     setLanguage("tr");
     const tr = await runDoctor(config);
-    expect(tr[0]?.detail).toBe("EVREN_API_KEY tanımlı değil");
+    expect(tr[0]?.detail).toBe("EVREN_API_KEY tanımlı değil (`usta login` çalıştırın)");
   });
 
   it("gateway configuration errors", () => {

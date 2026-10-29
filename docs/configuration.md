@@ -14,7 +14,7 @@ usta üç kaynaktan yapılandırılır: **ortam değişkenleri** (gateway erişi
 | `USTA_NO_RG`               | hayır   | Doluysa `rg` kullanılmaz, saf JS arama çalışır                                           |
 | `USTA_LANG`                | hayır   | Arayüz dili: `tr` veya `en` ([Dil](#dil))                                                |
 
-Arama sırası (ilk bulunan kazanır): gerçek ortam değişkenleri → `./.env` → `~/.usta/credentials`. Dosyalar `ANAHTAR=değer` biçimindedir.
+Arama sırası (ilk bulunan kazanır): gerçek ortam değişkenleri → `./.env` → `~/.usta/credentials`. Dosyalar `ANAHTAR=değer` biçimindedir. `~/.usta/credentials` dosyasını elle düzenlemek yerine `usta login` / `usta logout` kullanın (0600 izinle yazar, diğer satırları korur).
 
 ## Ayar dosyaları
 
@@ -123,7 +123,7 @@ Oturum içinde `/lang en` veya `/lang tr` dili anında değiştirir (o oturum i�
 
 | Yol                                   | İçerik                                 | Notlar                                             |
 | ------------------------------------- | -------------------------------------- | -------------------------------------------------- |
-| `credentials`                         | `EVREN_*` değişkenleri                 | `chmod 600` önerilir                               |
+| `credentials`                         | `EVREN_*` değişkenleri                 | `usta login` yazar (0600)                          |
 | `settings.json`                       | Kullanıcı ayarları                     |                                                    |
 | `trust.json`                          | Güvenilen proje ayarlarının özetleri   |                                                    |
 | `sessions/<id>.jsonl`                 | Konuşma kayıtları                      | 0600; `-c`/`-r` ile devam                          |

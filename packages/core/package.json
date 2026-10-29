@@ -1,6 +1,6 @@
 {
   "name": "@usta/core",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "UI-independent core of usta: agent loop, tools, permissions, token economy.",
   "type": "module",
   "license": "Apache-2.0",

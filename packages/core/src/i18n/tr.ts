@@ -9,9 +9,9 @@ export const tr: Record<MessageKey, Message> = {
   "unit.models": { one: "{count} model", other: "{count} model" },
   "unit.requests": { one: "{count} istek", other: "{count} istek" },
 
-  "error.noApiKey": "EVREN_API_KEY tanımlı değil.",
+  "error.noApiKey": "EVREN_API_KEY tanımlı değil. Kaydetmek için `usta login` çalıştırın.",
   "error.noBaseUrl":
-    "EVREN_BASE_URL tanımlı değil. Gateway adresini .env dosyanıza ekleyin (bkz. .env.example).",
+    "EVREN_BASE_URL tanımlı değil. `usta login` çalıştırın veya gateway adresini .env dosyanıza ekleyin (bkz. .env.example).",
   "error.termsNotAccepted":
     "Kullanım şartları kabul edilmemiş. Okumak için `usta terms`, kabul etmek için `usta terms accept` çalıştırın.",
   "error.contentGuard": "İçerik güvenlik katmanı isteği reddetti: {message}",
@@ -70,10 +70,10 @@ export const tr: Record<MessageKey, Message> = {
 
   "doctor.apiKey.name": "API anahtarı",
   "doctor.apiKey.ok": "EVREN_API_KEY tanımlı",
-  "doctor.apiKey.missing": "EVREN_API_KEY tanımlı değil",
+  "doctor.apiKey.missing": "EVREN_API_KEY tanımlı değil (`usta login` çalıştırın)",
   "doctor.baseUrl.name": "Gateway adresi",
   "doctor.baseUrl.ok": "EVREN_BASE_URL tanımlı",
-  "doctor.baseUrl.missing": "EVREN_BASE_URL tanımlı değil (bkz. .env.example)",
+  "doctor.baseUrl.missing": "EVREN_BASE_URL tanımlı değil (`usta login` çalıştırın)",
   "doctor.terms.name": "Kullanım şartları",
   "doctor.terms.notAccepted":
     "Kabul edilmemiş. Okumak için `usta terms`, kabul etmek için `usta terms accept`",
@@ -318,6 +318,32 @@ export const tr: Record<MessageKey, Message> = {
   "tui.attached": "Eklendi: {files}",
   "cli.opt.disableTools":
     "Bu oturumda bazı araçları kullanma, örn. --disable-tools Script Task (eval paketi kullanır)",
+  "login.intro": "EVREN gateway'ine giriş yapın. Değerler {file} dosyasına özel olarak kaydedilir.",
+  "login.baseUrl": "Gateway adresi (EVREN_BASE_URL)",
+  "login.apiKey": "API anahtarı (EVREN_API_KEY, gizli girilir)",
+  "login.keepKey": " [Enter {key} anahtarını korur]",
+  "login.invalidUrl": "Geçerli bir adres değil; https://host/v1 gibi olmalı",
+  "login.insecure": "Bu adres düz http kullanıyor: API anahtarı şifrelenmeden gider.",
+  "login.insecureConfirm": "Yine de kullanılsın mı? (evet/hayır)",
+  "login.cancelled": "Hiçbir şey kaydedilmedi.",
+  "login.saved":
+    "{file} dosyasına kaydedildi (anahtar {key}). Bağlantıyı istediğiniz zaman `usta doctor` ile denetleyin.",
+  "login.needed":
+    "usta henüz yapılandırılmamış (gateway adresi ve API anahtarı). Hemen ayarlayalım.",
+  "login.loggedOut": "Çıkış yapıldı: kayıtlı kimlik bilgileri silindi.",
+  "login.nothingToRemove": "Kayıtlı kimlik bilgisi yoktu.",
+  "login.termsHint":
+    "Gateway kullanım şartları henüz kabul edilmemiş: `usta terms` ile okuyun, `usta terms accept` ile kabul edin.",
+  "cli.cmd.login":
+    "Gateway adresini ve API anahtarını kaydeder (etkileşimli sorulur; ekrana yazılmaz)",
+  "cli.cmd.logout": "Kayıtlı API anahtarını siler (--all: adres ve varsayılanlar da)",
+  "cli.opt.loginBaseUrl": "Gateway adresi (sorulmadan)",
+  "cli.opt.loginKeyStdin": "API anahtarını standart girdiden oku (betikler için)",
+  "cli.opt.loginModel": "Varsayılan modeli kaydet (EVREN_DEFAULT_MODEL)",
+  "cli.opt.loginMaxTokens": "Varsayılan çıktı sınırını kaydet (EVREN_DEFAULT_MAX_TOKENS)",
+  "cli.opt.logoutAll": "Gateway adresini ve varsayılanları da sil",
+  "cli.needTerminal":
+    "Bu işlem bir terminal gerektirir (ya da anahtarı standart girdiden okumak için --key-stdin).",
   "slash.desc.tasks": "Alt ajan görevleri: /tasks, /tasks show <id>, /tasks stop <id>",
   "tasks.none": "Görev yok.",
   "tasks.line": "{id}  {status}  {agent}: {description} · {elapsed}",

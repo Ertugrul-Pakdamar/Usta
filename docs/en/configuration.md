@@ -14,7 +14,7 @@ usta is configured from three sources: **environment variables** (gateway access
 | `USTA_NO_RG`               | no       | When set, `rg` is not used and the pure-JS search runs                                           |
 | `USTA_LANG`                | no       | Interface language: `tr` or `en` ([Language](#language))                                         |
 
-Lookup order (first found wins): real environment variables → `./.env` → `~/.usta/credentials`. The files use `KEY=value` lines.
+Lookup order (first found wins): real environment variables → `./.env` → `~/.usta/credentials`. The files use `KEY=value` lines. Instead of editing `~/.usta/credentials` by hand use `usta login` / `usta logout` (writes with 0600, keeps other lines).
 
 ## Settings files
 
@@ -123,7 +123,7 @@ Inside a session, `/lang en` or `/lang tr` switches the language immediately (fo
 
 | Path                                    | Contents                                       | Notes                                          |
 | --------------------------------------- | ---------------------------------------------- | ---------------------------------------------- |
-| `credentials`                           | `EVREN_*` variables                            | `chmod 600` recommended                        |
+| `credentials`                           | `EVREN_*` variables                            | written by `usta login` (0600)                 |
 | `settings.json`                         | User settings                                  |                                                |
 | `trust.json`                            | Digests of trusted project settings            |                                                |
 | `sessions/<id>.jsonl`                   | Conversation records                           | 0600; continue with `-c`/`-r`                  |

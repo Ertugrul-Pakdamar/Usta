@@ -12,5 +12,6 @@
 | [0006](0006-localization.md)           | Yerelleştirme: kullanıcıya dönük ve modele dönük metin  | Kabul edildi |
 | [0007](0007-subagents.md)              | Alt ajanlar: yalıtılmış bağlam, paylaşılan izin kapısı  | Kabul edildi |
 | [0008](0008-auto-mode.md)              | Auto modu: sınıflandırıcı kuralların altındadır         | Kabul edildi |
+| [0011](0011-single-file-binary.md)     | Tek dosya binary: Node SEA + esbuild paketi             | Kabul edildi |
 | [0010](0010-plugins-and-stop-hooks.md) | Plugin'ler, modül hook'ları, Stop ile devam             | Kabul edildi |
 | [0009](0009-mcp.md)                    | MCP: araçlar aynı kapıdan, yapılandırma güven kapısında | Kabul edildi |

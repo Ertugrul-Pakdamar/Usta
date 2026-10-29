@@ -1,57 +1,53 @@
 # Başlangıç
 
-## Gereksinimler
-
-| Gereksinim                      | Neden                                                                         |
-| ------------------------------- | ----------------------------------------------------------------------------- |
-| Node.js ≥ 22                    | Çalışma zamanı (`.nvmrc` ile sabit)                                           |
-| [pnpm](https://pnpm.io) 12      | Monorepo yönetimi (`packageManager` alanında sabit)                           |
-| EVREN LLM Gateway hesabı        | Modele erişim: bir API anahtarı ve gateway adresi                             |
-| `python3` _(isteğe bağlı)_      | `Script` aracı python betiklerini çalıştırır (node betikleri için Node yeter) |
-| `rg` (ripgrep) _(isteğe bağlı)_ | `Grep` kuruluysa onu kullanır, yoksa saf JS yedeği çalışır                    |
-
 ## Kurulum
+
+**1. Tek dosya (önerilen).** [Sürümler](https://github.com/Ertugrul-Pakdamar/Usta/releases) sayfasından platformunuza uygun arşivi indirin (`usta-linux-x64`, `usta-linux-arm64`, `usta-macos-arm64`, `usta-windows-x64`), doğrulayın ve PATH'teki bir dizine koyun. **Node.js veya pnpm gerekmez**; Node çalışma zamanı dosyanın içindedir (yaklaşık 130 MB, arşivde ~40 MB).
+
+```sh
+sha256sum -c usta-linux-x64.sha256        # macOS'ta: shasum -a 256 -c …
+tar -xzf usta-linux-x64.tar.gz
+sudo mv usta /usr/local/bin/              # veya ~/.local/bin
+usta --version
+```
+
+İlk çalıştırmada paket `~/.usta/cache` altına bir kez açılır (sonraki başlatmalar hızlıdır, eski sürümün dosyası silinir).
+
+**2. Kaynaktan** (geliştirme için). Node.js ≥ 22 ve [pnpm](https://pnpm.io) 12 gerekir:
 
 ```sh
 git clone git@github.com:Ertugrul-Pakdamar/Usta.git
 cd Usta
 pnpm install
 pnpm build
+pnpm usta --version             # depo kökünden; ya da: cd packages/cli && npm link
 ```
 
-Çalıştırmanın iki yolu vardır:
+Aynı kaynaktan kendi binary'nizi üretmek için resmi bir Node.js ile `pnpm build:binary` (çıktı `dist-bin/`; dağıtım paketi Node'larında bu iş için gereken parça olmayabilir).
+
+İsteğe bağlı araçlar: `python3` (`Script` python betikleri için), `rg` (ripgrep; `Grep` varsa onu kullanır, yoksa saf JS yedeği çalışır).
+
+## Giriş: gateway adresi ve API anahtarı
+
+usta'yı ilk kez başlattığınızda yapılandırma yoksa sizi **adım adım sorar**; ayrıca istediğiniz zaman:
 
 ```sh
-pnpm usta --version            # depo kökünden (geliştirme için en kolayı)
-
-cd packages/cli && npm link    # `usta` komutunu her dizinde kullanılabilir yapar
-usta --version
+usta login
 ```
 
-> `npm link` global npm dizininize (`npm prefix -g`) bir sembolik bağ koyar; kaldırmak için `npm unlink -g @usta/cli`.
-
-## Yapılandırma
-
-usta üç ortam değişkeni okur (tam liste: [Yapılandırma](configuration.md)):
-
-```sh
-cp .env.example .env
+```text
+Gateway adresi (EVREN_BASE_URL): https://<gateway>/v1
+API anahtarı (EVREN_API_KEY, gizli girilir): ••••••••        ← ekrana yazılmaz
+Kaydedildi: ~/.usta/credentials (anahtar sk-…9a3f).
+✓ API anahtarı ✓ Gateway adresi ✓ Kullanım şartları …        ← bağlantı denetimi
 ```
 
-```ini
-EVREN_API_KEY=...                         # gateway hesabınızın API anahtarı
-EVREN_BASE_URL=https://<gateway>/v1       # gateway adresi (/v1 ile biter); varsayılanı yoktur
-EVREN_DEFAULT_MODEL=qwen3-vl-30b          # isteğe bağlı
-```
+- Değerler `~/.usta/credentials` dosyasına **yalnızca sizin okuyabileceğiniz** (0600) biçimde yazılır; anahtar hiçbir yerde tam olarak gösterilmez.
+- Betik/CI için: `echo "$ANAHTAR" | usta login --base-url https://<gateway>/v1 --key-stdin` (ya da hiç dosya yazmadan `EVREN_API_KEY` ve `EVREN_BASE_URL` ortam değişkenleri).
+- `--model` ve `--max-tokens` varsayılanları da kaydeder. Çıkış için `usta logout` (yalnızca anahtarı siler) ya da `usta logout --all`.
+- Düz `http://` adresi (yerel makine hariç) için açık bir onay istenir: anahtar şifresiz giderdi.
 
-Değişkenler şu sırayla aranır (ilk bulunan kazanır): gerçek ortam değişkenleri → çalışma dizinindeki `.env` → `~/.usta/credentials`.
-`usta`'yı farklı dizinlerden kullanacaksanız anahtarı bir kez `~/.usta/credentials` dosyasına koyun:
-
-```sh
-mkdir -p ~/.usta && cp .env ~/.usta/credentials && chmod 600 ~/.usta/credentials
-```
-
-`.env` dosyası `.gitignore` ile dışarıda tutulur; **asla commit etmeyin**.
+Kaynaktan geliştirirken eskisi gibi `.env` de kullanabilirsiniz (`cp .env.example .env`). Değişkenler şu sırayla aranır (ilk bulunan kazanır): gerçek ortam değişkenleri → çalışma dizinindeki `.env` → `~/.usta/credentials`. `.env` dosyası `.gitignore` ile dışarıda tutulur; **asla commit etmeyin**.
 
 Arayüz dili sistem yerelinizden seçilir (Türkçe veya İngilizce). Değiştirmek için `usta --lang en`, `export USTA_LANG=en` veya oturum içinde `/lang en` kullanın ([ayrıntı](configuration.md#dil)).
 

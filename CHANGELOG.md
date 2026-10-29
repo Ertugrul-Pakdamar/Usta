@@ -6,6 +6,12 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 
 ### Eklendi
 
+**M7c: Tek dosya binary ve uygulama içinden giriş**
+- `usta login`: gateway adresi ve API anahtarı etkileşimli sorulur (anahtar ekrana yazılmaz), `~/.usta/credentials` dosyasına 0600 ile kaydedilir, bağlantı denetlenir. İlk çalıştırmada yapılandırma yoksa sihirbaz kendiliğinden açılır. `--base-url`, `--key-stdin` (betikler), `--model`, `--max-tokens`; `usta logout [--all]`; düz `http://` için açık onay.
+- Tek dosya yürütülebilir (Node SEA + esbuild): `pnpm build:binary` → `dist-bin/usta` (Node gerektirmez). `.github/workflows/release.yml` `v*` etiketinde Linux x64/arm64, macOS arm64, Windows x64 için derler, SHA-256 ile GitHub sürümüne ekler; CI'a her PR'da binary duman testi eklendi.
+- Sürümler `0.1.0`. ADR-0011.
+- Gerçek doğrulama: Node'u PATH'ten saklayıp binary ile gerçek gateway'e `-p` isteği, TUI ve `@` tamamlama gerçek terminalde, `login` gizli girişi gerçek pty'de (anahtar ekrana yansımadı, dosya 0600).
+
 **M7b: Değerlendirme (eval) paketi**
 - `evals/`: 9 otomatik denetlenen görev (toplu düzenleme, hata düzeltme, özellik, okuma), gerçek CLI + gerçek gateway, varyant başına tekrarlı koşu; `evals/run.mjs`, `evals/report.mjs`; denetimlerin kendisi `evals/tasks.test.mjs` ile (bozuk projeyi reddet, doğru çözümü kabul et) test edilir.
 - Yeni bayrak `--disable-tools <ad...>` (varyant kurmak için; sistem isteminden ilgili satırlar da çıkar).

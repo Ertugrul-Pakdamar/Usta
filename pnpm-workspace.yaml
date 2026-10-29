@@ -1,2 +1,6 @@
 packages:
   - packages/*
+
+# esbuild runs fine without its postinstall (the platform binary comes as an optional dependency).
+allowBuilds:
+  esbuild: false
