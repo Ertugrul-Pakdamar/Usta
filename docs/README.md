@@ -11,6 +11,7 @@ Bu dizin hem kullanıcılar hem katkıcılar içindir. Proje alfa aşamasındad�
 | [İzinler ve güvenlik](permissions.md) | Modlar, kural sözdizimi, Bash güvenliği, proje güven kapısı, plan modu, hook'lar, rewind  |
 | [Token ekonomisi](token-economy.md)   | Maliyet görünürlüğü, önbellek, çıktı sınırlama, özetleme, bütçe, Script-first             |
 | [Plugin'ler](plugins.md)              | `usta-plugin.json`, kurulum, onay ve bütünlük, örnekler                                   |
+| [Değerlendirme raporu](evals.md)      | Script A/B ölçümü: yöntem, sonuç, bulunan hatalar, sınırlar                               |
 | [MCP connector'ları](mcp.md)          | `usta mcp`, yapılandırma, token maliyeti, güvenlik                                        |
 | [Skill'ler ve komutlar](skills.md)    | `SKILL.md`, `commands/*.md`, aşamalı yükleme, güven kapısı                                |
 | [Auto modu](auto-mode.md)             | Sınıflandırıcı destekli izin modu, yerel katman, devre kesici, denetim, ölçülmüş doğruluk |

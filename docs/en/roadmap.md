@@ -13,7 +13,7 @@ usta is in **alpha**. Milestones go in order; each one aims for a working produc
 | **M5** Subagents      | ✅     | `Task`/`TaskOutput`, built-in (`explore`, `plan`, `general`) and custom agents (`agents/*.md`, trust gate for project agents), shared permission gate and a one-box approval queue, background tasks and `/tasks`, the `SubagentStop` hook, `models.fast` routing, subagent transcripts |
 | **M5.5** Auto mode    | ✅     | A classifier-backed permission mode: a fast model classifies each changing call with its context as "safe / risky / unsure"; deny rules and protected paths stay above it; circuit breaker; audit log                                                                                   |
 | **M6** Extensibility  | ✅     | **6a skills + custom commands; 6b MCP; 6c plugins, module hooks, continuing on `Stop`.** Scope: Skills, slash commands, plugin manifest and `usta plugin`, MCP connectors, TS-module hooks, continuing from a `Stop` hook, example plugins                                              |
-| **M7** Release        | 🚧     | **7a ✅ `@file` completion and colored diffs**; 7b evaluation report; 7c binary and v0.1.0. Scope: Single-file binary (`bun build --compile`), a real A/B **evaluation report** (success, tokens, CR), `@file` completion, syntax-highlighted diff, `v0.1.0`                            |
+| **M7** Release        | 🚧     | **7a ✅ `@file` completion and colored diffs**; **7b ✅ evaluation report**; 7c binary and v0.1.0. Scope: Single-file binary (`bun build --compile`), a real A/B **evaluation report** (success, tokens, CR), `@file` completion, syntax-highlighted diff, `v0.1.0`                     |
 
 ## Why this order
 

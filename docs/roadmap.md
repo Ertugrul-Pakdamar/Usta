@@ -13,7 +13,7 @@ usta **alfa** aşamasındadır. Aşamalar sırayla ilerler; her aşama sonunda �
 | **M5** Subagent'lar        | ✅    | `Task`/`TaskOutput`, dahili (`explore`, `plan`, `general`) ve özel ajanlar (`agents/*.md`, proje ajanları için güven kapısı), paylaşılan izin kapısı ve tek kutuluk onay sırası, arka plan görevleri ve `/tasks`, `SubagentStop` hook'u, `models.fast` yönlendirmesi, alt ajan kayıtları |
 | **M5.5** Auto modu         | ✅    | Sınıflandırıcı destekli izin modu: hızlı model her değişiklik çağrısını bağlamıyla "güvenli / riskli / belirsiz" diye sınıflar; deny kuralları ve korunan yollar üstün kalır; devre kesici; denetim günlüğü                                                                              |
 | **M6** Genişletilebilirlik | ✅    | **6a skill + özel komutlar; 6b MCP; 6c plugin'ler, modül hook'ları, `Stop` ile devam.** Kapsam: Skill'ler, slash komutları, plugin manifesti ve `usta plugin`, MCP connector'ları, TS modül hook'ları, `Stop` hook'unda devam ettirme, örnek plugin'ler                                  |
-| **M7** Yayın               | 🚧    | **7a ✅ `@dosya` tamamlama ve renkli diff**; 7b eval raporu; 7c binary ve v0.1.0. Kapsam: Tek dosya binary (`bun build --compile`), gerçek A/B **eval raporu** (başarı, token, CR), `@dosya` tamamlama, sözdizimi vurgulu diff, `v0.1.0`                                                 |
+| **M7** Yayın               | 🚧    | **7a ✅ `@dosya` tamamlama ve renkli diff**; **7b ✅ eval raporu**; 7c binary ve v0.1.0. Kapsam: Tek dosya binary (`bun build --compile`), gerçek A/B **eval raporu** (başarı, token, CR), `@dosya` tamamlama, sözdizimi vurgulu diff, `v0.1.0`                                          |
 
 ## Sıra gerekçeleri
 

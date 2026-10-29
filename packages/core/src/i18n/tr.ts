@@ -316,6 +316,8 @@ export const tr: Record<MessageKey, Message> = {
   "plugin.unknown": '"{name}" adlı kurulu plugin yok.',
   "slash.desc.plugins": "Kurulu plugin'leri listeler",
   "tui.attached": "Eklendi: {files}",
+  "cli.opt.disableTools":
+    "Bu oturumda bazı araçları kullanma, örn. --disable-tools Script Task (eval paketi kullanır)",
   "slash.desc.tasks": "Alt ajan görevleri: /tasks, /tasks show <id>, /tasks stop <id>",
   "tasks.none": "Görev yok.",
   "tasks.line": "{id}  {status}  {agent}: {description} · {elapsed}",

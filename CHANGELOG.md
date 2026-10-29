@@ -6,6 +6,12 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 
 ### Eklendi
 
+**M7b: Değerlendirme (eval) paketi**
+- `evals/`: 9 otomatik denetlenen görev (toplu düzenleme, hata düzeltme, özellik, okuma), gerçek CLI + gerçek gateway, varyant başına tekrarlı koşu; `evals/run.mjs`, `evals/report.mjs`; denetimlerin kendisi `evals/tasks.test.mjs` ile (bozuk projeyi reddet, doğru çözümü kabul et) test edilir.
+- Yeni bayrak `--disable-tools <ad...>` (varyant kurmak için; sistem isteminden ilgili satırlar da çıkar).
+- İlk A/B sonucu: toplu düzenlemede Script toplam token'ı **−%56** düşürüyor (102.869 ↔ 234.073), başarı eşit (27/27); toplu olmayan görevlerde fark yok/gürültü. Rapor: `docs/evals.md` (TR/EN), ham sonuçlar `evals/results/`.
+- Eval'in bulduğu düzeltmeler: `Grep` `path` tek dosyaysa çöküyordu; model çok eşleşmeyi yanlış sayıyordu, `Grep` artık toplamı yazıyor (aynı görev 0/6 → 6/6). Ayrıca görev tanımlarımdaki belirsizlikler düzeltildi ve ilk (kusurlu) tur da kayıt altında.
+
 **M7a: `@dosya` tamamlama ve renkli diff**
 - İstemde `@yol` önerisi ve Tab ile tamamlama; bahsedilen dosyanın içeriği isteme eklenir (en çok 5 dosya, 12.000 karakter; büyük dosya kesilir ve `Read` ile devam edilir). Gizli dosyalar, proje dışı yollar ve bunlara giden sembolik bağlar eklenmez (testin yakaladığı sembolik bağ açığı kapatıldı). Başsız modda da çalışır. Tab ayrıca `/komut` adlarını tamamlar.
 - Diff'lerde sözdizimi renklendirme (bağımlılıksız küçük bir ayrıştırıcı: anahtar sözcük, metin, yorum, sayı; dil uzantıdan). Gerçek modelle `@dosya` doğrulandı (model `Read` çağırmadan cevapladı).

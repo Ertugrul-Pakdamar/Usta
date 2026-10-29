@@ -138,7 +138,7 @@ Aşağıdaki sayılar `qwen3-vl-30b` ile, gateway'in kendi `count_tokens` ve `us
 | 8 dosyada aynı değişiklik                               | 3 model turu, tek betik, 3.8k girdi token'ı (%64 önbellekten)                   |
 | 80 KB'lık komut çıktısı                                 | Bağlama ~12k karakter girer, tamamı diske kaydedilir, model `Read` ile açabilir |
 
-Ayrıntılar ve yöntem: [Token ekonomisi](docs/token-economy.md). Gerçek A/B eval seti [M7](docs/roadmap.md) kapsamında.
+Ayrıntılar ve yöntem: [Token ekonomisi](docs/token-economy.md). Gerçek A/B sonuçları: [Değerlendirme raporu](docs/evals.md) (toplu düzenlemede Script ile −%56 token, aynı başarı).
 
 ## Güvenlik modeli
 

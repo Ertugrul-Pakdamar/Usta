@@ -13,6 +13,7 @@ _Turkish documentation: [docs/README.md](../README.md)._
 | [Permissions and security](permissions.md) | Modes, rule syntax, Bash safety, project trust gate, plan mode, hooks, rewind                                 |
 | [Token economy](token-economy.md)          | Cost visibility, caching, output limiting, summarization, budgets, Script-first                               |
 | [Plugins](plugins.md)                      | `usta-plugin.json`, install, consent and integrity, examples                                                  |
+| [Evaluation report](evals.md)              | Script A/B measurement: method, result, bugs found, limits                                                    |
 | [MCP connectors](mcp.md)                   | `usta mcp`, configuration, token cost, security                                                               |
 | [Skills and commands](skills.md)           | `SKILL.md`, `commands/*.md`, on-demand loading, trust gate                                                    |
 | [Auto mode](auto-mode.md)                  | Classifier-backed permission mode, local layer, circuit breaker, audit, measured accuracy                     |
