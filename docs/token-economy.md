@@ -2,7 +2,7 @@
 
 usta'nın tasarım hedeflerinden biri, aynı işi **daha az token ve daha az model turuyla** yapmaktır. Bu sayfa kullanılan teknikleri, ölçülmüş sonuçları ve sınırlarını anlatır.
 
-> Tüm sayılar `qwen3-vl-30b` ile, gateway'in kendi `count_tokens` ve `usage` değerlerinden, 2026-10-29'da ölçüldü. Gerçek A/B eval seti [yol haritasında](roadmap.md) (M7).
+> Tüm sayılar `qwen3-vl-30b` ile, gateway'in kendi `count_tokens` ve `usage` değerlerinden, 2026-10-29'da ölçüldü. Gerçek A/B sonuçları: [Değerlendirme raporu](evals.md).
 
 ## Görünürlük: ne harcıyorsunuz?
 

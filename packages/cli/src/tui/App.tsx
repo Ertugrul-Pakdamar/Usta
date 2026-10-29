@@ -85,6 +85,8 @@ export interface AppProps {
   agents?: AgentDefinition[];
   /** Skills and custom commands. */
   extensions?: LoadedExtensions;
+  /** Tools left out of this session (`--disable-tools`). */
+  disabledTools?: string[];
   /** Connected MCP servers (their tools are already in `tools`). */
   mcp?: McpManager;
   /** Existing transcript when resuming. */
@@ -148,7 +150,9 @@ export function App(props: AppProps) {
       }),
   );
   // Stable for the whole session so the gateway can cache the prompt prefix.
-  const [systemPrompt] = useState(() => buildSystemPrompt(props.cwd));
+  const [systemPrompt] = useState(() =>
+    buildSystemPrompt(props.cwd, { without: props.disabledTools }),
+  );
 
   const nextId = useRef(0);
   const [items, setItems] = useState<Item[]>(() => {
@@ -310,7 +314,9 @@ export function App(props: AppProps) {
   );
   const [taskTools] = useState(() => createTaskTools(manager, agents));
   const [skillTool] = useState(() => createSkillTool(props.extensions?.skills ?? []));
-  const allTools = [...tools, ...taskTools, ...(skillTool ? [skillTool] : [])];
+  const allTools = [...tools, ...taskTools, ...(skillTool ? [skillTool] : [])].filter(
+    (tool) => !props.disabledTools?.includes(tool.name),
+  );
 
   const elapsed = (rec: { startedAt: number; endedAt?: number }) =>
     `${Math.round(((rec.endedAt ?? Date.now()) - rec.startedAt) / 1000)}s`;
@@ -430,7 +436,12 @@ export function App(props: AppProps) {
         signal: ctl.signal,
         approve: gate,
         review,
-        afterTool: composeAfterTool(hookAfterTool, createNudgeAfterTool(new BulkEditNudge())),
+        afterTool: composeAfterTool(
+          hookAfterTool,
+          props.disabledTools?.includes("Script")
+            ? undefined
+            : createNudgeAfterTool(new BulkEditNudge()),
+        ),
         pendingMessages: () => manager.drainNotices(),
         onStop: createOnStop(
           hooks,

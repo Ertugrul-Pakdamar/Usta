@@ -82,6 +82,7 @@ const program = new Command("usta")
   .option("--allow <rule...>", t("cli.opt.allow"))
   .option("--deny <rule...>", t("cli.opt.deny"))
   .option("--trust-project", t("cli.opt.trustProject"))
+  .option("--disable-tools <names...>", t("cli.opt.disableTools"))
   .option("--budget <cr>", t("cli.opt.budget"), (v) => Number.parseFloat(v))
   .option("--token-budget <n>", t("cli.opt.tokenBudget"), parseTokens)
   .option("-y, --yes", t("cli.opt.yes"))
@@ -154,6 +155,7 @@ interface InteractiveOptions {
   trustProject?: boolean;
   budget?: number;
   tokenBudget?: number;
+  disableTools?: string[];
 }
 
 async function runInteractive(opts: InteractiveOptions, initialPrompt?: string): Promise<void> {
@@ -185,6 +187,7 @@ async function runInteractive(opts: InteractiveOptions, initialPrompt?: string):
     economy,
     agents: loadedAgents.agents,
     extensions,
+    disabledTools: opts.disableTools,
     mcp: mcp.manager,
     tools: [...builtinTools, ...mcp.manager.tools],
     warnings: [...warnings, ...loadedAgents.warnings, ...extensions.warnings, ...mcp.warnings],
@@ -288,12 +291,13 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
   const mcp = await loadSessionMcp(cwd, opts, interactive);
   for (const w of mcp.warnings) warn(w);
   const skillTool = createSkillTool(extensions.skills);
-  const allTools = [
+  const everyTool = [
     ...builtinTools,
     ...createTaskTools(manager, loadedAgents.agents),
     ...(skillTool ? [skillTool] : []),
     ...mcp.manager.tools,
   ];
+  const allTools = everyTool.filter((tool) => !opts.disableTools?.includes(tool.name));
 
   const start = await hooks.run("SessionStart");
   const submit = await hooks.run("UserPromptSubmit", { prompt: typed });
@@ -312,7 +316,7 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
     model: economy.modelId,
     tools: () => toolsForMode(allTools, engine.mode),
     cwd,
-    system: buildSystemPrompt(cwd),
+    system: buildSystemPrompt(cwd, { without: opts.disableTools }),
     volatileTail: () => (engine.mode === "plan" ? PLAN_MODE_REMINDER : undefined),
     maxTokens: config.maxTokens,
     maxTurns: opts.maxTurns,
@@ -321,7 +325,7 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
     review: createReviewer({ engine, ask: askSerial }),
     afterTool: composeAfterTool(
       createAfterTool(hooks, undefined, warn),
-      createNudgeAfterTool(new BulkEditNudge()),
+      ...(opts.disableTools?.includes("Script") ? [] : [createNudgeAfterTool(new BulkEditNudge())]),
     ),
     beforeRequest: economy.beforeRequest,
     limitOutput: economy.limitOutput,

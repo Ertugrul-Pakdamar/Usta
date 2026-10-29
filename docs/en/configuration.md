@@ -83,24 +83,25 @@ usta terms [accept]                show / accept the terms of use
 usta models                        list the models on the gateway
 ```
 
-| Flag                          | Meaning                                                                 |
-| ----------------------------- | ----------------------------------------------------------------------- |
-| `-p, --print <prompt>`        | Run non-interactively, print the result, exit                           |
-| `--output-format text\|json`  | Output format for `-p` (default `text`)                                 |
-| `--model <name>`              | Model for this session                                                  |
-| `--max-turns <n>`             | Maximum agent turns for `-p` (default 25; 50 in an interactive session) |
-| `-c, --continue`              | Continue the latest session of this directory                           |
-| `-r, --resume [id]`           | Continue a specific (or the latest) session                             |
-| `--permission-mode <mode>`    | `default` \| `acceptEdits` \| `auto` \| `plan` \| `bypass`              |
-| `--plan`                      | Start in plan mode                                                      |
-| `--allow <rule...>`           | Add an allow rule (repeatable)                                          |
-| `--deny <rule...>`            | Add a deny rule (repeatable)                                            |
-| `--trust-project`             | Trust the repository's `.usta/settings.json` without asking             |
-| `--budget <cr>`               | Credit budget for the session                                           |
-| `--token-budget <n>`          | Token budget for the session; `200k`, `1.5m` are accepted               |
-| `--lang <lang>`               | Interface language: `tr` or `en`                                        |
-| `-y, --yes`                   | `bypass` mode: **allows everything except deny rules**                  |
-| `-V, --version`, `-h, --help` | Version, help                                                           |
+| Flag                          | Meaning                                                                      |
+| ----------------------------- | ---------------------------------------------------------------------------- |
+| `-p, --print <prompt>`        | Run non-interactively, print the result, exit                                |
+| `--output-format text\|json`  | Output format for `-p` (default `text`)                                      |
+| `--model <name>`              | Model for this session                                                       |
+| `--max-turns <n>`             | Maximum agent turns for `-p` (default 25; 50 in an interactive session)      |
+| `-c, --continue`              | Continue the latest session of this directory                                |
+| `-r, --resume [id]`           | Continue a specific (or the latest) session                                  |
+| `--permission-mode <mode>`    | `default` \| `acceptEdits` \| `auto` \| `plan` \| `bypass`                   |
+| `--plan`                      | Start in plan mode                                                           |
+| `--allow <rule...>`           | Add an allow rule (repeatable)                                               |
+| `--deny <rule...>`            | Add a deny rule (repeatable)                                                 |
+| `--trust-project`             | Trust the repository's `.usta/settings.json` without asking                  |
+| `--disable-tools <name...>`   | Leave tools out of this session (e.g. `Script Task`); used by the eval suite |
+| `--budget <cr>`               | Credit budget for the session                                                |
+| `--token-budget <n>`          | Token budget for the session; `200k`, `1.5m` are accepted                    |
+| `--lang <lang>`               | Interface language: `tr` or `en`                                             |
+| `-y, --yes`                   | `bypass` mode: **allows everything except deny rules**                       |
+| `-V, --version`, `-h, --help` | Version, help                                                                |
 
 ## Language
 

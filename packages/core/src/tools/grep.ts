@@ -1,6 +1,6 @@
 import { spawn, spawnSync } from "node:child_process";
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { readFile, stat } from "node:fs/promises";
+import { basename, dirname, join } from "node:path";
 import { defineTool, ToolError, z } from "@usta/sdk";
 import fg from "fast-glob";
 import { IGNORE } from "./glob.js";
@@ -110,25 +110,30 @@ export const grepTool = defineTool({
     glob: z.string().optional(),
     ignore_case: z.boolean().optional(),
   }),
-  async run({ pattern, path, glob = "**/*", ignore_case }, ctx) {
+  async run({ pattern, path, glob: globArg = "**/*", ignore_case }, ctx) {
+    let glob = globArg;
     try {
       new RegExp(pattern); // surface syntax errors identically regardless of the engine
     } catch (err) {
       throw new ToolError(`Invalid regular expression: ${(err as Error).message}`);
     }
-    const search = {
-      pattern,
-      root: path ? resolvePath(ctx.cwd, path) : ctx.cwd,
-      glob,
-      ignoreCase: ignore_case,
-    };
+    let root = path ? resolvePath(ctx.cwd, path) : ctx.cwd;
+    // `path` may name a single file: search just that file.
+    if (path && (await stat(root).catch(() => undefined))?.isFile()) {
+      glob = fg.escapePath(basename(root));
+      root = dirname(root);
+    }
+    const search = { pattern, root, glob, ignoreCase: ignore_case };
     const lines = sortMatches(
       (rgAvailable() ? await searchWithRg(search) : undefined) ?? (await searchWithJs(search)),
     );
     if (!lines.length) return "No matches.";
     const shown = lines.slice(0, MAX_MATCHES).join("\n");
+    // The total is stated outright: models miscount long result lists (measured in the evals).
     return lines.length > MAX_MATCHES
-      ? `${shown}\n… ${lines.length - MAX_MATCHES} more matches`
-      : shown;
+      ? `${shown}\n… ${lines.length - MAX_MATCHES} more matches (${lines.length} in total)`
+      : lines.length > 1
+        ? `${shown}\n(${lines.length} matches)`
+        : shown;
   },
 });

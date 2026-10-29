@@ -336,6 +336,8 @@ export const en = {
   "plugin.unknown": 'No installed plugin named "{name}".',
   "slash.desc.plugins": "List the installed plugins",
   "tui.attached": "Attached: {files}",
+  "cli.opt.disableTools":
+    "Leave tools out of this session, e.g. --disable-tools Script Task (used by the evaluation suite)",
   "slash.desc.tasks": "Subagent tasks: /tasks, /tasks show <id>, /tasks stop <id>",
   "tasks.none": "No tasks.",
   "tasks.line": "{id}  {status}  {agent}: {description} · {elapsed}",

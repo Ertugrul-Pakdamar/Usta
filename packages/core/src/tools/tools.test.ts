@@ -75,6 +75,15 @@ describe("Glob/Grep", () => {
   it("rejects an invalid regex with a ToolError", async () => {
     await expect(grepTool.run({ pattern: "(" }, { cwd })).rejects.toThrow("Invalid regular");
   });
+
+  it("searches a single file when `path` names one", async () => {
+    await mkdir(join(cwd, "src"));
+    await writeFile(join(cwd, "src/a.ts"), "const needle = 1;\n");
+    expect(await grepTool.run({ pattern: "needle", path: "src/a.ts" }, { cwd })).toBe(
+      "a.ts:1:const needle = 1;",
+    );
+    expect(await grepTool.run({ pattern: "zzz", path: "src/a.ts" }, { cwd })).toBe("No matches.");
+  });
 });
 
 describe("Bash", () => {
@@ -135,7 +144,7 @@ describe("Grep engines", () => {
     await writeFile(join(cwd, "node_modules/c.ts"), "needle");
     await writeFile(join(cwd, ".env"), "needle=secret");
   };
-  const expected = "src/a.ts:1:needle one\nsrc/b.ts:2:needle two";
+  const expected = "src/a.ts:1:needle one\nsrc/b.ts:2:needle two\n(2 matches)";
 
   it("ripgrep path: ordered output, secrets and node_modules excluded", async () => {
     await prepare();

@@ -2,7 +2,7 @@
 
 One of usta's design goals is to do the same work **with fewer tokens and fewer model turns**. This page describes the techniques used, the measured results and their limits.
 
-> All numbers were measured with `qwen3-vl-30b`, from the gateway's own `count_tokens` and `usage` values, on 2026-10-29. A real A/B evaluation set is on the [roadmap](roadmap.md) (M7).
+> All numbers were measured with `qwen3-vl-30b`, from the gateway's own `count_tokens` and `usage` values, on 2026-10-29. Real A/B results: [Evaluation report](evals.md).
 
 ## Visibility: what are you spending?
 

@@ -83,24 +83,25 @@ usta terms [accept]                kullanım şartlarını göster / kabul et
 usta models                        gateway'deki modelleri listele
 ```
 
-| Bayrak                        | Anlamı                                                                |
-| ----------------------------- | --------------------------------------------------------------------- |
-| `-p, --print <istem>`         | Etkileşimsiz çalıştır, sonucu yazdır, çık                             |
-| `--output-format text\|json`  | `-p` çıktı biçimi (varsayılan `text`)                                 |
-| `--model <ad>`                | Bu oturumun modeli                                                    |
-| `--max-turns <n>`             | `-p` için en fazla ajan turu (varsayılan 25; etkileşimli oturumda 50) |
-| `-c, --continue`              | Bu dizindeki son oturuma devam et                                     |
-| `-r, --resume [id]`           | Belirli (veya son) oturuma devam et                                   |
-| `--permission-mode <mod>`     | `default` \| `acceptEdits` \| `auto` \| `plan` \| `bypass`            |
-| `--plan`                      | Plan modunda başla                                                    |
-| `--allow <kural...>`          | İzin kuralı ekle (tekrarlanabilir)                                    |
-| `--deny <kural...>`           | Yasak kuralı ekle (tekrarlanabilir)                                   |
-| `--trust-project`             | Repodaki `.usta/settings.json` dosyasına sormadan güven               |
-| `--lang <dil>`                | Arayüz dili: `tr` veya `en`                                           |
-| `--budget <cr>`               | Oturum kredi bütçesi                                                  |
-| `--token-budget <n>`          | Oturum token bütçesi; `200k`, `1.5m` biçimleri geçerli                |
-| `-y, --yes`                   | `bypass` modu: **deny kuralları dışında her şeye izin verir**         |
-| `-V, --version`, `-h, --help` | Sürüm, yardım                                                         |
+| Bayrak                        | Anlamı                                                                  |
+| ----------------------------- | ----------------------------------------------------------------------- |
+| `-p, --print <istem>`         | Etkileşimsiz çalıştır, sonucu yazdır, çık                               |
+| `--output-format text\|json`  | `-p` çıktı biçimi (varsayılan `text`)                                   |
+| `--model <ad>`                | Bu oturumun modeli                                                      |
+| `--max-turns <n>`             | `-p` için en fazla ajan turu (varsayılan 25; etkileşimli oturumda 50)   |
+| `-c, --continue`              | Bu dizindeki son oturuma devam et                                       |
+| `-r, --resume [id]`           | Belirli (veya son) oturuma devam et                                     |
+| `--permission-mode <mod>`     | `default` \| `acceptEdits` \| `auto` \| `plan` \| `bypass`              |
+| `--plan`                      | Plan modunda başla                                                      |
+| `--allow <kural...>`          | İzin kuralı ekle (tekrarlanabilir)                                      |
+| `--deny <kural...>`           | Yasak kuralı ekle (tekrarlanabilir)                                     |
+| `--trust-project`             | Repodaki `.usta/settings.json` dosyasına sormadan güven                 |
+| `--lang <dil>`                | Arayüz dili: `tr` veya `en`                                             |
+| `--disable-tools <ad...>`     | Araçları bu oturumda kullanma (ör. `Script Task`); eval paketi kullanır |
+| `--budget <cr>`               | Oturum kredi bütçesi                                                    |
+| `--token-budget <n>`          | Oturum token bütçesi; `200k`, `1.5m` biçimleri geçerli                  |
+| `-y, --yes`                   | `bypass` modu: **deny kuralları dışında her şeye izin verir**           |
+| `-V, --version`, `-h, --help` | Sürüm, yardım                                                           |
 
 ## Dil
 
