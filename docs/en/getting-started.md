@@ -96,6 +96,8 @@ Type a goal, for example _"list the TODO comments under src/ and fix the most ur
 - ⇧Tab cycles the permission mode: _ask_ → _accept edits_ → _auto_ → _plan mode_.
 - `Esc` cancels running work; `Ctrl+C` cancels or (when idle) quits.
 - `/help` lists every command.
+- **`@file`**: typing `@` in the prompt suggests project files and **Tab** completes (it also completes `/command` names). The mentioned file's content is added to the prompt so the model need not call `Read` (big files are cut at 12,000 characters and the model opens the rest with `Read`; at most 5 files). Secret files (`.env`, `*.pem`, `*.key`), paths outside the project and symlinks leading to them are **not attached**. It works headless too: `usta -p "explain @src/a.ts"`.
+- Diffs in the approval box and in results are syntax-colored (keywords, strings, comments, numbers); the language comes from the file extension.
 
 Before a big or risky task try **plan mode** (`usta --plan` or `/plan`): the model only reads, presents a plan at the end, and changes nothing until you approve it.
 

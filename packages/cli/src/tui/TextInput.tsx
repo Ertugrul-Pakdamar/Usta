@@ -6,6 +6,8 @@ interface Props {
   history: string[];
   onChange(value: string): void;
   onSubmit(value: string): void;
+  /** Tab: returns the completed text for the current value, or undefined when nothing applies. */
+  complete?(value: string): string | undefined;
 }
 
 interface State {
@@ -20,7 +22,7 @@ const wordStart = (s: string, from: number) => {
   return i;
 };
 
-export function TextInput({ isActive, history, onChange, onSubmit }: Props) {
+export function TextInput({ isActive, history, onChange, onSubmit, complete }: Props) {
   const [{ value, cursor }, setState] = useState<State>({ value: "", cursor: 0 });
   const [histIndex, setHistIndex] = useState<number | null>(null);
 
@@ -70,7 +72,12 @@ export function TextInput({ isActive, history, onChange, onSubmit }: Props) {
         }
         return;
       }
-      if (key.meta || key.escape || key.tab || !input) return;
+      if (key.tab) {
+        const next = complete?.(value);
+        if (next !== undefined) update({ value: next, cursor: next.length });
+        return;
+      }
+      if (key.meta || key.escape || !input) return;
       // Pasted text arrives as one chunk and may contain newlines.
       const text = input.replace(/\r\n?/g, "\n");
       update({

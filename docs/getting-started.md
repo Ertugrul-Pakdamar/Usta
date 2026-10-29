@@ -96,6 +96,8 @@ Bir hedef yazın, örneğin _"src/ altındaki TODO yorumlarını listele ve en a
 - ⇧Tab izin modunu döndürür: _izin sor_ → _düzenlemeleri kabul_ → _auto_ → _plan modu_.
 - `Esc` çalışan işi iptal eder; `Ctrl+C` iptal eder veya (boştayken) çıkar.
 - `/help` komutların tamamını listeler.
+- **`@dosya`**: istemde `@` yazınca proje dosyaları önerilir, **Tab** tamamlar (`/komut` adlarını da tamamlar). Bahsettiğiniz dosyanın içeriği isteme eklenir, model `Read` çağırmak zorunda kalmaz (büyük dosyalar 12.000 karakterde kesilir ve model kalanı `Read` ile açar; en çok 5 dosya). Gizli dosyalar (`.env`, `*.pem`, `*.key`), proje dışı yollar ve bunlara çıkan sembolik bağlar **eklenmez**. Başsız modda da çalışır: `usta -p "@src/a.ts dosyasını açıkla"`.
+- Onay kutusundaki ve sonuçtaki diff'lerde kod renklendirilir (anahtar sözcük, metin, yorum, sayı); dil dosya uzantısından seçilir.
 
 Büyük veya riskli bir işe başlamadan önce **plan modunu** deneyin (`usta --plan` veya `/plan`): model yalnızca okur, sonunda planı sunar ve siz onaylayana kadar hiçbir şeyi değiştirmez.
 

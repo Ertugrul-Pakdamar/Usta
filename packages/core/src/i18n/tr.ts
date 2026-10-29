@@ -315,6 +315,7 @@ export const tr: Record<MessageKey, Message> = {
   "plugin.removed": '"{name}" plugin\'i silindi.',
   "plugin.unknown": '"{name}" adlı kurulu plugin yok.',
   "slash.desc.plugins": "Kurulu plugin'leri listeler",
+  "tui.attached": "Eklendi: {files}",
   "slash.desc.tasks": "Alt ajan görevleri: /tasks, /tasks show <id>, /tasks stop <id>",
   "tasks.none": "Görev yok.",
   "tasks.line": "{id}  {status}  {agent}: {description} · {elapsed}",

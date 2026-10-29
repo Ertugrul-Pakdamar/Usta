@@ -25,16 +25,19 @@ import {
   createToolGate,
   Economy,
   expandCommand,
+  expandMentions,
   formatAutoReport,
   formatReport,
   HookRunner,
   type LoadedExtensions,
+  listProjectFiles,
   type Message,
   ModelRegistry,
   PermissionEngine,
   type PermissionMode,
   PLAN_MODE_REMINDER,
   type Provider,
+  rankFiles,
   runAgent,
   type Session,
   serializeAsk,
@@ -105,6 +108,16 @@ interface PendingConfirm {
 type NewItem = Item extends infer I ? (I extends { id: number } ? Omit<I, "id"> : never) : never;
 
 const MODE_CYCLE: PermissionMode[] = ["default", "acceptEdits", "auto", "plan"];
+
+/** The `path` argument of a tool call, if it has one. */
+function pathOfCall(rawArgs: string): string | undefined {
+  try {
+    const p = (JSON.parse(rawArgs) as { path?: unknown }).path;
+    return typeof p === "string" ? p : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 function historyItems(messages: Message[]): NewItem[] {
   const out: NewItem[] = [];
@@ -235,6 +248,15 @@ export function App(props: AppProps) {
       { cancelled: () => abort.current?.signal.aborted ?? false },
     ),
   );
+  // Project files for `@` completion, listed the first time an `@` is typed.
+  const [projectFiles, setProjectFiles] = useState<string[]>([]);
+  const filesRequested = useRef(false);
+  useEffect(() => {
+    if (filesRequested.current || !/(?:^|\s)@/.test(input)) return;
+    filesRequested.current = true;
+    void listProjectFiles(props.cwd).then(setProjectFiles);
+  }, [input]);
+
   const [auto] = useState(() =>
     createAutoClassifier({
       provider: props.provider,
@@ -371,9 +393,22 @@ export function App(props: AppProps) {
     context.push(...submit.context);
 
     store.beginTurn(messages.current.length, text);
+    const mentions = expandMentions(text, props.cwd);
+    if (mentions.attached.length) {
+      info(
+        t("tui.attached", {
+          files: mentions.attached
+            .map(
+              (a) =>
+                `${a.path} (${t("unit.lines", { count: a.lines })}${a.truncated ? ", …" : ""})`,
+            )
+            .join(", "),
+        }),
+      );
+    }
     const content = context.length
-      ? `${text}\n\n<hook-context>\n${context.join("\n")}\n</hook-context>`
-      : text;
+      ? `${mentions.text}\n\n<hook-context>\n${context.join("\n")}\n</hook-context>`
+      : mentions.text;
     const userMsg: Message = { role: "user", content };
     messages.current.push(userMsg);
     appendMessage(sess, userMsg);
@@ -439,6 +474,7 @@ export function App(props: AppProps) {
               output: summarizeOutput(ev.display ?? ev.output),
               isError: ev.isError,
               diff: ev.isError ? undefined : diff,
+              path: pathOfCall(ev.call.arguments),
             });
           }
         },
@@ -665,6 +701,26 @@ export function App(props: AppProps) {
           })),
         ].filter((c) => c.name.startsWith(input.slice(1)))
       : [];
+  const atQuery = /(?:^|\s)@([^\s@]*)$/.exec(input)?.[1];
+  const fileSuggestions = atQuery === undefined ? [] : rankFiles(projectFiles, atQuery);
+  const complete = (value: string): string | undefined => {
+    const at = /(?:^|\s)@([^\s@]*)$/.exec(value);
+    if (at) {
+      const best = rankFiles(projectFiles, at[1] as string, 1)[0];
+      return best
+        ? `${value.slice(0, value.length - (at[1] as string).length)}${best} `
+        : undefined;
+    }
+    if (value.startsWith("/") && !value.includes(" ")) {
+      const names = [
+        ...slashCommands.map((c) => c.name),
+        ...(props.extensions?.commands ?? []).map((c) => c.name),
+      ];
+      const hit = names.filter((n) => n.startsWith(value.slice(1)));
+      return hit.length === 1 ? `/${hit[0]} ` : undefined;
+    }
+    return undefined;
+  };
   const streamTail = streaming.split("\n").slice(-20).join("\n");
   const tracker = economy.tracker;
 
@@ -697,8 +753,19 @@ export function App(props: AppProps) {
         paddingX={1}
         marginTop={1}
       >
-        <TextInput isActive={!busy} history={history} onChange={setInput} onSubmit={submit} />
+        <TextInput
+          isActive={!busy}
+          history={history}
+          onChange={setInput}
+          onSubmit={submit}
+          complete={complete}
+        />
       </Box>
+      {fileSuggestions.map((f) => (
+        <Text key={f} dimColor>
+          {"  "}@{f}
+        </Text>
+      ))}
       {suggestions.map((c) => (
         <Text key={c.name} dimColor>
           {"  "}/{c.name.padEnd(11)} {c.text}

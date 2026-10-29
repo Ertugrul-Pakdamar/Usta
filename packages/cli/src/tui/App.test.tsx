@@ -187,6 +187,36 @@ describe("App", () => {
     ui.unmount();
   });
 
+  it("@ suggests project files, Tab completes, and the file content reaches the model", async () => {
+    await writeFile(join(cwd, "notes.txt"), "zebra-content-123\n");
+    await writeFile(join(cwd, ".env"), "TOPSECRET=1");
+    const ui = mount([{ text: "okudum" }]);
+    const { provider } = ui;
+    ui.stdin.write("bak @not");
+    await waitFor(ui, "@notes.txt");
+    expect(ui.lastFrame()).not.toContain(".env");
+    ui.stdin.write("\t");
+    await waitFor(ui, "bak @notes.txt ");
+    ui.stdin.write("\r");
+    await waitFor(ui, "okudum");
+    await waitFor(ui, "Eklendi: notes.txt");
+    const sent = JSON.stringify(ui.lastFrame());
+    expect(sent).not.toContain("zebra-content-123"); // shown to the user as a notice, not dumped
+    const request = JSON.stringify(provider.requests[0]?.messages);
+    expect(request).toContain("zebra-content-123");
+    expect(request).not.toContain("TOPSECRET");
+    ui.unmount();
+  });
+
+  it("Tab completes a unique slash command", async () => {
+    const ui = mount([]);
+    ui.stdin.write("/perm");
+    await new Promise((r) => setTimeout(r, 30));
+    ui.stdin.write("\t");
+    await waitFor(ui, "/permissions ");
+    ui.unmount();
+  });
+
   it("runs !shell commands directly", async () => {
     const ui = mount([]);
     await type(ui, "!echo selam-shell");

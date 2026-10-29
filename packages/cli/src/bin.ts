@@ -20,6 +20,7 @@ import {
   createTaskTools,
   createToolGate,
   expandCommand,
+  expandMentions,
   fetchTerms,
   findSession,
   GatewayError,
@@ -280,7 +281,10 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
   for (const w of extensions.warnings) warn(w);
   const slashMatch = /^\/(\S+)\s*(.*)$/s.exec(opts.print.trim());
   const custom = slashMatch && extensions.commands.find((c) => c.name === slashMatch[1]);
-  const userText = custom ? expandCommand(custom, (slashMatch?.[2] ?? "").trim()) : opts.print;
+  const typed = custom ? expandCommand(custom, (slashMatch?.[2] ?? "").trim()) : opts.print;
+  const mentions = expandMentions(typed, cwd);
+  const userText = mentions.text;
+  for (const a of mentions.attached) warn(t("tui.attached", { files: a.path }));
   const mcp = await loadSessionMcp(cwd, opts, interactive);
   for (const w of mcp.warnings) warn(w);
   const skillTool = createSkillTool(extensions.skills);
@@ -292,7 +296,7 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
   ];
 
   const start = await hooks.run("SessionStart");
-  const submit = await hooks.run("UserPromptSubmit", { prompt: userText });
+  const submit = await hooks.run("UserPromptSubmit", { prompt: typed });
   for (const w of [...start.warnings, ...submit.warnings]) warn(w);
   if (submit.blocked) {
     throw new GatewayError(t("tui.hookBlockedPrompt", { reason: submit.blocked.reason }));

@@ -13,6 +13,7 @@ export * from "./extensions/index.js";
 export * from "./gate.js";
 export * from "./hooks.js";
 export * from "./i18n/index.js";
+export * from "./mentions.js";
 export * from "./models.js";
 export * from "./nudge.js";
 export * from "./output-limit.js";
