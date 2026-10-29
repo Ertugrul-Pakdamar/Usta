@@ -39,3 +39,4 @@ Thumbs.db
 # Temporary files
 *.tmp
 .cache/
+dist-bin/

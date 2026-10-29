@@ -1,0 +1,77 @@
+name: Release
+
+# Push a tag like v0.1.0 to publish single-file binaries for Linux, macOS and Windows.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  binaries:
+    name: Binary (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, target: linux-x64 }
+          - { os: ubuntu-24.04-arm, target: linux-arm64 }
+          - { os: macos-latest, target: macos-arm64 }
+          - { os: windows-latest, target: windows-x64 }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Lint and tests run on every push to main (ci.yml); a tag should only be pushed from a green main.
+      - run: pnpm build
+      - name: Check the tag matches the package version
+        shell: bash
+        run: |
+          v="$(node -p "require('./packages/cli/package.json').version")"
+          [ "v$v" = "$GITHUB_REF_NAME" ] || { echo "tag $GITHUB_REF_NAME != package version v$v"; exit 1; }
+      - run: pnpm build:binary
+      - name: Smoke test
+        shell: bash
+        run: ./dist-bin/usta --version
+      - name: Package
+        shell: bash
+        run: |
+          mkdir -p out
+          cd dist-bin
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            7z a "../out/usta-${{ matrix.target }}.zip" usta.exe
+          else
+            tar -czf "../out/usta-${{ matrix.target }}.tar.gz" usta
+          fi
+          cd ../out
+          if command -v sha256sum >/dev/null; then sum=sha256sum; else sum="shasum -a 256"; fi
+          $sum usta-${{ matrix.target }}.* > usta-${{ matrix.target }}.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: usta-${{ matrix.target }}
+          path: out/*
+
+  publish:
+    name: GitHub release
+    needs: binaries
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" out/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "usta $GITHUB_REF_NAME" \
+            --generate-notes

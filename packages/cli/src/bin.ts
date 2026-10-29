@@ -41,8 +41,10 @@ import {
   toolsForMode,
 } from "@usta/core";
 import { Command } from "commander";
+import { runLogin, runLogout } from "./login.js";
 import { registerMcpCommands } from "./mcp-cmd.js";
 import { registerPluginCommands } from "./plugin-cmd.js";
+import { terminalIO } from "./prompt.js";
 import {
   askYesNo,
   createEconomy,
@@ -63,7 +65,15 @@ try {
   process.exit(1);
 }
 
-const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+/** Replaced at build time in the single-file bundle (there is no package.json next to it). */
+declare const __USTA_VERSION__: string | undefined;
+const pkg = {
+  version:
+    typeof __USTA_VERSION__ === "string"
+      ? __USTA_VERSION__
+      : (JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"))
+          .version as string),
+};
 
 const program = new Command("usta")
   .description(t("cli.description"))
@@ -132,6 +142,39 @@ terms
     console.log(t("terms.accepted", { version: doc.version }));
   });
 
+program
+  .command("login")
+  .description(t("cli.cmd.login"))
+  .option("--base-url <url>", t("cli.opt.loginBaseUrl"))
+  .option("--key-stdin", t("cli.opt.loginKeyStdin"))
+  .option("--model <model>", t("cli.opt.loginModel"))
+  .option("--max-tokens <n>", t("cli.opt.loginMaxTokens"))
+  .action(async (opts) => {
+    let apiKey: string | undefined;
+    if (opts.keyStdin) {
+      apiKey = (await readStdin()).trim();
+      if (!apiKey) throw new Error(t("login.cancelled"));
+    } else if (!process.stdin.isTTY) {
+      throw new Error(t("cli.needTerminal"));
+    }
+    const ok = await runLogin(terminalIO, {
+      baseUrl: opts.baseUrl,
+      apiKey,
+      model: opts.model,
+      maxTokens: opts.maxTokens,
+      verify: () => runDoctor(configFromEnv()),
+    });
+    if (!ok) process.exitCode = 1;
+  });
+
+program
+  .command("logout")
+  .description(t("cli.cmd.logout"))
+  .option("--all", t("cli.opt.logoutAll"))
+  .action((opts) => {
+    console.log(runLogout(Boolean(opts.all)) ? t("login.loggedOut") : t("login.nothingToRemove"));
+  });
+
 registerMcpCommands(program);
 registerPluginCommands(program);
 
@@ -158,7 +201,25 @@ interface InteractiveOptions {
   disableTools?: string[];
 }
 
+/** Reads all of standard input (for `--key-stdin`). */
+async function readStdin(): Promise<string> {
+  let text = "";
+  for await (const chunk of process.stdin) text += chunk;
+  return text;
+}
+
+/** First run: with no gateway address / key and a terminal to ask on, set them up on the spot. */
+async function ensureConfigured(): Promise<void> {
+  const c = configFromEnv();
+  if ((c.apiKey && c.baseUrl) || !process.stdin.isTTY) return;
+  console.error(t("login.needed"));
+  if (!(await runLogin(terminalIO, { verify: () => runDoctor(configFromEnv()) }))) {
+    throw gatewayError("error.noApiKey");
+  }
+}
+
 async function runInteractive(opts: InteractiveOptions, initialPrompt?: string): Promise<void> {
+  await ensureConfigured();
   const config = configFromEnv();
   const cwd = process.cwd();
   let resume: { session: Session; messages: Message[] } | undefined;
@@ -203,6 +264,7 @@ interface HeadlessOptions extends InteractiveOptions {
 }
 
 async function runHeadless(opts: HeadlessOptions): Promise<void> {
+  await ensureConfigured();
   const config = configFromEnv();
   const cwd = process.cwd();
   const json = opts.outputFormat === "json";
