@@ -25,6 +25,8 @@ export function buildSystemPrompt(cwd: string, opts: { without?: readonly string
 ${lines.join("\n")}
 - Call independent tools in the same turn so they run in parallel.
 - Never read or print secrets (.env, keys). If a call is denied, do not retry it; say what you need.
+- Investigate before you conclude: do not state findings about files you have not read, and label guesses as guesses. A review, plan or list request means read-only: do not edit files unless asked.
+- Between tool calls write at most a few sentences (what you do next). Put the complete findings only in the final answer, once, self-contained; never repeat a plan or summary you already gave.
 - Finish with a short summary.
 
 ${environmentLine(cwd)}`;

@@ -23,6 +23,8 @@ const VARIANTS = {
   "no-script": ["--disable-tools", "Script"],
   "no-task": ["--disable-tools", "Task", "TaskOutput"],
 };
+// Variants that only change the environment (e.g. sampling parameters).
+const VARIANT_ENV = { "freq-penalty": { EVREN_FREQUENCY_PENALTY: "0.3" } };
 const reps = Number(arg("reps", 3));
 const variantNames = arg("variants", "baseline,no-script").split(",");
 const only = arg("tasks", "")?.split(",").filter(Boolean);
@@ -54,7 +56,7 @@ function runOne({ task, variant, rep }) {
       process.execPath,
       [
         join(root, "packages/cli/dist/bin.js"),
-        ...VARIANTS[variant],
+        ...(VARIANTS[variant] ?? []),
         "-p",
         task.prompt,
         "--output-format",
@@ -65,7 +67,11 @@ function runOne({ task, variant, rep }) {
         "--lang",
         "en",
       ],
-      { cwd: dir, env: { ...process.env, HOME: home }, stdio: ["ignore", "pipe", "pipe"] },
+      {
+        cwd: dir,
+        env: { ...process.env, ...(VARIANT_ENV[variant] ?? {}), HOME: home },
+        stdio: ["ignore", "pipe", "pipe"],
+      },
     );
     let stdout = "";
     let stderr = "";
@@ -92,6 +98,8 @@ function runOne({ task, variant, rep }) {
         exit: code,
         stop: json?.stop_reason,
         turns: json?.turns,
+        assistant_chars: json?.assistant_chars,
+        repeat_ratio: json?.repeat_ratio,
         prompt_tokens: json?.session_usage?.prompt_tokens,
         completion_tokens: json?.session_usage?.completion_tokens,
         requests: json?.session_usage?.requests,

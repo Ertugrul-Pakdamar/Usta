@@ -59,6 +59,10 @@ const SOLUTIONS = {
       ),
     "done",
   ],
+  "review-project": [
+    () => {},
+    "Found change-me-in-production as a default secret, dangerouslySetInnerHTML in FormEditor and HS256 signing.",
+  ],
   "csv-to-json": [
     (d) => {
       const [, ...rows] = read(d, "people.csv").trim().split("\n");

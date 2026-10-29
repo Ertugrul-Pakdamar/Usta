@@ -252,3 +252,64 @@ export const tasks = [
     },
   },
 ];
+
+// A code-review request on a small Go + React project (the kind of prompt that produced long,
+// repetitive output). Pass = the real findings are named; verbosity is measured separately
+// (completion tokens, `repeat_ratio`).
+const goFile = (name, body) => [`backend/${name}`, body];
+const REVIEW_FILES = [
+  goFile(
+    "pkg/utils/jwt.go",
+    'package utils\n\nimport "github.com/golang-jwt/jwt/v5"\n\nfunc Sign(secret string, claims jwt.Claims) (string, error) {\n\treturn jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(secret))\n}\n',
+  ),
+  goFile(
+    "pkg/utils/password.go",
+    'package utils\n\nimport "golang.org/x/crypto/bcrypt"\n\nfunc Hash(p string) (string, error) {\n\tb, err := bcrypt.GenerateFromPassword([]byte(p), 4)\n\treturn string(b), err\n}\n',
+  ),
+  goFile(
+    "internal/config/config.go",
+    'package config\n\nimport "os"\n\ntype JWT struct {\n\tSecret     string\n\tExpiration string\n}\n\nfunc Load() JWT {\n\treturn JWT{Secret: get("JWT_SECRET", "change-me-in-production"), Expiration: get("JWT_EXPIRATION", "24h")}\n}\n\nfunc get(k, d string) string {\n\tif v := os.Getenv(k); v != "" {\n\t\treturn v\n\t}\n\treturn d\n}\n',
+  ),
+  goFile(
+    "internal/middleware/auth.go",
+    'package middleware\n\nimport "net/http"\n\nfunc Auth(next http.Handler) http.Handler {\n\treturn http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {\n\t\tif r.Header.Get("Authorization") == "" {\n\t\t\thttp.Error(w, "unauthorized", 401)\n\t\t\treturn\n\t\t}\n\t\tnext.ServeHTTP(w, r)\n\t})\n}\n',
+  ),
+  goFile(
+    "internal/repository/form_repository.go",
+    'package repository\n\nimport "context"\n\nfunc (r *Repo) AllForms(ctx context.Context) ([]Form, error) {\n\tcur, err := r.col.Find(ctx, bson.M{})\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\tvar out []Form\n\treturn out, cur.All(ctx, &out)\n}\n',
+  ),
+  [
+    "frontend/src/components/FormEditor.jsx",
+    'import { useState } from "react";\nexport default function FormEditor({ form }) {\n  const [fields, setFields] = useState(form.fields);\n  return <div dangerouslySetInnerHTML={{ __html: form.description }} />;\n}\n',
+  ],
+  [
+    "frontend/vite.config.js",
+    'import { defineConfig } from "vite";\nexport default defineConfig({});\n',
+  ],
+  [
+    "docker-compose.yml",
+    'services:\n  api:\n    build: ./backend\n    ports: ["8080:8080"]\n  mongo:\n    image: mongo\n    ports: ["27017:27017"]\n',
+  ],
+  [".gitignore", ".env\nnode_modules\n"],
+  [".env", "JWT_SECRET=dev-secret-123\nJWT_EXPIRATION=24h\n"],
+  ["README.md", "# Formexus\n\nA small form builder (Go + React + MongoDB).\n"],
+];
+
+tasks.push({
+  id: "review-project",
+  category: "review",
+  prompt:
+    "Selam bu proje bir form oluşturucu uygulaması. Projeyi inceleyip güvenlik açıklarını ve optimizasyon sorunlarını listeleyip çözüm önerileri planlayabilir misin?",
+  setup(dir) {
+    for (const [rel, text] of REVIEW_FILES) write(dir, rel, text);
+  },
+  check(_dir, answer) {
+    const a = answer.toLowerCase();
+    const found = ["change-me-in-production", "dangerouslysetinnerhtml", "hs256", "27017"].filter(
+      (k) => a.includes(k),
+    );
+    return found.length >= 2
+      ? { ok: true }
+      : { ok: false, detail: `only ${found.length} real finding(s) named` };
+  },
+});

@@ -4,6 +4,14 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 
 ## [Yayımlanmamış]
 
+### Düzeltildi
+
+- Bilinmeyen dilli kod bloğunda ekrana sızan `Could not find the language 'env'` uyarısı (`usta -c` ile geçmiş yüklerken de; release binary'sinde de görülüyordu): bilinmeyen diller `plaintext`'e çevrilir; iç içe listelerdeki fazladan boş satırlar temizlenir.
+
+### Eklendi
+
+- **Uzun/tekrarlı çıktı ve okumadan iddia sorunu (kısmen ölçüldü):** sistem istemine "okumadan bulgu yazma", "inceleme isteği salt okumadır", "ara turlarda kısa yaz, bulguları yalnızca son cevapta ver" kuralları; `VerbosityGuard` (uzun ara metin/tekrar için araç sonucuna hatırlatma); JSON çıktısında `assistant_chars` ve `repeat_ratio`; `review-project` eval görevi; deneysel `EVREN_FREQUENCY_PENALTY` (fayda ölçülmedi, varsayılan kapalı). Etki **ölçülebilir şekilde kanıtlanmadı**: tekrar payı %5 → %1, çıktı uzunluğu ve başarı gürültü içinde; ayrıntı [Değerlendirme raporu](docs/evals.md#ek-ölçüm-uzun-ve-tekrarlı-çıktı).
+
 ## [0.1.0] — 2026-10-29 (yayımlandı)
 
 İlk sürüm: aşağıdaki M0–M7 çalışmalarının tamamı.
