@@ -46,16 +46,16 @@ Layers are merged: lists (`allow`, `deny`, `ask`, hooks) are concatenated, scala
 }
 ```
 
-| Field                                | Type                                             | Description                                                                          |
-| ------------------------------------ | ------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| `permissions.allow` / `deny` / `ask` | `string[]`                                       | [Rule syntax](permissions.md#rule-syntax)                                            |
-| `permissions.defaultMode`            | `default` \| `acceptEdits` \| `plan` \| `bypass` | Initial permission mode. `bypass` is valid **only in user settings**                 |
-| `hooks.<Event>`                      | `{matcher?, command, timeout?}[]`                | [Hooks](permissions.md#hooks). `timeout` in seconds, default 30                      |
-| `models.main` / `models.fast`        | `string`                                         | Main model and the summarization model                                               |
-| `budget.tokens`                      | `int`                                            | Cap on total tokens processed in a session (input + output)                          |
-| `budget.cr`                          | `number`                                         | Credit (CR) cap for a session                                                        |
-| `compactAt`                          | `0.3 – 0.95`                                     | Fraction of the context window at which it is summarized automatically (default 0.8) |
-| `language`                           | `tr` \| `en`                                     | Interface language ([Language](#language)). Harmless, so it applies from every layer |
+| Field                                | Type                                                       | Description                                                                          |
+| ------------------------------------ | ---------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `permissions.allow` / `deny` / `ask` | `string[]`                                                 | [Rule syntax](permissions.md#rule-syntax)                                            |
+| `permissions.defaultMode`            | `default` \| `acceptEdits` \| `auto` \| `plan` \| `bypass` | Initial permission mode. `bypass` is valid **only in user settings**                 |
+| `hooks.<Event>`                      | `{matcher?, command, timeout?}[]`                          | [Hooks](permissions.md#hooks). `timeout` in seconds, default 30                      |
+| `models.main` / `models.fast`        | `string`                                                   | Main model and the summarization model                                               |
+| `budget.tokens`                      | `int`                                                      | Cap on total tokens processed in a session (input + output)                          |
+| `budget.cr`                          | `number`                                                   | Credit (CR) cap for a session                                                        |
+| `compactAt`                          | `0.3 – 0.95`                                               | Fraction of the context window at which it is summarized automatically (default 0.8) |
+| `language`                           | `tr` \| `en`                                               | Interface language ([Language](#language)). Harmless, so it applies from every layer |
 
 ### Project trust gate
 
@@ -91,7 +91,7 @@ usta models                        list the models on the gateway
 | `--max-turns <n>`             | Maximum agent turns for `-p` (default 25; 50 in an interactive session) |
 | `-c, --continue`              | Continue the latest session of this directory                           |
 | `-r, --resume [id]`           | Continue a specific (or the latest) session                             |
-| `--permission-mode <mode>`    | `default` \| `acceptEdits` \| `plan` \| `bypass`                        |
+| `--permission-mode <mode>`    | `default` \| `acceptEdits` \| `auto` \| `plan` \| `bypass`              |
 | `--plan`                      | Start in plan mode                                                      |
 | `--allow <rule...>`           | Add an allow rule (repeatable)                                          |
 | `--deny <rule...>`            | Add a deny rule (repeatable)                                            |
@@ -120,16 +120,17 @@ Inside a session, `/lang en` or `/lang tr` switches the language immediately (fo
 
 ## The `~/.usta` directory
 
-| Path                   | Contents                                       | Notes                                    |
-| ---------------------- | ---------------------------------------------- | ---------------------------------------- |
-| `credentials`          | `EVREN_*` variables                            | `chmod 600` recommended                  |
-| `settings.json`        | User settings                                  |                                          |
-| `trust.json`           | Digests of trusted project settings            |                                          |
-| `sessions/<id>.jsonl`  | Conversation records                           | 0600; continue with `-c`/`-r`            |
-| `checkpoints/<id>/`    | File backups for `/rewind`                     | 0600                                     |
-| `outputs/<id>/`        | Full tool outputs that did not fit the context | Older than 7 days are deleted at startup |
-| `cache/models.json`    | Cache of gateway model info                    | Valid for 1 hour                         |
-| `agents/*.md`          | The user's custom subagents                    | [Subagents](subagents.md#custom-agents)  |
-| `subagents/<session>/` | Subagent conversation records                  | 0600; for auditing                       |
+| Path                    | Contents                                       | Notes                                          |
+| ----------------------- | ---------------------------------------------- | ---------------------------------------------- |
+| `credentials`           | `EVREN_*` variables                            | `chmod 600` recommended                        |
+| `settings.json`         | User settings                                  |                                                |
+| `trust.json`            | Digests of trusted project settings            |                                                |
+| `sessions/<id>.jsonl`   | Conversation records                           | 0600; continue with `-c`/`-r`                  |
+| `checkpoints/<id>/`     | File backups for `/rewind`                     | 0600                                           |
+| `outputs/<id>/`         | Full tool outputs that did not fit the context | Older than 7 days are deleted at startup       |
+| `cache/models.json`     | Cache of gateway model info                    | Valid for 1 hour                               |
+| `agents/*.md`           | The user's custom subagents                    | [Subagents](subagents.md#custom-agents)        |
+| `subagents/<session>/`  | Subagent conversation records                  | 0600; for auditing                             |
+| `audit/<session>.jsonl` | Auto mode decisions                            | 0600; [Auto mode](auto-mode.md#audit-and-cost) |
 
 Session files may contain tool output; review them before sharing.

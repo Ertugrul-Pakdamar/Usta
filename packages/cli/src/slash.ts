@@ -27,6 +27,8 @@ export interface SlashContext {
   setMode(mode: PermissionMode): void;
   /** Human-readable rules, hooks and settings files in effect. */
   describePermissions(): string;
+  /** The latest auto-mode decisions and counts. */
+  autoReport(): string;
   /** Recent turns that /rewind can undo, newest first. */
   rewindList(): string;
   rewind(turns: number): void;
@@ -122,6 +124,11 @@ export const slashCommands: SlashCommand[] = [
       ctx.setMode(args as PermissionMode);
       ctx.info(t("slash.modeSet", { mode: args }));
     },
+  },
+  {
+    name: "auto",
+    description: "slash.desc.auto",
+    run: (_, ctx) => ctx.info(ctx.autoReport()),
   },
   {
     name: "plan",

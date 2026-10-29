@@ -93,7 +93,7 @@ usta
 Type a goal, for example _"list the TODO comments under src/ and fix the most urgent one"_. The model uses its tools; for every call that would change something it asks for your approval with a diff:
 
 - `y` allows once, `a` allows similar calls for the rest of the session, `n` denies.
-- ⇧Tab cycles the permission mode: _ask_ → _accept edits_ → _plan mode_.
+- ⇧Tab cycles the permission mode: _ask_ → _accept edits_ → _auto_ → _plan mode_.
 - `Esc` cancels running work; `Ctrl+C` cancels or (when idle) quits.
 - `/help` lists every command.
 

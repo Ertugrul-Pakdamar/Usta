@@ -146,6 +146,17 @@ Yükleyici satırları sırayla oynatır; yarım yazılmış son satırı yok sa
 
 Gerekçe ve ölçümler: [ADR-0007](adr/0007-subagents.md).
 
+## Auto modu
+
+`core/src/auto` altında: `rules.ts` (yerel tehlikeli-kalıp ve salt okuma listesi), `classifier.ts` (`AutoClassifier`: girdi daraltma, `models.fast` çağrısı, devre kesici, denetim günlüğü), `factory.ts` (oturuma bağlama), `report.ts` (`/auto`).
+
+- **Motor → kapı:** `PermissionEngine.decide` `auto` modunda "sor" yerine `classify` kararı döner; `createToolGate` bunu sınıflandırıcıya götürür. `deny`, korunan yol ve `ask` kuralı sınıflandırıcıdan önce biter.
+- **Kapalı başarısızlık:** sınıflandırıcı yoksa, hata verirse ya da `safe` demezse çağrı kullanıcıya sorulur (soracak kimse yoksa reddedilir).
+- **Devre kesici:** art arda 3 / toplam 10 `risky`/`unsure` sonrası kapı modu `default`'a çevirir ve uyarır.
+- Alt ajanlar aynı sınıflandırıcıyı `SubagentRuntime.auto` ile paylaşır.
+
+Gerekçe ve ölçümler: [ADR-0008](adr/0008-auto-mode.md), kullanıcı rehberi: [Auto modu](auto-mode.md).
+
 ## Yerelleştirme (i18n)
 
 usta'daki her metin **iki sınıftan birine** girer ve bu ayrım tasarımın temelidir:

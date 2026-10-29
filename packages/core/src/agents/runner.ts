@@ -3,6 +3,7 @@ import { join } from "node:path";
 import type { Tool } from "@usta/sdk";
 import { type AgentResult, runAgent } from "../agent/loop.js";
 import { environmentLine } from "../agent/prompt.js";
+import type { AutoClassifier } from "../auto/classifier.js";
 import type { CheckpointStore } from "../checkpoint.js";
 import type { Economy } from "../economy.js";
 import {
@@ -32,6 +33,8 @@ export interface SubagentRuntime {
   /** Foreground approval (already serialized by the caller). Background runs never use it. */
   ask?: (req: AskRequest) => Promise<AskAnswer>;
   onWarning?: (text: string) => void;
+  /** Auto mode classifier shared with the main agent. */
+  auto?: AutoClassifier;
   /** Where subagent transcripts are written (`~/.usta/subagents/<session>`). */
   logDir?: () => string | undefined;
 }
@@ -79,6 +82,7 @@ export async function runSubagent(
     ask,
     onWarning: rt.onWarning,
     agent: def.name,
+    auto: rt.auto,
   });
   const modelId = rt.economy.resolveModel(def.model);
   const dir = rt.logDir?.();

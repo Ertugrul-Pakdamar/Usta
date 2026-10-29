@@ -1,10 +1,16 @@
 import { dirname } from "node:path";
 import type { ReviewRequest, ReviewVerdict, Tool } from "@usta/sdk";
 import type { AfterToolFn, ApprovalVerdict } from "./agent/loop.js";
+import type { AutoClassifier, Classification } from "./auto/classifier.js";
 import type { CheckpointStore } from "./checkpoint.js";
 import type { HookRunner } from "./hooks.js";
 import { t, tl } from "./i18n/index.js";
-import { type PermissionEngine, type PermissionMode, resolveTarget } from "./permissions.js";
+import {
+  type Decision,
+  type PermissionEngine,
+  type PermissionMode,
+  resolveTarget,
+} from "./permissions.js";
 import type { ToolCall } from "./types.js";
 
 export interface AskRequest {
@@ -43,6 +49,8 @@ export interface GateOptions {
   onPreview?: (callId: string, diff: string) => void;
   /** Name of the subagent this gate belongs to, shown in approval prompts. */
   agent?: string;
+  /** Auto mode: decides calls the rules leave open. Without it such calls ask the user. */
+  auto?: AutoClassifier;
 }
 
 /** What "always allow" means for this call, and how to apply it. */
@@ -82,7 +90,7 @@ function remember(tool: Tool<any>, input: unknown, engine: PermissionEngine) {
 export function createToolGate(opts: GateOptions) {
   const { engine } = opts;
   return async (tool: Tool<any>, input: unknown, call: ToolCall): Promise<ApprovalVerdict> => {
-    const verdict = engine.decide(tool, input);
+    let verdict: Decision = engine.decide(tool, input);
     if (verdict.decision === "deny") {
       return { allow: false, reason: verdict.reason, reasonKey: verdict.reasonKey };
     }
@@ -109,13 +117,44 @@ export function createToolGate(opts: GateOptions) {
     // Previews of commands (Script source) are for the approval box only, not for the result line.
     if (diff && tool.permission?.kind === "path") opts.onPreview?.(call.id, diff);
 
+    // Auto mode: the classifier may turn a would-be question into an allow, never the reverse.
+    let classified: Classification | undefined;
+    if (verdict.decision === "classify") {
+      if (!opts.auto) {
+        verdict = { decision: "ask", reason: verdict.reason, reasonKey: verdict.reasonKey };
+      } else {
+        classified = await opts.auto.classify(tool.name, input, engine.cwd);
+        if (opts.auto.tripped && engine.mode === "auto") {
+          engine.setMode("default");
+          opts.onWarning?.(t("auto.tripped", { count: opts.auto.blocked }));
+          opts.auto.reset();
+        }
+        verdict =
+          classified.verdict === "safe"
+            ? { decision: "allow" }
+            : {
+                decision: "ask",
+                reason: `Auto mode (${classified.verdict}): ${classified.reason}`,
+                reasonKey: {
+                  key: classified.verdict === "risky" ? "auto.risky" : "auto.unsure",
+                  params: { reason: classified.reason },
+                },
+              };
+      }
+    }
+    const settle = (allowed: boolean) => {
+      if (classified) opts.auto?.outcome(classified.id, allowed);
+    };
+
     if (verdict.decision === "ask") {
       if (!opts.ask) {
+        settle(false);
         return {
           allow: false,
-          reason:
-            "approval is needed but nobody can be asked (it can be allowed with an --allow rule or --permission-mode)",
-          reasonKey: { key: "perm.noApproval" },
+          reason: classified
+            ? `auto mode did not approve this call (${classified.verdict}: ${classified.reason}) and nobody can be asked`
+            : "approval is needed but nobody can be asked (it can be allowed with an --allow rule or --permission-mode)",
+          reasonKey: verdict.reasonKey ?? { key: "perm.noApproval" },
         };
       }
       const isPlan = tool.name === "ExitPlanMode";
@@ -131,6 +170,7 @@ export function createToolGate(opts: GateOptions) {
         rememberLabel: mem.label,
         agent: opts.agent,
       });
+      settle(answer.allow);
       if (!answer.allow) {
         return {
           allow: false,
@@ -142,6 +182,7 @@ export function createToolGate(opts: GateOptions) {
       else if (answer.remember) mem.apply();
     }
 
+    if (verdict.decision === "allow") settle(true);
     if (tool.mutating && tool.permission?.kind === "path") {
       const target = tool.permission.target(input as never);
       const store = opts.checkpoints?.();

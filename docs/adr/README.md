@@ -11,3 +11,4 @@
 | [0005](0005-stable-prompt-prefix.md)  | Sabit istem öneki ve sondaki geçici mesaj              | Kabul edildi |
 | [0006](0006-localization.md)          | Yerelleştirme: kullanıcıya dönük ve modele dönük metin | Kabul edildi |
 | [0007](0007-subagents.md)             | Alt ajanlar: yalıtılmış bağlam, paylaşılan izin kapısı | Kabul edildi |
+| [0008](0008-auto-mode.md)             | Auto modu: sınıflandırıcı kuralların altındadır        | Kabul edildi |

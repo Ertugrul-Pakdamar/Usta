@@ -29,6 +29,8 @@ export interface ChatRequest {
   messages: Message[];
   tools?: ToolSpec[];
   maxTokens?: number;
+  /** 0 for repeatable answers (classifiers). */
+  temperature?: number;
   signal?: AbortSignal;
 }
 

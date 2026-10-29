@@ -104,6 +104,26 @@ describe("App", () => {
     ui.unmount();
   });
 
+  it("auto mode: the classifier approves a command without a prompt and /auto lists the decision", async () => {
+    const engine = new PermissionEngine({ cwd, mode: "auto" });
+    // The same scripted provider serves the main agent and the classifier, in call order.
+    const provider = new MockProvider([
+      { toolCalls: [{ name: "Bash", args: { command: "echo auto-ran-ok" } }] },
+      { text: '{"verdict":"safe","reason":"prints a word"}' },
+      { text: "bitti" },
+    ]);
+    const ui = render(
+      <App provider={provider} config={config} cwd={cwd} model="m" engine={engine} />,
+    );
+    await type(ui, "komutu çalıştır");
+    await waitFor(ui, "bitti");
+    expect(ui.lastFrame()).not.toContain("izin");
+    await type(ui, "/auto");
+    await waitFor(ui, "prints a word");
+    await waitFor(ui, "izin verildi");
+    ui.unmount();
+  });
+
   it("runs !shell commands directly", async () => {
     const ui = mount([]);
     await type(ui, "!echo selam-shell");
@@ -173,11 +193,13 @@ describe("App", () => {
     ui.unmount();
   });
 
-  it("Shift+Tab cycles default → acceptEdits → plan → default", async () => {
+  it("Shift+Tab cycles default → acceptEdits → auto → plan → default", async () => {
     const ui = mount([]);
     await waitFor(ui, "izin sor");
     ui.stdin.write("\u001b[Z");
     await waitFor(ui, "düzenlemeleri kabul");
+    ui.stdin.write("\u001b[Z");
+    await waitFor(ui, "AUTO");
     ui.stdin.write("\u001b[Z");
     await waitFor(ui, "PLAN MODU");
     ui.stdin.write("\u001b[Z");

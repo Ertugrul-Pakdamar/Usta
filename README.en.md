@@ -35,7 +35,7 @@ Coding agents are powerful but can be expensive and unsupervised. **usta** tackl
 
 - **Agent and tools:** `Read` `Write` `Edit` `Glob` `Grep` `Bash` `Script`, parallel independent calls, streaming, repair of malformed tool calls.
 - **Planning:** read-only plan mode → plan approval with `ExitPlanMode` → implementation; ⇧Tab cycles modes.
-- **Permissions:** `default` · `acceptEdits` · `plan` · `bypass`; rules such as `Bash(git status:*)`, `Edit(src/**)`, `Read(.env)`; layered settings; project trust gate.
+- **Permissions:** `default` · `acceptEdits` · `auto` (classifier-backed, experimental) · `plan` · `bypass`; rules such as `Bash(git status:*)`, `Edit(src/**)`, `Read(.env)`; layered settings; project trust gate.
 - **Undo:** a checkpoint before every Write/Edit/Script; `/rewind N` restores files **and** the conversation.
 - **Hooks:** `PreToolUse` `PostToolUse` `UserPromptSubmit` `SessionStart` `Stop` `SubagentStop`.
 - **Token economy:** `/cost` `/context` `/compact`, budgets (`--budget`, `--token-budget`), cache-friendly prompts, output limiter, read cache.
@@ -94,7 +94,7 @@ Measured with `qwen3-vl-30b` on 2026-10-29 using the gateway's own `count_tokens
 
 ## Roadmap
 
-M0–M5 are done (skeleton, core, TUI, security, token economy, localization, subagents). Next: M5.5 auto mode, M6 skills/plugins/MCP, M7 single-file binary and v0.1.0. See [docs/en/roadmap.md](docs/en/roadmap.md).
+M0–M5.5 are done (skeleton, core, TUI, security, token economy, localization, subagents, auto mode). Next: M6 skills/plugins/MCP, M7 single-file binary and v0.1.0. See [docs/en/roadmap.md](docs/en/roadmap.md).
 
 ## Contributing and license
 

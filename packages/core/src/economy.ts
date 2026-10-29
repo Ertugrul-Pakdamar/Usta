@@ -114,6 +114,12 @@ export class Economy {
     return this.opts.registry.get(this.modelId);
   }
 
+  /** False once the session budget is used up and the user has not agreed to go over it. */
+  withinBudget(): boolean {
+    if (!this.opts.budget || this.budgetAllowed) return true;
+    return checkBudget(this.opts.budget, this.tracker, 0, this.model).level !== "exceeded";
+  }
+
   /** The cheaper model (summaries, exploration subagents). */
   get fastModelId(): string {
     return this.opts.fastModel?.() ?? this.modelId;

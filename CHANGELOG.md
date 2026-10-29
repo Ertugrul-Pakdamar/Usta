@@ -6,6 +6,13 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 
 ### Eklendi
 
+**M5.5: Auto modu (deneysel)**
+- Yeni izin modu `auto` (`--permission-mode auto`, `/mode auto`, ⇧Tab döngüsünde `acceptEdits`'ten sonra): değişiklik yapan çağrıları (`Bash`, `Script`, proje dışı yollar, eklenti araçları) `models.fast` ile "güvenli / riskli / belirsiz" diye sınıflar; `safe` izin alır, diğerleri kullanıcıya sorulur (soracak kimse yoksa reddedilir).
+- Sınıflandırıcı kuralları gevşetemez: `deny`, korunan yollar ve `ask` kuralları onun önünde biter. Yalnızca kullanıcı mesajlarını ve ajanın araç çağrılarını görür; araç çıktısı, alt ajan raporu, özet ve hook metni görmez (prompt injection direnci). Hata/zaman aşımı = `unsure`.
+- Yerel katman: tehlikeli Bash kalıpları model çağrılmadan `risky`, küçük salt okuma listesi `safe`.
+- Devre kesici: art arda 3 / toplam 10 onaylanamayan çağrıdan sonra `default` moduna dönüş. Denetim günlüğü `~/.usta/audit/<oturum>.jsonl` (0600, anahtar maskeli); `/auto` komutu; sınıflandırma kullanımı oturum toplamına eklenir.
+- Belgeler: `docs/auto-mode.md` (TR/EN), ADR-0008. Gerçek model ölçümü (39 çağrı): tehlikeli 20'den 0'ı `safe` sayıldı, güvenli 15'ten 14'ü `safe`, median 274 ms.
+
 **M5: Alt ajanlar ve arka plan görevleri**
 - `Task` ve `TaskOutput` araçları: iş, kendi bağlamında çalışan bir alt ajana devredilir; ana ajana yalnızca son rapor ve maliyet notu döner. Salt okuma alt ajanlar aynı turda paralel çalışır (en fazla 3).
 - Dahili ajanlar `explore` (salt okuma, `models.fast`), `plan`, `general`; özel ajanlar `~/.usta/agents/*.md` ve `<proje>/.usta/agents/*.md` (proje ajanları güven kapısına tabi, içerik özetine bağlı onay).

@@ -4,14 +4,15 @@ usta's security idea is simple: **whatever the model asks for, every tool call p
 
 ## Permission modes
 
-| Mode          | Reads | Write/Edit in the working directory | Bash / Script | When                                             |
-| ------------- | ----- | ----------------------------------- | ------------- | ------------------------------------------------ |
-| `default`     | free  | asks                                | asks          | Default                                          |
-| `acceptEdits` | free  | automatic                           | asks          | When you trust the edits                         |
-| `plan`        | free  | **forbidden**                       | **forbidden** | Research and a plan first                        |
-| `bypass`      | free  | automatic                           | automatic     | Isolated environments only; `-y` or user setting |
+| Mode          | Reads | Write/Edit in the working directory | Bash / Script | When                                                                       |
+| ------------- | ----- | ----------------------------------- | ------------- | -------------------------------------------------------------------------- |
+| `default`     | free  | asks                                | asks          | Default                                                                    |
+| `acceptEdits` | free  | automatic                           | asks          | When you trust the edits                                                   |
+| `auto`        | free  | automatic                           | classified    | Fewer prompts, same safety rules: [Auto mode](auto-mode.md) (experimental) |
+| `plan`        | free  | **forbidden**                       | **forbidden** | Research and a plan first                                                  |
+| `bypass`      | free  | automatic                           | automatic     | Isolated environments only; `-y` or user setting                           |
 
-⇧Tab cycles `default → acceptEdits → plan` (you cannot reach `bypass` from there). Paths **outside** the working directory ask in every mode (except bypass).
+⇧Tab cycles `default → acceptEdits → auto → plan` (you cannot reach `bypass` from there). Paths **outside** the working directory ask in every mode (except bypass).
 
 ## Decision order
 
@@ -27,7 +28,7 @@ The permission engine decides for a tool call in this order; the first match win
 8. A path outside the working directory → asks (except `~/.usta/outputs/**`, which may be read freely).
 9. A read-only tool → allowed.
 10. `acceptEdits` + a file tool → allowed.
-11. Otherwise → asks.
+11. Otherwise → asks. (In `auto` mode this step is **classified**: `safe` is allowed, `risky`/`unsure` asks; the classifier cannot loosen any step above. See [Auto mode](auto-mode.md).)
 
 If the decision is "ask" and no interactive approval exists (`-p` with no terminal), the call is **denied** and the reason is passed to the model.
 

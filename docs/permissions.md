@@ -4,14 +4,14 @@ usta'nın güvenlik anlayışı basittir: **model ne isterse istesin, her araç 
 
 ## İzin modları
 
-| Mod           | Okuma   | Çalışma dizininde Write/Edit | Bash / Script | Ne zaman                                        |
-| ------------- | ------- | ---------------------------- | ------------- | ----------------------------------------------- |
-| `default`     | serbest | sorar                        | sorar         | Varsayılan                                      |
-| `acceptEdits` | serbest | otomatik                     | sorar         | Düzenlemelere güvendiğinizde                    |
-| `plan`        | serbest | **yasak**                    | **yasak**     | Önce araştırma ve plan                          |
-| `bypass`      | serbest | otomatik                     | otomatik      | Yalnızca izole ortam; `-y` veya kullanıcı ayarı |
+| Mod           | Okuma   | Çalışma dizininde Write/Edit | Bash / Script   | Ne zaman                                                               |
+| ------------- | ------- | ---------------------------- | --------------- | ---------------------------------------------------------------------- |
+| `default`     | serbest | sorar                        | sorar           | Varsayılan                                                             |
+| `acceptEdits` | serbest | otomatik                     | sorar           | Düzenlemelere güvendiğinizde                                           |
+| `auto`        | serbest | otomatik                     | sınıflandırılır | Az onay, güvenlik kuralları aynı: [Auto modu](auto-mode.md) (deneysel) |
+| `bypass`      | serbest | otomatik                     | otomatik        | Yalnızca izole ortam; `-y` veya kullanıcı ayarı                        |
 
-⇧Tab `default → acceptEdits → plan` döngüsünü gezer (`bypass`'a oradan geçilemez). Çalışma dizini **dışındaki** yollar her modda (bypass hariç) sorar.
+⇧Tab `default → acceptEdits → auto → plan` döngüsünü gezer (`bypass`'a oradan geçilemez). Çalışma dizini **dışındaki** yollar her modda (bypass hariç) sorar.
 
 ## Karar sırası
 
@@ -27,7 +27,7 @@ Bir araç çağrısı için izin motoru şu sırayla karar verir; ilk eşleşen 
 8. Çalışma dizini dışında bir yol → sorar (okunması serbest olan `~/.usta/outputs/**` hariç).
 9. Salt okuma aracı → izin verir.
 10. `acceptEdits` + dosya aracı → izin verir.
-11. Aksi halde → sorar.
+11. Aksi halde → sorar. (`auto` modunda bu adım **sınıflandırılır**: `safe` ise izin, `risky`/`unsure` ise sorar; sınıflandırıcı yukarıdaki hiçbir adımı gevşetemez. Bkz. [Auto modu](auto-mode.md).)
 
 Karar "sor" ise ve etkileşimli onay yoksa (`-p` ve terminal yok) çağrı **reddedilir**; sebep modele iletilir.
 

@@ -12,6 +12,7 @@ import {
   composeAfterTool,
   configFromEnv,
   createAfterTool,
+  createAutoClassifier,
   createNudgeAfterTool,
   createReviewer,
   createTaskTools,
@@ -232,6 +233,15 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
   // Subagents may ask too; their questions are answered one at a time.
   const askSerial = ask ? serializeAsk(ask) : undefined;
 
+  // Auto mode reads the conversation so far: the prompt plus what the run produces.
+  const conversation: Message[] = [];
+  const auto = createAutoClassifier({
+    provider,
+    economy,
+    context: () => conversation,
+    sessionId: () => headlessId,
+  });
+
   const loadedAgents = await loadSessionAgents(cwd, opts, interactive);
   for (const w of loadedAgents.warnings) warn(w);
   const manager = new TaskManager({
@@ -241,6 +251,7 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
       provider,
       cwd,
       engine,
+      auto,
       economy,
       tools: () => builtinTools,
       hooks,
@@ -262,6 +273,7 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
     ? `${opts.print}\n\n<hook-context>\n${context.join("\n")}\n</hook-context>`
     : opts.print;
 
+  conversation.push({ role: "user", content: prompt });
   const result = await runAgent(prompt, {
     provider,
     model: economy.modelId,
@@ -272,7 +284,7 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
     maxTokens: config.maxTokens,
     maxTurns: opts.maxTurns,
     signal: abort.signal,
-    approve: createToolGate({ engine, hooks, onWarning: warn, ask: askSerial }),
+    approve: createToolGate({ engine, hooks, auto, onWarning: warn, ask: askSerial }),
     review: createReviewer({ engine, ask: askSerial }),
     afterTool: composeAfterTool(
       createAfterTool(hooks, undefined, warn),
@@ -281,6 +293,7 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
     beforeRequest: economy.beforeRequest,
     limitOutput: economy.limitOutput,
     state: economy.state,
+    onMessage: (m) => conversation.push(m),
     onEvent: (ev) => {
       if (ev.type === "text" && !json) process.stdout.write(ev.delta);
       if (ev.type === "usage") economy.recordUsage(ev.usage, ev.sentMessages);
