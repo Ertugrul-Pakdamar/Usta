@@ -32,3 +32,40 @@ Sorumlular, bu kurallara uymayan yorum, commit, kod, issue ve katkıları kaldı
 ## Kaynak
 
 Bu metin, [Contributor Covenant](https://www.contributor-covenant.org/tr/version/2/1/code_of_conduct/) 2.1 sürümünden uyarlanmıştır (CC BY 4.0).
+
+---
+
+# Code of Conduct (English)
+
+## Our pledge
+
+We pledge to make participation in the usta community a **harassment-free** experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.
+
+## Expected behavior
+
+- Being respectful, kind and inclusive to others.
+- Being open to different views and experiences; directing criticism at the **idea**, not the person.
+- Giving and receiving constructive feedback.
+- Taking responsibility for our mistakes and being patient with less experienced contributors.
+- Thinking about what is best for the whole community.
+
+## Unacceptable behavior
+
+- Sexualized language or imagery, unwelcome attention and harassment of any kind.
+- Insults, put-downs, personal or political attacks; trolling.
+- Publishing others' private information (address, email, etc.) without permission.
+- Other conduct that could reasonably be considered inappropriate in a professional setting.
+
+## Scope
+
+These rules apply in all project spaces (issues, PRs, discussions, code review) and when an individual is representing the project in public.
+
+## Enforcement
+
+Unacceptable behavior can be reported to the project maintainers **privately through GitHub**: reach the repository owner through the contact on their profile. All reports are reviewed promptly and fairly; the reporter's privacy is respected.
+
+Maintainers have the right to remove, edit or reject comments, commits, code, issues and contributions that do not follow these rules, and to temporarily or permanently remove people who behave inappropriately from the community.
+
+## Attribution
+
+This text is adapted from the [Contributor Covenant](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) version 2.1 (CC BY 4.0).

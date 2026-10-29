@@ -24,4 +24,4 @@ Bu dizin hem kullanıcılar hem katkıcılar içindir. Proje alfa aşamasındad�
 
 ## Dil
 
-Belgeler şu an Türkçedir. İngilizce belgeler M4.5 (lokalizasyon) ile gelir; o zamana kadar [README.en.md](../README.en.md) projeyi özetler.
+Belgeler iki dillidir: Türkçe (bu dizin) ve İngilizce ([docs/en](en/README.md)). İkisi birlikte güncellenir; [README.en.md](../README.en.md) projeyi İngilizce özetler.
