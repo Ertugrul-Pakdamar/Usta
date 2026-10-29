@@ -42,7 +42,7 @@ Kod ajanları güçlüdür ama pahalı ve denetimsiz olabilir. **usta** üç şe
 | **Hook'lar**            | `PreToolUse` `PostToolUse` `UserPromptSubmit` `SessionStart` `Stop`; kabuk komutu, JSON protokolü                                                        |
 | **Token ekonomisi**     | `/cost` `/context` `/compact`; bütçe (`--budget`, `--token-budget`); önbellek dostu istem; çıktı sınırlayıcı; okuma önbelleği                            |
 | **Oturumlar**           | JSONL, 0600 izinli; `usta -c` / `usta -r <id>` ile devam; otomatik özet devamda da geçerli                                                               |
-| **Dil**                 | Türkçe ve İngilizce arayüz ve belgeler (`--lang`, `USTA_LANG`, `/lang`); modele giden metin dilden bağımsız, sabit İngilizce                                         |
+| **Dil**                 | Türkçe ve İngilizce arayüz ve belgeler (`--lang`, `USTA_LANG`, `/lang`); modele giden metin dilden bağımsız, sabit İngilizce                             |
 | **Headless**            | `usta -p "..." --output-format json` — CI ve betikler için; çıkış kodları anlamlı                                                                        |
 | **Genişletilebilirlik** | `@usta/sdk` ile araç tanımlama bugün; skill, plugin ve MCP connector'ları [M6](docs/roadmap.md)                                                          |
 
@@ -148,16 +148,16 @@ Ayrıntılar: [İzinler ve güvenlik](docs/permissions.md) · Zafiyet bildirimi:
 
 usta **alfa** aşamasındadır: çekirdek, arayüz, güvenlik ve token ekonomisi tamamlandı.
 
-|     | Aşama                                             | Durum                                |
-| --- | ------------------------------------------------- | ------------------------------------ |
-| ✅  | M0–M2 İskelet, çekirdek, TUI                      | Tamamlandı                           |
-| ✅  | M3 Güvenlik: izinler, plan modu, rewind, hook'lar | Tamamlandı                           |
-| ✅  | M4 Token ekonomisi: bütçe, önbellek, özet, Script | Tamamlandı                           |
+|     | Aşama                                             | Durum      |
+| --- | ------------------------------------------------- | ---------- |
+| ✅  | M0–M2 İskelet, çekirdek, TUI                      | Tamamlandı |
+| ✅  | M3 Güvenlik: izinler, plan modu, rewind, hook'lar | Tamamlandı |
+| ✅  | M4 Token ekonomisi: bütçe, önbellek, özet, Script | Tamamlandı |
 | ✅  | M4.5 Lokalizasyon (TR/EN arayüz ve belgeler)      | Tamamlandı |
-| 🔜  | M5 Subagent'lar ve arka plan görevleri            | Planlandı                            |
-| 🔜  | M5.5 Auto modu (sınıflandırıcı destekli izin)     | Planlandı                            |
-| 🔜  | M6 Skill, plugin ve MCP connector'ları            | Planlandı                            |
-| 🔜  | M7 Tek dosya binary, eval raporu, v0.1.0          | Planlandı                            |
+| 🔜  | M5 Subagent'lar ve arka plan görevleri            | Planlandı  |
+| 🔜  | M5.5 Auto modu (sınıflandırıcı destekli izin)     | Planlandı  |
+| 🔜  | M6 Skill, plugin ve MCP connector'ları            | Planlandı  |
+| 🔜  | M7 Tek dosya binary, eval raporu, v0.1.0          | Planlandı  |
 
 Tam liste: [docs/roadmap.md](docs/roadmap.md).
 

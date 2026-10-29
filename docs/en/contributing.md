@@ -2,7 +2,7 @@
 
 Thank you for your interest in usta! This guide describes the shortest path from an idea to a merged change. Your participation is subject to the [Code of Conduct](../../CODE_OF_CONDUCT.md).
 
-*Turkish version: [CONTRIBUTING.md](../../CONTRIBUTING.md).*
+_Turkish version: [CONTRIBUTING.md](../../CONTRIBUTING.md)._
 
 ## Contents
 
@@ -37,13 +37,13 @@ pnpm test           # all tests; no real API key or network needed
 pnpm lint           # Biome
 ```
 
-| Command | What it does |
-|---|---|
-| `pnpm build` | Builds all packages with `tsc -b` (**required before tests**: `cli` tests use the built output of `core`) |
-| `pnpm test` | All tests with Vitest |
-| `pnpm lint` | Biome check (required in CI) |
-| `pnpm format` | Format with Biome and apply safe fixes |
-| `pnpm usta …` | Runs the built CLI (e.g. `pnpm usta doctor`) |
+| Command       | What it does                                                                                              |
+| ------------- | --------------------------------------------------------------------------------------------------------- |
+| `pnpm build`  | Builds all packages with `tsc -b` (**required before tests**: `cli` tests use the built output of `core`) |
+| `pnpm test`   | All tests with Vitest                                                                                     |
+| `pnpm lint`   | Biome check: code **and Markdown formatting** (required in CI; if it fails run `pnpm format`)             |
+| `pnpm format` | Format with Biome and apply safe fixes                                                                    |
+| `pnpm usta …` | Runs the built CLI (e.g. `pnpm usta doctor`)                                                              |
 
 To try it against the real gateway copy `.env.example` to `.env` and fill it in ([Getting started](getting-started.md)). **`.env` is never committed**; tests never use a real key.
 
@@ -66,16 +66,19 @@ An important rule: **`core` knows nothing about the UI** (it never imports Ink/R
 2. Keep the change **small and focused**. A PR should do one thing; do not mix formatting and behavior changes.
 3. Write the test (or a failing example) first; then fix.
 4. All of these must be green locally:
+
    ```sh
    pnpm lint && pnpm build && pnpm test
    ```
 5. Commit in [Conventional Commits](https://www.conventionalcommits.org/) form:
+
    ```
    feat(core): ask interactively when the budget would be exceeded
    fix(cli): do not truncate the banner on long paths
    docs: add a hook example to the permissions page
    test(core): attempt to bypass a deny rule through a symlink
    ```
+
    Types: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `chore`. Scopes: `core`, `cli`, `sdk`, `mcp`, `docs`.
 6. Open a PR, fill in the template, wait for CI. Merging is by **squash**; the PR title becomes the commit message.
 
@@ -86,18 +89,18 @@ An important rule: **`core` knows nothing about the UI** (it never imports Ink/R
 - **Readability comes first.** Follow the naming and comment density of the surrounding code. A comment explains **why**, not what.
 - **Small files, clear responsibility.** A module does one thing (`permissions.ts` only decides, `gate.ts` only wires).
 - **Discuss before adding a dependency:** size, maintenance status and working in an air-gapped environment matter. Runtime dependencies are kept few on purpose.
-- **Text language:** Code, comments and identifiers are English. Text comes in **two classes**: everything *sent to the model* (system prompt, tool descriptions, tool results and error messages, denial reasons) is short **fixed English** written plainly in code; everything *shown to the user* comes from the catalog via `t("key")` (`packages/core/src/i18n`: `en.ts` first, then `tr.ts`; a missing translation breaks the build). Details: [Architecture → Localization](architecture.md#localization-i18n).
+- **Text language:** Code, comments and identifiers are English. Text comes in **two classes**: everything _sent to the model_ (system prompt, tool descriptions, tool results and error messages, denial reasons) is short **fixed English** written plainly in code; everything _shown to the user_ comes from the catalog via `t("key")` (`packages/core/src/i18n`: `en.ts` first, then `tr.ts`; a missing translation breaks the build). Details: [Architecture → Localization](architecture.md#localization-i18n).
 - **Do not add telemetry.** usta sends no data outside the gateway; this is a product guarantee.
 
 ## Testing
 
-| What is tested | How |
-|---|---|
-| Pure logic (permission engine, parsers, economy) | Direct unit tests; include edge cases and **bypass attempts** |
-| Agent behavior | A scenario with `MockProvider`: model replies are written in advance, outgoing requests are checked |
-| File system | A temporary directory (`mkdtemp`); do not touch the real user directory (isolate `HOME`) |
-| Interface | `ink-testing-library`; **write the text and Enter separately** (so it is not treated as a paste) |
-| Gateway calls | A fake `fetch`; no real network or key |
+| What is tested                                   | How                                                                                                 |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
+| Pure logic (permission engine, parsers, economy) | Direct unit tests; include edge cases and **bypass attempts**                                       |
+| Agent behavior                                   | A scenario with `MockProvider`: model replies are written in advance, outgoing requests are checked |
+| File system                                      | A temporary directory (`mkdtemp`); do not touch the real user directory (isolate `HOME`)            |
+| Interface                                        | `ink-testing-library`; **write the text and Enter separately** (so it is not treated as a paste)    |
+| Gateway calls                                    | A fake `fetch`; no real network or key                                                              |
 
 **Also try interface changes in a real terminal.** Unit tests cannot catch layout problems (for example the banner truncation on a long directory path was only seen in a real terminal). Mentioning in the PR description, in one sentence, that you ran `pnpm usta` inside a pty and checked the change by eye helps a lot.
 
@@ -115,7 +118,7 @@ Changes touching these get **extra care** in review: `permissions.ts`, `gate.ts`
 ## Documentation and decision records
 
 - Every user-visible behavior change must update the relevant [documentation](README.md) and [CHANGELOG.md](../../CHANGELOG.md).
-- If you change the **architecture or an expensive-to-reverse decision** add a short ADR under [docs/en/adr](adr/README.md) (and its Turkish original under `docs/adr`): *Context, Decision, Consequences* and, if possible, **measurements/evidence**. In usta, decisions rest on measurement, not guesswork.
+- If you change the **architecture or an expensive-to-reverse decision** add a short ADR under [docs/en/adr](adr/README.md) (and its Turkish original under `docs/adr`): _Context, Decision, Consequences_ and, if possible, **measurements/evidence**. In usta, decisions rest on measurement, not guesswork.
 - Adding a new tool? Read the [Extending](extending.md) guide first; every tool costs ~110 tokens on every request, so the reason it is needed should be in the PR.
 - **Keep both languages in step.** A change to a Turkish document must update its English counterpart in `docs/en` (or say in the PR that the translation follows).
 

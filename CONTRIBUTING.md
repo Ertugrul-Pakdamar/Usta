@@ -2,7 +2,7 @@
 
 usta'ya ilgi gösterdiğiniz için teşekkürler! Bu rehber, bir fikri birleştirilmiş bir değişikliğe dönüştürmenin en kısa yolunu anlatır. Katılımınız [Davranış Kuralları](CODE_OF_CONDUCT.md)'na tabidir.
 
-*English version: [docs/en/contributing.md](docs/en/contributing.md).*
+_English version: [docs/en/contributing.md](docs/en/contributing.md)._
 
 ## İçindekiler
 
@@ -41,7 +41,7 @@ pnpm lint           # Biome
 | ------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `pnpm build`  | Tüm paketleri `tsc -b` ile derler (**test öncesi gerekir**: `cli` testleri `core`'un derlenmiş çıktısını kullanır) |
 | `pnpm test`   | Vitest ile tüm testler                                                                                             |
-| `pnpm lint`   | Biome denetimi (CI'da zorunlu)                                                                                     |
+| `pnpm lint`   | Biome denetimi: kod **ve Markdown biçimi** (CI'da zorunlu; hata verirse `pnpm format` çalıştırın)                  |
 | `pnpm format` | Biome ile biçimlendir ve güvenli düzeltmeleri uygula                                                               |
 | `pnpm usta …` | Derlenmiş CLI'ı çalıştırır (örn. `pnpm usta doctor`)                                                               |
 

@@ -6,12 +6,12 @@ One of usta's design goals is to do the same work **with fewer tokens and fewer 
 
 ## Visibility: what are you spending?
 
-| Command / field | What it shows |
-|---|---|
-| Status bar | model · mode · context % · ↑input ↓output tokens · cache % · free/remaining CR |
-| `/cost` | Requests in the session, tokens, cache hits, price, remaining credit (spent in the session), daily quota, budget |
-| `/context` | Breakdown of the context window: system prompt / tools / messages / free. **With the gateway's exact count**; estimated (and labeled) if it cannot be reached |
-| `usta -p … --output-format json` | `usage`, `cache_ratio`, `spent_cr`, `remaining_cr` |
+| Command / field                  | What it shows                                                                                                                                                 |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Status bar                       | model · mode · context % · ↑input ↓output tokens · cache % · free/remaining CR                                                                                |
+| `/cost`                          | Requests in the session, tokens, cache hits, price, remaining credit (spent in the session), daily quota, budget                                              |
+| `/context`                       | Breakdown of the context window: system prompt / tools / messages / free. **With the gateway's exact count**; estimated (and labeled) if it cannot be reached |
+| `usta -p … --output-format json` | `usage`, `cache_ratio`, `spent_cr`, `remaining_cr`                                                                                                            |
 
 ```
 Context window: 262.1k tokens (qwen3-vl-30b)
@@ -22,7 +22,7 @@ Context window: 262.1k tokens (qwen3-vl-30b)
 Used: 1.6k (1%) · auto-summary threshold 80% · gateway count
 ```
 
-**The truth about spending is the gateway's balance.** The remaining credit is read from `GET /v1/quota` at startup and after every turn; spent in the session = starting balance − current balance. Price × tokens is only a *pre-estimate* (the price unit is assumed per token from the field name and must be checked against the real balance delta in the paid period). The model is currently free (until its `free_until` date), so CR spending shows 0.
+**The truth about spending is the gateway's balance.** The remaining credit is read from `GET /v1/quota` at startup and after every turn; spent in the session = starting balance − current balance. Price × tokens is only a _pre-estimate_ (the price unit is assumed per token from the field name and must be checked against the real balance delta in the paid period). The model is currently free (until its `free_until` date), so CR spending shows 0.
 
 ## Token estimation
 
@@ -36,12 +36,12 @@ The gateway caches the **prefix** of the prompt (`usage.prompt_tokens_details.ca
 - The tool list is fixed. `ExitPlanMode` enters the list only in plan mode; switching modes costs one cache miss.
 - The mode-dependent reminder (plan mode) is not put into the system prompt but appended to the **end** of the request as a temporary message that is not stored in the history.
 
-| Measurement | Result |
-|---|---|
+| Measurement                          | Result                                          |
+| ------------------------------------ | ----------------------------------------------- |
 | Fixed cost (system + 8 tool schemas) | **1.07k tokens** (1.19k before the improvement) |
-| A 2-request turn | 49% from cache |
-| A 3-request Script turn | 64% |
-| A 6-request session (`/cost`) | 97% |
+| A 2-request turn                     | 49% from cache                                  |
+| A 3-request Script turn              | 64%                                             |
+| A 6-request session (`/cost`)        | 97%                                             |
 
 Reducing the fixed cost: tool descriptions are short English (Turkish costs more tokens), and noise is removed from the JSON schema (`additionalProperties:false`, safe-integer bounds; we validate arguments ourselves anyway).
 
@@ -64,7 +64,7 @@ If the next request would exceed `compactAt` of the context window (default **80
 - The summary is written to the session file as a `compact` record, so `usta -c` gives the same result.
 - `/compact [focus]` runs it by hand: `/compact focus on the authentication bug`.
 - If summarizing fails a warning is shown and the request goes on without a summary (retry after 4 more messages).
-- Because the summarizer only sees the *older* part, it is told not to make absolute statements about the whole session such as "only X was done".
+- Because the summarizer only sees the _older_ part, it is told not to make absolute statements about the whole session such as "only X was done".
 
 ## Budgets
 
@@ -103,7 +103,7 @@ Details:
 - **The copy:** `node_modules`, `.git`, `dist`, `build`, `coverage`, `.usta`, `__pycache__`, `.venv`, `venv`, `.next`, `target`, secret files, symlinks and files larger than 1 MB are not copied. Total limit 150 MB, run-time limit 60 s.
 - **Two approvals:** first the code (before it runs), then the diff (before it is applied). In `acceptEdits` mode the second is automatic; `deny` rules and protected paths still apply per file.
 - **Conflict protection:** if files changed while you were reviewing the diff, **nothing is applied** (all or nothing).
-- **Result:** the changed files and an *"by hand ≈ X tokens, by script ≈ Y tokens"* estimate.
+- **Result:** the changed files and an _"by hand ≈ X tokens, by script ≈ Y tokens"_ estimate.
 - **Heuristic:** If the same change hits ≥ 3 files, or ≥ 6 separate Write/Edit calls are made, a "write one script" hint is added to the next tool result.
 
 > **Security note:** The copy is **not isolation**. The script can reach the network and your home directory; that is why the code is put in front of you for approval before it runs. `python3` and/or `node` must be installed.

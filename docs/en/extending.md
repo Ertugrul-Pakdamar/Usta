@@ -2,12 +2,12 @@
 
 You can extend usta in three ways today; the rest arrives with [M6](roadmap.md).
 
-| Way | Status | Use |
-|---|---|---|
-| A new built-in tool | ✅ today | A code contribution: `packages/core/src/tools` |
-| Hooks | ✅ today | A shell command in a settings file: [Hooks](permissions.md#hooks) |
-| Permission rules | ✅ today | In a settings file: [Permissions](permissions.md) |
-| Skill, slash command, plugin, MCP connector | 🔜 M6 | Draft below |
+| Way                                         | Status   | Use                                                               |
+| ------------------------------------------- | -------- | ----------------------------------------------------------------- |
+| A new built-in tool                         | ✅ today | A code contribution: `packages/core/src/tools`                    |
+| Hooks                                       | ✅ today | A shell command in a settings file: [Hooks](permissions.md#hooks) |
+| Permission rules                            | ✅ today | In a settings file: [Permissions](permissions.md)                 |
+| Skill, slash command, plugin, MCP connector | 🔜 M6    | Draft below                                                       |
 
 ## Adding a new tool
 
@@ -21,12 +21,12 @@ import { resolvePath } from "./paths.js";
 
 export const wordCountTool = defineTool({
   name: "WordCount",
-  description: "Count the words in a file.",          // English, short: it costs tokens on every request
+  description: "Count the words in a file.", // English, short: it costs tokens on every request
   permission: { kind: "path", target: (i) => i.path }, // permission rules match the file path
-  mutating: false,                                     // does not change state
+  mutating: false, // does not change state
   input: z.object({ path: z.string() }),
   async run({ path }, ctx) {
-    const abs = resolvePath(ctx.cwd, path);            // applies the secret-file protection
+    const abs = resolvePath(ctx.cwd, path); // applies the secret-file protection
     try {
       const text = await readFile(abs, "utf8");
       return String(text.split(/\s+/).filter(Boolean).length);
@@ -62,12 +62,12 @@ The easiest way to add behavior without writing code is a hook: blocking command
 
 > **Draft:** The formats below are design goals; they may change until implemented. They will be kept close to existing Claude Code skill/plugin formats so that migration is easy.
 
-| Concept | Format | Note |
-|---|---|---|
-| **Skill** | `skills/<name>/SKILL.md` (`name`, `description` frontmatter) | At first only its description enters the context; the full content loads when it is triggered (token-friendly) |
-| **Slash command** | `commands/<name>.md` (with `$ARGUMENTS` support) | |
-| **Custom agent** | `agents/<name>.md` (model, tools, prompt) | Together with the M5 subagents |
-| **Connector** | MCP servers (stdio / HTTP) | `usta mcp add\|list\|remove`; tools appear as `mcp__server__tool`, permission rules apply to them too |
-| **Plugin** | `usta-plugin.json` manifest: packages all of the above | `usta plugin install` from a local folder, git URL or npm |
+| Concept           | Format                                                       | Note                                                                                                           |
+| ----------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| **Skill**         | `skills/<name>/SKILL.md` (`name`, `description` frontmatter) | At first only its description enters the context; the full content loads when it is triggered (token-friendly) |
+| **Slash command** | `commands/<name>.md` (with `$ARGUMENTS` support)             |                                                                                                                |
+| **Custom agent**  | `agents/<name>.md` (model, tools, prompt)                    | Together with the M5 subagents                                                                                 |
+| **Connector**     | MCP servers (stdio / HTTP)                                   | `usta mcp add\|list\|remove`; tools appear as `mcp__server__tool`, permission rules apply to them too          |
+| **Plugin**        | `usta-plugin.json` manifest: packages all of the above       | `usta plugin install` from a local folder, git URL or npm                                                      |
 
 If you have an idea or a need, open a [feature request](https://github.com/Ertugrul-Pakdamar/Usta/issues/new?template=feature_request.yml); you can shape the M6 design.

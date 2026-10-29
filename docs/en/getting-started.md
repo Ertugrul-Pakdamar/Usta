@@ -2,13 +2,13 @@
 
 ## Requirements
 
-| Requirement | Why |
-|---|---|
-| Node.js ≥ 22 | Runtime (pinned by `.nvmrc`) |
-| [pnpm](https://pnpm.io) 12 | Monorepo management (pinned in the `packageManager` field) |
-| An EVREN LLM Gateway account | Access to the model: an API key and the gateway address |
-| `python3` *(optional)* | The `Script` tool runs python scripts (Node is enough for node scripts) |
-| `rg` (ripgrep) *(optional)* | `Grep` uses it when installed, otherwise a pure-JS fallback runs |
+| Requirement                  | Why                                                                     |
+| ---------------------------- | ----------------------------------------------------------------------- |
+| Node.js ≥ 22                 | Runtime (pinned by `.nvmrc`)                                            |
+| [pnpm](https://pnpm.io) 12   | Monorepo management (pinned in the `packageManager` field)              |
+| An EVREN LLM Gateway account | Access to the model: an API key and the gateway address                 |
+| `python3` _(optional)_       | The `Script` tool runs python scripts (Node is enough for node scripts) |
+| `rg` (ripgrep) _(optional)_  | `Grep` uses it when installed, otherwise a pure-JS fallback runs        |
 
 ## Installation
 
@@ -90,10 +90,10 @@ cd ~/my-project
 usta
 ```
 
-Type a goal, for example *"list the TODO comments under src/ and fix the most urgent one"*. The model uses its tools; for every call that would change something it asks for your approval with a diff:
+Type a goal, for example _"list the TODO comments under src/ and fix the most urgent one"_. The model uses its tools; for every call that would change something it asks for your approval with a diff:
 
 - `y` allows once, `a` allows similar calls for the rest of the session, `n` denies.
-- ⇧Tab cycles the permission mode: *ask* → *accept edits* → *plan mode*.
+- ⇧Tab cycles the permission mode: _ask_ → _accept edits_ → _plan mode_.
 - `Esc` cancels running work; `Ctrl+C` cancels or (when idle) quits.
 - `/help` lists every command.
 
@@ -115,18 +115,23 @@ JSON output:
   "result": "…",
   "turns": 3,
   "stop_reason": "end_turn",
-  "usage": { "prompt_tokens": 3781, "completion_tokens": 301, "cached_tokens": 2416, "cache_ratio": 0.639 },
+  "usage": {
+    "prompt_tokens": 3781,
+    "completion_tokens": 301,
+    "cached_tokens": 2416,
+    "cache_ratio": 0.639
+  },
   "spent_cr": 0,
   "remaining_cr": 1010
 }
 ```
 
-| Exit code | Meaning |
-|---|---|
-| `0` | Finished normally |
-| `1` | Error (configuration, gateway, invalid flag) |
-| `2` | Stopped early (turn limit or cancelled) |
-| `3` | Stopped because the budget would be exceeded |
+| Exit code | Meaning                                      |
+| --------- | -------------------------------------------- |
+| `0`       | Finished normally                            |
+| `1`       | Error (configuration, gateway, invalid flag) |
+| `2`       | Stopped early (turn limit or cancelled)      |
+| `3`       | Stopped because the budget would be exceeded |
 
 In non-interactive mode a call that needs approval is **denied** (there is nobody to ask). To allow things, add rules:
 

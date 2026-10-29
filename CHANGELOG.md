@@ -60,5 +60,7 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 
 ### Düzeltildi
 
+- CI: Markdown biçim hataları (Türkçe README/CONTRIBUTING, İngilizce SECURITY, kararsız biçimlenen bir mimari tablosu) `pnpm lint`'i kırıyordu; düzeltildi.
+
 - Uzun dizin yollarında banner'ın "usta" yerine "ust" görünmesi; `›`/`●` öneklerinin küçülmesi.
 - Özetleyicinin tüm oturum hakkında "yalnızca X yapıldı" gibi yanıltıcı kesin ifadeler kurması.
