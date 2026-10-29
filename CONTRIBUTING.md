@@ -54,7 +54,7 @@ packages/
   sdk/   genel API (Tool, defineTool, ToolError): plugin/araç yazarlarının gördüğü tek yüzey
   core/  arayüzden bağımsız çekirdek: ajan döngüsü, araçlar, izinler, token ekonomisi
   cli/   Ink arayüzü, slash komutları, headless mod
-  mcp/   MCP connector'ları (M6)
+  mcp/   MCP connector istemcisi
 docs/    belgeler ve mimari karar kayıtları (ADR)
 ```
 

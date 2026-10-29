@@ -31,6 +31,8 @@ export interface SlashContext {
   autoReport(): string;
   /** Loaded skills and custom commands. */
   extensionsReport(): string;
+  /** Connected MCP servers and their tools. */
+  mcpReport(): string;
   /** Recent turns that /rewind can undo, newest first. */
   rewindList(): string;
   rewind(turns: number): void;
@@ -126,6 +128,11 @@ export const slashCommands: SlashCommand[] = [
       ctx.setMode(args as PermissionMode);
       ctx.info(t("slash.modeSet", { mode: args }));
     },
+  },
+  {
+    name: "mcp",
+    description: "slash.desc.mcp",
+    run: (_, ctx) => ctx.info(ctx.mcpReport()),
   },
   {
     name: "skills",

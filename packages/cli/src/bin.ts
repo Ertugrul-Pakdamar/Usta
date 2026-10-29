@@ -39,12 +39,14 @@ import {
   toolsForMode,
 } from "@usta/core";
 import { Command } from "commander";
+import { registerMcpCommands } from "./mcp-cmd.js";
 import {
   askYesNo,
   createEconomy,
   initLanguage,
   loadSessionAgents,
   loadSessionExtensions,
+  loadSessionMcp,
   parseTokens,
   setupRuntime,
 } from "./runtime.js";
@@ -126,6 +128,8 @@ terms
     console.log(t("terms.accepted", { version: doc.version }));
   });
 
+registerMcpCommands(program);
+
 program
   .command("models")
   .description(t("cli.cmd.models"))
@@ -163,6 +167,7 @@ async function runInteractive(opts: InteractiveOptions, initialPrompt?: string):
   const economy = await createEconomy({ config, provider, settings, flags: opts, model });
   const loadedAgents = await loadSessionAgents(cwd, opts, true);
   const extensions = await loadSessionExtensions(cwd, opts, true);
+  const mcp = await loadSessionMcp(cwd, opts, true);
   const { startTui } = await import("./tui/start.js");
   await startTui({
     provider,
@@ -176,9 +181,12 @@ async function runInteractive(opts: InteractiveOptions, initialPrompt?: string):
     economy,
     agents: loadedAgents.agents,
     extensions,
-    warnings: [...warnings, ...loadedAgents.warnings, ...extensions.warnings],
+    mcp: mcp.manager,
+    tools: [...builtinTools, ...mcp.manager.tools],
+    warnings: [...warnings, ...loadedAgents.warnings, ...extensions.warnings, ...mcp.warnings],
     version: `v${pkg.version}`,
   });
+  await mcp.manager.close();
 }
 
 interface HeadlessOptions extends InteractiveOptions {
@@ -270,11 +278,14 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
   const slashMatch = /^\/(\S+)\s*(.*)$/s.exec(opts.print.trim());
   const custom = slashMatch && extensions.commands.find((c) => c.name === slashMatch[1]);
   const userText = custom ? expandCommand(custom, (slashMatch?.[2] ?? "").trim()) : opts.print;
+  const mcp = await loadSessionMcp(cwd, opts, interactive);
+  for (const w of mcp.warnings) warn(w);
   const skillTool = createSkillTool(extensions.skills);
   const allTools = [
     ...builtinTools,
     ...createTaskTools(manager, loadedAgents.agents),
     ...(skillTool ? [skillTool] : []),
+    ...mcp.manager.tools,
   ];
 
   const start = await hooks.run("SessionStart");
@@ -318,6 +329,7 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
         console.error(`  ✗ ${(ev.display ?? ev.output).split("\n")[0]}`);
     },
   });
+  await mcp.manager.close();
   if (result.stopReason === "end_turn") for (const w of (await hooks.run("Stop")).warnings) warn(w);
   await economy.refreshQuota();
 

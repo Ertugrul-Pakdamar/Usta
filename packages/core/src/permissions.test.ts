@@ -90,6 +90,25 @@ const engine = (
   extra: { allow?: string[]; deny?: string[]; ask?: string[] } = {},
 ) => new PermissionEngine({ cwd, home, mode, ...extra });
 
+describe("MCP tool rules", () => {
+  const mcpTool = (name: string, mutating = true) =>
+    ({ name, mutating, description: "", input: {} }) as never;
+
+  it("`mcp__server` covers every tool of that server, and only that server", () => {
+    const e = engine("default", { allow: ["mcp__gh"], deny: ["mcp__gh__delete_repo"] });
+    expect(e.decide(mcpTool("mcp__gh__create_issue"), {}).decision).toBe("allow");
+    expect(e.decide(mcpTool("mcp__gh__delete_repo"), {}).decision).toBe("deny");
+    expect(e.decide(mcpTool("mcp__ghost__x"), {}).decision).toBe("ask");
+    expect(e.decide(mcpTool("mcp__other__x"), {}).decision).toBe("ask");
+  });
+
+  it("a specific tool rule does not cover its siblings; unknown MCP tools ask by default", () => {
+    const e = engine("default", { allow: ["mcp__gh__list_issues"] });
+    expect(e.decide(mcpTool("mcp__gh__list_issues"), {}).decision).toBe("allow");
+    expect(e.decide(mcpTool("mcp__gh__create_issue"), {}).decision).toBe("ask");
+  });
+});
+
 describe("path rules", () => {
   it("deny Read(.env) matches in any directory and via ./", () => {
     const e = engine("default", { deny: ["Read(.env)"] });

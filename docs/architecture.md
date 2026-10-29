@@ -146,6 +146,10 @@ Yükleyici satırları sırayla oynatır; yarım yazılmış son satırı yok sa
 
 Gerekçe ve ölçümler: [ADR-0007](adr/0007-subagents.md).
 
+## MCP
+
+`packages/mcp`: `config.ts` (`~/.usta/mcp.json` + güven kapısındaki proje dosyası, `${VAR}` açma) ve `manager.ts` (`McpManager`: SDK istemcisiyle bağlanır, her uzak aracı `adaptTool` ile `Tool`'a çevirir). Araçlar `Tool.jsonSchema` ile sunucunun şemasını taşır; `mutating` varsayılan doğrudur, `readOnlyHint` yalnızca sorma davranışını etkiler. CLI oturum başında bağlanır (`loadSessionMcp`), araçları `tools`'a ekler ve çıkışta kapatır. Gerekçe: [ADR-0009](adr/0009-mcp.md).
+
 ## Auto modu
 
 `core/src/auto` altında: `rules.ts` (yerel tehlikeli-kalıp ve salt okuma listesi), `classifier.ts` (`AutoClassifier`: girdi daraltma, `models.fast` çağrısı, devre kesici, denetim günlüğü), `factory.ts` (oturuma bağlama), `report.ts` (`/auto`).

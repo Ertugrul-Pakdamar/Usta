@@ -34,6 +34,16 @@ export interface ParsedRule {
 }
 
 /** `Tool` or `Tool(specifier)`. Returns undefined for malformed rules. */
+/** A rule names a tool; `mcp__server` also covers every tool of that MCP server (`mcp__server__*`). */
+export function ruleCovers(ruleTool: string, toolName: string): boolean {
+  if (ruleTool === toolName) return true;
+  return (
+    ruleTool.startsWith("mcp__") &&
+    !ruleTool.slice(5).includes("__") &&
+    toolName.startsWith(`${ruleTool}__`)
+  );
+}
+
 export function parseRule(raw: string): ParsedRule | undefined {
   const m = /^([A-Za-z0-9_.:*-]+)(?:\(([\s\S]*)\))?$/.exec(raw.trim());
   if (!m) return undefined;
@@ -200,7 +210,7 @@ export class PermissionEngine {
   /** Rules for this tool whose specifier (if any) matches `target`. */
   private matching(kind: "allow" | "deny" | "ask", tool: Tool, target: string | undefined) {
     return this.rules[kind].filter((r) => {
-      if (r.tool !== tool.name) return false;
+      if (!ruleCovers(r.tool, tool.name)) return false;
       if (r.spec === undefined) return true;
       if (target === undefined) return false;
       return tool.permission?.kind === "command"
@@ -346,7 +356,7 @@ export class PermissionEngine {
   }
 
   private isAllowed(tool: Tool, target: string | undefined): boolean {
-    const rules = this.rules.allow.filter((r) => r.tool === tool.name);
+    const rules = this.rules.allow.filter((r) => ruleCovers(r.tool, tool.name));
     if (!rules.length) return false;
     if (tool.permission?.kind === "command") {
       return (

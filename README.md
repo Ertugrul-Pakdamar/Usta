@@ -45,7 +45,7 @@ Kod ajanları güçlüdür ama pahalı ve denetimsiz olabilir. **usta** üç şe
 | **Alt ajanlar**         | `Task` ile geniş keşfi ayrı bağlamda yürüt (paralel, arka plan, `/tasks`); dahili `explore`/`plan`/`general` ve kendi `agents/*.md` ajanların; aynı izin kapısı                                |
 | **Dil**                 | Türkçe ve İngilizce arayüz ve belgeler (`--lang`, `USTA_LANG`, `/lang`); modele giden metin dilden bağımsız, sabit İngilizce                                                                   |
 | **Headless**            | `usta -p "..." --output-format json` — CI ve betikler için; çıkış kodları anlamlı                                                                                                              |
-| **Genişletilebilirlik** | `@usta/sdk` ile araç tanımlama, Markdown **skill'leri** ve **özel komutlar** ([docs](docs/skills.md)) bugün; plugin ve MCP connector'ları [M6](docs/roadmap.md)                                |
+| **Genişletilebilirlik** | `@usta/sdk` ile araç tanımlama, Markdown **skill'leri** ve **özel komutlar** ([docs](docs/skills.md)) bugün; **MCP connector'ları** ([docs](docs/mcp.md)) bugün; plugin [M6](docs/roadmap.md)  |
 
 ## Hızlı başlangıç
 
@@ -84,6 +84,7 @@ Oturum içinde `/help` tüm komutları listeler:
 | -------------------------------------------------- | ---------------------------------------------------------------------- |
 | `/plan`, `/mode`                                   | Plan moduna geçer, izin modunu gösterir/değiştirir (⇧Tab ile de döner) |
 | `/auto`                                            | Auto modunun son kararlarını ve sayılarını gösterir                    |
+| `/mcp`                                             | Bağlı MCP sunucularını ve araçlarını gösterir                          |
 | `/skills`                                          | Yüklü skill'leri ve özel komutları listeler                            |
 | `/context`                                         | Bağlam penceresinin neye gittiğini gateway'in tam sayımıyla gösterir   |
 | `/cost`                                            | Token, önbellek isabeti, kalan kredi, günlük kota ve bütçe             |
@@ -99,7 +100,7 @@ Oturum içinde `/help` tüm komutları listeler:
 ```mermaid
 flowchart LR
   CLI["@usta/cli<br/>TUI · komutlar · headless"] --> CORE["@usta/core<br/>ajan döngüsü · araçlar<br/>izinler · token ekonomisi"]
-  CLI -.-> MCP["@usta/mcp<br/>connector'lar (M6)"]
+  CLI --> MCP["@usta/mcp<br/>connector'lar"]
   CORE --> SDK["@usta/sdk<br/>araç / plugin API'si"]
   MCP -.-> SDK
   CORE -->|"OpenAI uyumlu"| GW[("EVREN LLM Gateway")]
@@ -172,7 +173,7 @@ packages/
   core/   ajan döngüsü, provider, araçlar, izinler, token ekonomisi, oturumlar
   cli/    Ink arayüzü, komutlar, headless mod
   sdk/    araç/plugin yazarları için genel API
-  mcp/    MCP connector istemcisi (M6)
+  mcp/    MCP connector istemcisi
 docs/     kullanıcı ve geliştirici belgeleri, mimari karar kayıtları (ADR)
 ```
 

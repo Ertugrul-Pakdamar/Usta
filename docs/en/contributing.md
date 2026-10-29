@@ -54,7 +54,7 @@ packages/
   sdk/   public API (Tool, defineTool, ToolError): the only surface plugin/tool authors see
   core/  UI-independent core: agent loop, tools, permissions, token economy, localization
   cli/   Ink interface, slash commands, headless mode
-  mcp/   MCP connectors (M6)
+  mcp/   MCP connector client
 docs/    documentation and architecture decision records (ADR); docs/en holds the English version
 ```
 

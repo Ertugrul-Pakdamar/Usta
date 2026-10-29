@@ -102,7 +102,10 @@ function slim(node: unknown): unknown {
 }
 
 export function toToolSpec(tool: Tool): ToolSpec {
-  const { $schema: _, ...parameters } = z.toJSONSchema(tool.input) as Record<string, unknown>;
+  const { $schema: _, ...parameters } = (tool.jsonSchema ?? z.toJSONSchema(tool.input)) as Record<
+    string,
+    unknown
+  >;
   return {
     name: tool.name,
     description: tool.description,

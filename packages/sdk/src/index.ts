@@ -33,6 +33,8 @@ export interface Tool<S extends ZodType = ZodType> {
   description: string;
   /** Zod schema of the arguments; also sent to the model as JSON Schema. */
   input: S;
+  /** Sent to the model instead of the schema derived from `input` (tools that bring their own, e.g. MCP). */
+  jsonSchema?: Record<string, unknown>;
   /** True when the tool changes state (files, processes). Gated by permissions. */
   mutating: boolean;
   /** Returns the text the model will see. Throw `ToolError` for expected failures. */

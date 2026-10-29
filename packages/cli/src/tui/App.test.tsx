@@ -163,6 +163,30 @@ describe("App", () => {
     ui.unmount();
   });
 
+  it("/mcp lists connected servers with their tools and failures", async () => {
+    const mcp = {
+      status: [
+        { name: "gh", state: "connected", tools: ["mcp__gh__list_issues"], approxTokens: 321 },
+        { name: "dead", state: "failed", tools: [], error: "spawn ENOENT", approxTokens: 0 },
+      ],
+      tools: [],
+    };
+    const ui = render(
+      <App
+        provider={new MockProvider([])}
+        config={config}
+        cwd={cwd}
+        model="m"
+        mcp={mcp as never}
+      />,
+    );
+    await type(ui, "/mcp");
+    await waitFor(ui, "mcp__gh__list_issues");
+    await waitFor(ui, "321");
+    await waitFor(ui, "spawn ENOENT");
+    ui.unmount();
+  });
+
   it("runs !shell commands directly", async () => {
     const ui = mount([]);
     await type(ui, "!echo selam-shell");
