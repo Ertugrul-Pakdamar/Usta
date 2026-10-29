@@ -13,6 +13,8 @@ export type Item =
       output: string;
       isError: boolean;
       diff?: string;
+      /** File the diff belongs to (picks the syntax highlighting). */
+      path?: string;
     }
   | { id: number; kind: "info"; text: string }
   | { id: number; kind: "error"; text: string };
@@ -62,7 +64,7 @@ export function ItemView({ item, width }: { item: Item; width: number }) {
           </Text>
           {item.diff ? (
             <Box marginLeft={2} flexDirection="column">
-              <DiffView diff={item.diff} />
+              <DiffView diff={item.diff} path={item.path} />
             </Box>
           ) : (
             <Box marginLeft={2}>

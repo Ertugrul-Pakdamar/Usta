@@ -6,6 +6,10 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 
 ### Eklendi
 
+**M7a: `@dosya` tamamlama ve renkli diff**
+- İstemde `@yol` önerisi ve Tab ile tamamlama; bahsedilen dosyanın içeriği isteme eklenir (en çok 5 dosya, 12.000 karakter; büyük dosya kesilir ve `Read` ile devam edilir). Gizli dosyalar, proje dışı yollar ve bunlara giden sembolik bağlar eklenmez (testin yakaladığı sembolik bağ açığı kapatıldı). Başsız modda da çalışır. Tab ayrıca `/komut` adlarını tamamlar.
+- Diff'lerde sözdizimi renklendirme (bağımlılıksız küçük bir ayrıştırıcı: anahtar sözcük, metin, yorum, sayı; dil uzantıdan). Gerçek modelle `@dosya` doğrulandı (model `Read` çağırmadan cevapladı).
+
 **M6c: Plugin'ler, modül hook'ları, Stop ile devam**
 - Plugin: `usta-plugin.json` + `skills/`, `commands/`, `agents/`; manifestte hook'lar ve MCP sunucuları (`${PLUGIN_ROOT}`). `usta plugin install|list|enable|disable|remove`, `/plugins`. Kaynak: klasör veya git (npm ertelendi). Kurulum içeriği gösterip etkileşimli onay ister (atlanamaz); kurulumdan sonra değişen plugin uyarıyla atlanır.
 - Modül hook'ları: `{"module": "…"}` (süreç içi, block/context döner); yalnızca kullanıcı ayarlarından ve plugin'lerden okunur, proje ayarındaki yok sayılır. Ayar şeması: `command` ile `module`'den tam biri.

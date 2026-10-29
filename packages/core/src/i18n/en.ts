@@ -335,6 +335,7 @@ export const en = {
   "plugin.removed": 'Plugin "{name}" removed.',
   "plugin.unknown": 'No installed plugin named "{name}".',
   "slash.desc.plugins": "List the installed plugins",
+  "tui.attached": "Attached: {files}",
   "slash.desc.tasks": "Subagent tasks: /tasks, /tasks show <id>, /tasks stop <id>",
   "tasks.none": "No tasks.",
   "tasks.line": "{id}  {status}  {agent}: {description} · {elapsed}",

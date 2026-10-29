@@ -41,7 +41,10 @@ export function Approval({ request, width }: { request: AskRequest; width: numbe
         {request.reason && <Text dimColor>{request.reason}</Text>}
         {request.diff && (
           <Box marginTop={1}>
-            <DiffView diff={request.diff} />
+            <DiffView
+              diff={request.diff}
+              path={(request.input as { path?: string } | undefined)?.path}
+            />
           </Box>
         )}
         <Box marginTop={1}>
@@ -64,7 +67,10 @@ export function Approval({ request, width }: { request: AskRequest; width: numbe
       {request.reason && <Text dimColor>{request.reason}</Text>}
       {request.diff && (
         <Box marginTop={1}>
-          <DiffView diff={request.diff} />
+          <DiffView
+            diff={request.diff}
+            path={(request.input as { path?: string } | undefined)?.path}
+          />
         </Box>
       )}
       <Box marginTop={1}>
