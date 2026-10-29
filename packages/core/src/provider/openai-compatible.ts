@@ -44,7 +44,10 @@ function toGatewayError(err: unknown): unknown {
 export class OpenAICompatibleProvider implements Provider {
   private readonly client: OpenAI;
 
-  constructor(config: Pick<UstaConfig, "apiKey" | "baseUrl">) {
+  private readonly config: Pick<UstaConfig, "apiKey" | "baseUrl" | "frequencyPenalty">;
+
+  constructor(config: Pick<UstaConfig, "apiKey" | "baseUrl" | "frequencyPenalty">) {
+    this.config = config;
     if (!config.apiKey) throw gatewayError("error.noApiKey", undefined, "no_key");
     if (!config.baseUrl) throw gatewayError("error.noBaseUrl", undefined, "no_base_url");
     this.client = new OpenAI({ apiKey: config.apiKey, baseURL: config.baseUrl });
@@ -71,6 +74,11 @@ export class OpenAICompatibleProvider implements Provider {
           stream_options: { include_usage: true },
           ...(req.maxTokens && { max_tokens: req.maxTokens }),
           ...(req.temperature !== undefined && { temperature: req.temperature }),
+          // Only for the agent's own requests: the auto-mode classifier (temperature 0) answers JSON.
+          ...(req.temperature === undefined &&
+            this.config.frequencyPenalty !== undefined && {
+              frequency_penalty: this.config.frequencyPenalty,
+            }),
           ...(req.tools?.length && {
             tools: req.tools.map((t) => ({
               type: "function" as const,

@@ -29,3 +29,4 @@ export * from "./terms.js";
 export * from "./tokens.js";
 export * from "./tools/index.js";
 export * from "./types.js";
+export * from "./verbosity.js";

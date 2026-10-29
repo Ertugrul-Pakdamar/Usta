@@ -8,6 +8,8 @@ export interface UstaConfig {
   baseUrl: string;
   model: string;
   maxTokens: number | undefined;
+  /** Sent with agent requests (not with the classifier's) to curb repetition; unset = the model's default. */
+  frequencyPenalty?: number;
 }
 
 /**
@@ -23,11 +25,13 @@ export function loadEnvFiles(cwd = process.cwd(), home = homedir()): void {
 /** Reads configuration from the environment (EVREN_* variables). */
 export function configFromEnv(env: NodeJS.ProcessEnv = process.env): UstaConfig {
   const maxTokens = Number.parseInt(env.EVREN_DEFAULT_MAX_TOKENS ?? "", 10);
+  const penalty = Number.parseFloat(env.EVREN_FREQUENCY_PENALTY ?? "");
   return {
     apiKey: env.EVREN_API_KEY || undefined,
     // No built-in default: the gateway address is deployment-specific and never ships in the repo.
     baseUrl: (env.EVREN_BASE_URL ?? "").trim().replace(/\/+$/, ""),
     model: env.EVREN_DEFAULT_MODEL || "qwen3-vl-30b",
     maxTokens: Number.isFinite(maxTokens) ? maxTokens : undefined,
+    ...(Number.isFinite(penalty) && { frequencyPenalty: penalty }),
   };
 }

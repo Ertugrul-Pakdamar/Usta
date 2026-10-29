@@ -6,6 +6,7 @@ import { createInterface } from "node:readline/promises";
 import {
   type AskRequest,
   acceptTerms,
+  analyzeAssistantText,
   BulkEditNudge,
   buildSystemPrompt,
   builtinTools,
@@ -39,6 +40,7 @@ import {
   TaskManager,
   t,
   toolsForMode,
+  VerbosityGuard,
 } from "@usta/core";
 import { Command } from "commander";
 import { runLogin, runLogout } from "./login.js";
@@ -372,6 +374,7 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
     ? `${userText}\n\n<hook-context>\n${context.join("\n")}\n</hook-context>`
     : userText;
 
+  const verbosity = new VerbosityGuard();
   conversation.push({ role: "user", content: prompt });
   const result = await runAgent(prompt, {
     provider,
@@ -388,11 +391,15 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
     afterTool: composeAfterTool(
       createAfterTool(hooks, undefined, warn),
       ...(opts.disableTools?.includes("Script") ? [] : [createNudgeAfterTool(new BulkEditNudge())]),
+      async () => verbosity.take(),
     ),
     beforeRequest: economy.beforeRequest,
     limitOutput: economy.limitOutput,
     state: economy.state,
-    onMessage: (m) => conversation.push(m),
+    onMessage: (m) => {
+      conversation.push(m);
+      verbosity.observe(m);
+    },
     onStop: createOnStop(hooks, undefined, warn, (reason) =>
       warn(t("hooks.stopContinue", { reason })),
     ),
@@ -415,6 +422,8 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
         result: result.text,
         turns: result.turns,
         stop_reason: result.stopReason,
+        assistant_chars: analyzeAssistantText(result.messages).chars,
+        repeat_ratio: analyzeAssistantText(result.messages).repeatRatio,
         ...(result.stopDetail && { stop_detail: result.stopDetail }),
         usage: {
           prompt_tokens: result.usage.promptTokens,

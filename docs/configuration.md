@@ -4,15 +4,16 @@ usta üç kaynaktan yapılandırılır: **ortam değişkenleri** (gateway erişi
 
 ## Ortam değişkenleri
 
-| Değişken                   | Zorunlu | Anlamı                                                                                   |
-| -------------------------- | ------- | ---------------------------------------------------------------------------------------- |
-| `EVREN_API_KEY`            | evet    | Gateway API anahtarı. Loglara ve oturum dosyalarına yazılmadan önce maskelenir           |
-| `EVREN_BASE_URL`           | evet    | Gateway adresi, `/v1` ile biter. Kuruma özgü olduğu için yerleşik varsayılanı **yoktur** |
-| `EVREN_DEFAULT_MODEL`      | hayır   | Başka model seçilmediğinde kullanılan model (varsayılan `qwen3-vl-30b`)                  |
-| `EVREN_DEFAULT_MAX_TOKENS` | hayır   | Tek bir model cevabının üst sınırı; boşsa gateway varsayılanı                            |
-| `EVREN_FAST_MODEL`         | hayır   | Bağlam özetleri için ucuz model; boşsa ana model (`models.fast` ayarı önceliklidir)      |
-| `USTA_NO_RG`               | hayır   | Doluysa `rg` kullanılmaz, saf JS arama çalışır                                           |
-| `USTA_LANG`                | hayır   | Arayüz dili: `tr` veya `en` ([Dil](#dil))                                                |
+| Değişken                   | Zorunlu | Anlamı                                                                                                                                                  |
+| -------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `EVREN_API_KEY`            | evet    | Gateway API anahtarı. Loglara ve oturum dosyalarına yazılmadan önce maskelenir                                                                          |
+| `EVREN_BASE_URL`           | evet    | Gateway adresi, `/v1` ile biter. Kuruma özgü olduğu için yerleşik varsayılanı **yoktur**                                                                |
+| `EVREN_DEFAULT_MODEL`      | hayır   | Başka model seçilmediğinde kullanılan model (varsayılan `qwen3-vl-30b`)                                                                                 |
+| `EVREN_DEFAULT_MAX_TOKENS` | hayır   | Tek bir model cevabının üst sınırı; boşsa gateway varsayılanı                                                                                           |
+| `EVREN_FREQUENCY_PENALTY`  | hayır   | Deneysel: ajan isteklerine `frequency_penalty` ekler. Ölçümde **fayda görülmedi**, varsayılan kapalı ([eval](evals.md#ek-ölçüm-uzun-ve-tekrarlı-çıktı)) |
+| `EVREN_FAST_MODEL`         | hayır   | Bağlam özetleri için ucuz model; boşsa ana model (`models.fast` ayarı önceliklidir)                                                                     |
+| `USTA_NO_RG`               | hayır   | Doluysa `rg` kullanılmaz, saf JS arama çalışır                                                                                                          |
+| `USTA_LANG`                | hayır   | Arayüz dili: `tr` veya `en` ([Dil](#dil))                                                                                                               |
 
 Arama sırası (ilk bulunan kazanır): gerçek ortam değişkenleri → `./.env` → `~/.usta/credentials`. Dosyalar `ANAHTAR=değer` biçimindedir. `~/.usta/credentials` dosyasını elle düzenlemek yerine `usta login` / `usta logout` kullanın (0600 izinle yazar, diğer satırları korur).
 

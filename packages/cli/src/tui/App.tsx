@@ -47,6 +47,7 @@ import {
   toToolSpec,
   truncateSession,
   type UstaConfig,
+  VerbosityGuard,
 } from "@usta/core";
 import type { McpManager } from "@usta/mcp";
 import type { Tool } from "@usta/sdk";
@@ -186,6 +187,7 @@ export function App(props: AppProps) {
   const messages = useRef<Message[]>(props.resume?.messages ?? []);
   const session = useRef<Session | undefined>(props.resume?.session);
   const checkpoints = useRef<CheckpointStore | undefined>(undefined);
+  const verbosity = useRef(new VerbosityGuard());
   const streamBuf = useRef("");
   const flushTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const abort = useRef<AbortController | undefined>(undefined);
@@ -441,6 +443,7 @@ export function App(props: AppProps) {
           props.disabledTools?.includes("Script")
             ? undefined
             : createNudgeAfterTool(new BulkEditNudge()),
+          async () => verbosity.current.take(),
         ),
         pendingMessages: () => manager.drainNotices(),
         onStop: createOnStop(
@@ -459,6 +462,7 @@ export function App(props: AppProps) {
         limitOutput: economy.limitOutput,
         state: economy.state,
         onMessage: (m) => {
+          verbosity.current.observe(m);
           messages.current.push(m);
           appendMessage(sess, m);
         },
@@ -620,6 +624,7 @@ export function App(props: AppProps) {
           checkpoints.current = undefined;
           sessionStarted.current = false;
           manager.stopAll();
+          verbosity.current = new VerbosityGuard();
           auto.reset();
           economy.reset();
           economy.setSession(undefined);

@@ -47,6 +47,30 @@ usta'nın "daha az token" iddiasını tahminle değil **ölçümle** göstermek 
 - **Toplu olmayan görevlerde fark yok ya da gürültü.** Hata düzeltme ve cevap bulmada iki varyant da benzer; özellik eklemede baseline daha pahalı çıktı (47.234'e karşı 35.843) ama N=3 ile bunu "Script'in sabit yükü" diye yorumlamak için yeterli kanıt yok. Script şeması her isteğe ek yük bindirir (bkz. [Token ekonomisi](token-economy.md)); toplu iş yoksa bir faydası olmaz.
 - Model Script'i çoğunlukla doğru yerde seçti: baseline'da 13 Script çağrısı, hepsi toplu görevlerde.
 
+## Ek ölçüm: uzun ve tekrarlı çıktı
+
+Bir kullanıcı denemesinde (Go + React form oluşturucusu için "güvenlik açıklarını ve optimizasyonu incele" isteği) çıktı çok uzun ve tekrarlıydı. Transkriptten dört sorun çıktı: (1) model **tek bir `Glob`'dan sonra**, hiçbir dosyayı okumadan "…olabilir" kalıbında sekiz güvenlik maddesi yazdı; (2) her `Read`'den sonra aynı plan/özet/sonraki adımlar bölümlerini **yeniden yazdı**; (3) erişimi reddedilen `.env` hakkında içeriğini görmüş gibi konuştu (değeri aslında `config.go` varsayılanıydı); (4) bizim hatamız: model ```env kod bloğu açınca Markdown boyayıcı ekrana `Could not find the language 'env'` basıyordu (`usta -c` ile geçmiş yüklenirken de, yani **release binary'sinde de**).
+
+**Düzeltmeler:** bilinmeyen dilli kod blokları `plaintext`'e çevrilir (hata ekrana sızmaz) ve iç içe listelerdeki fazladan boş satırlar temizlenir; sistem istemine "okumadığın dosya hakkında bulgu yazma, tahmini tahmin diye işaretle", "inceleme/plan/liste isteği salt okumadır", "araç çağrıları arasında en çok birkaç cümle, bulguların tamamı yalnızca son cevapta, önceki özeti tekrarlama" kuralları eklendi; `VerbosityGuard` ara turlarda uzun metni ya da önceki içeriğin tekrarını fark edince bir sonraki araç sonucuna kısa bir hatırlatma ekler (en çok her iki çağrıda bir); JSON çıktısına `assistant_chars` ve `repeat_ratio` eklendi.
+
+**Ölçüm (`review-project` görevi, gerçek model):**
+
+| Varyant                         | Koşu | Cevapta gerçek bulgular | Ortanca tamamlama token'ı | Tekrarlanan pay |
+| ------------------------------- | ---: | ----------------------: | ------------------------: | --------------: |
+| Önce (eski istem, koruyucu yok) |    4 |                     2/4 |                     2.099 |              %5 |
+| Sonra (yeni istem + koruyucu)   |    6 |                     3/6 |                     2.177 |              %1 |
+| Sonra + `frequency_penalty` 0,3 |    6 |                     1/6 |                     1.858 |              %1 |
+
+Dokuz görevlik standart paket yeni istemle yeniden koşuldu: **27/27 başarı** (önceki 27/27); tamamlama token'ı toplamı 11.672 → 11.727 (aynı).
+
+**Dürüst yorum:**
+
+- **Kullanıcının uzun çıktısını yeniden üretemedim.** Benim 11 dosyalık örnek projem çok daha küçük; temel çıktı zaten ~2.100 token ve tekrar payı %5 idi. İstem ve koruyucu tekrar payını %5'ten %1'e indirdi, ama **çıktı uzunluğunu ve başarıyı ölçülebilir şekilde değiştirmedi** (N = 4–6, fark gürültü içinde).
+- **`frequency_penalty` fayda sağlamadı** (1/6 başarı, uzunlukta anlamlı fark yok); bu yüzden **varsayılan kapalı**, yalnızca deneysel bir `EVREN_FREQUENCY_PENALTY` ayarı olarak duruyor.
+- "Gerçek bulgu" denetimi kaba (dört anahtardan en az ikisi son cevapta geçmeli) ve sonuçlar gürültülü; "okunmadan yazılmış iddia" oranını ölçen bir metrik **henüz yok**.
+- Standart pakette toplam token 220.665 → 337.154 çıktı; fark neredeyse tamamen `bulk-rename` görevinin doğal oynaklığından (ortanca 13.303 → 36.316; aynı görev daha önce 97.179'a kadar çıkmıştı) ve tamamlama token'ı değişmedi; yine de bu görev istem değişikliğiyle birlikte izlenmeli.
+- **Sıradaki adım:** gerçek projeyle (kullanıcının Formexus'u) aynı isteği yeni sürümle yeniden denemek ve transkripti paylaşmak.
+
 ## Süreç ve bulunan hatalar (düzeltildi)
 
 Değerlendirme paketi, ürünün ve görevlerin kusurlarını da ortaya çıkardı. Hepsi kayıtlı:

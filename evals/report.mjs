@@ -66,6 +66,25 @@ for (const v of variants) {
     }`,
   );
 }
+const withVerbosity = rows.filter((r) => r.repeat_ratio !== undefined);
+if (withVerbosity.length) {
+  lines.push(
+    "",
+    "### Verbosity (median per run)",
+    "",
+    "| Task | Variant | Completion tokens | Assistant chars | Repeated share | Turns |",
+    "| --- | --- | ---: | ---: | ---: | ---: |",
+  );
+  for (const t of [...new Set(withVerbosity.map((r) => r.task))]) {
+    for (const v of variants) {
+      const rs = withVerbosity.filter((r) => r.task === t && r.variant === v);
+      if (!rs.length) continue;
+      lines.push(
+        `| ${t} | ${v} | ${fmt(median(rs.map((r) => r.completion_tokens)))} | ${fmt(median(rs.map((r) => r.assistant_chars)))} | ${Math.round(100 * median(rs.map((r) => r.repeat_ratio)))}% | ${fmt(median(rs.map((r) => r.turns)))} |`,
+      );
+    }
+  }
+}
 const failed = rows.filter((r) => !r.ok);
 if (failed.length) {
   lines.push("", "### Failures", "");

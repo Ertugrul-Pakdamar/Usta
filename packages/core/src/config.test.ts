@@ -12,6 +12,12 @@ describe("configFromEnv", () => {
   it("has no built-in gateway address", () => {
     expect(configFromEnv({}).baseUrl).toBe("");
   });
+
+  it("reads an optional frequency penalty and leaves it unset otherwise", () => {
+    expect(configFromEnv({ EVREN_FREQUENCY_PENALTY: "0.3" }).frequencyPenalty).toBe(0.3);
+    expect(configFromEnv({ EVREN_FREQUENCY_PENALTY: "x" }).frequencyPenalty).toBeUndefined();
+    expect("frequencyPenalty" in configFromEnv({})).toBe(false);
+  });
 });
 
 describe("loadEnvFiles", () => {

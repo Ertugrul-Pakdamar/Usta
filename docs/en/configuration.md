@@ -4,15 +4,16 @@ usta is configured from three sources: **environment variables** (gateway access
 
 ## Environment variables
 
-| Variable                   | Required | Meaning                                                                                          |
-| -------------------------- | -------- | ------------------------------------------------------------------------------------------------ |
-| `EVREN_API_KEY`            | yes      | Gateway API key. It is masked before anything is logged or written to session files              |
-| `EVREN_BASE_URL`           | yes      | Gateway address, ends with `/v1`. It is deployment specific, so there is **no** built-in default |
-| `EVREN_DEFAULT_MODEL`      | no       | Model used when no other is chosen (default `qwen3-vl-30b`)                                      |
-| `EVREN_DEFAULT_MAX_TOKENS` | no       | Upper bound for one model reply; empty means the gateway default                                 |
-| `EVREN_FAST_MODEL`         | no       | Cheaper model for context summaries; empty means the main model (the `models.fast` setting wins) |
-| `USTA_NO_RG`               | no       | When set, `rg` is not used and the pure-JS search runs                                           |
-| `USTA_LANG`                | no       | Interface language: `tr` or `en` ([Language](#language))                                         |
+| Variable                   | Required | Meaning                                                                                                                                                                          |
+| -------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `EVREN_API_KEY`            | yes      | Gateway API key. It is masked before anything is logged or written to session files                                                                                              |
+| `EVREN_BASE_URL`           | yes      | Gateway address, ends with `/v1`. It is deployment specific, so there is **no** built-in default                                                                                 |
+| `EVREN_DEFAULT_MODEL`      | no       | Model used when no other is chosen (default `qwen3-vl-30b`)                                                                                                                      |
+| `EVREN_DEFAULT_MAX_TOKENS` | no       | Upper bound for one model reply; empty means the gateway default                                                                                                                 |
+| `EVREN_FREQUENCY_PENALTY`  | no       | Experimental: adds `frequency_penalty` to the agent's requests. **No benefit was measured**, off by default ([eval](evals.md#additional-measurement-long-and-repetitive-output)) |
+| `EVREN_FAST_MODEL`         | no       | Cheaper model for context summaries; empty means the main model (the `models.fast` setting wins)                                                                                 |
+| `USTA_NO_RG`               | no       | When set, `rg` is not used and the pure-JS search runs                                                                                                                           |
+| `USTA_LANG`                | no       | Interface language: `tr` or `en` ([Language](#language))                                                                                                                         |
 
 Lookup order (first found wins): real environment variables → `./.env` → `~/.usta/credentials`. The files use `KEY=value` lines. Instead of editing `~/.usta/credentials` by hand use `usta login` / `usta logout` (writes with 0600, keeps other lines).
 
