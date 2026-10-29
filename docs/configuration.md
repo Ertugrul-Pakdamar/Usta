@@ -1,0 +1,112 @@
+# Yapılandırma
+
+usta üç kaynaktan yapılandırılır: **ortam değişkenleri** (gateway erişimi), **ayar dosyaları** (izinler, hook'lar, bütçe, modeller) ve **komut satırı bayrakları** (o oturum için). Öncelik her zaman daha özel olandadır: bayrak > ayar dosyası > varsayılan.
+
+## Ortam değişkenleri
+
+| Değişken                   | Zorunlu | Anlamı                                                                                   |
+| -------------------------- | ------- | ---------------------------------------------------------------------------------------- |
+| `EVREN_API_KEY`            | evet    | Gateway API anahtarı. Loglara ve oturum dosyalarına yazılmadan önce maskelenir           |
+| `EVREN_BASE_URL`           | evet    | Gateway adresi, `/v1` ile biter. Kuruma özgü olduğu için yerleşik varsayılanı **yoktur** |
+| `EVREN_DEFAULT_MODEL`      | hayır   | Başka model seçilmediğinde kullanılan model (varsayılan `qwen3-vl-30b`)                  |
+| `EVREN_DEFAULT_MAX_TOKENS` | hayır   | Tek bir model cevabının üst sınırı; boşsa gateway varsayılanı                            |
+| `EVREN_FAST_MODEL`         | hayır   | Bağlam özetleri için ucuz model; boşsa ana model (`models.fast` ayarı önceliklidir)      |
+| `USTA_NO_RG`               | hayır   | Doluysa `rg` kullanılmaz, saf JS arama çalışır                                           |
+
+Arama sırası (ilk bulunan kazanır): gerçek ortam değişkenleri → `./.env` → `~/.usta/credentials`. Dosyalar `ANAHTAR=değer` biçimindedir.
+
+## Ayar dosyaları
+
+```
+~/.usta/settings.json            kullanıcı        (her alan geçerli)
+<proje>/.usta/settings.json      proje, repoda    (güven kapısı var, aşağıya bakın)
+<proje>/.usta/settings.local.json  yerel, gitignore'lu  (kullanıcıya ait)
+```
+
+Katmanlar birleştirilir: listeler (`allow`, `deny`, `ask`, hook'lar) birbirine eklenir, skaler değerlerde sonraki katman kazanır, **`deny` her zaman kazanır**. Geçersiz bir dosya sessizce yok sayılmaz: usta hata verip durur (kurallar kaybolmasın diye).
+
+### Şema
+
+```json
+{
+  "permissions": {
+    "allow": ["Bash(git status:*)", "Edit(src/**)"],
+    "deny": ["Read(.env)", "Bash(rm:*)"],
+    "ask": ["Bash(git push:*)"],
+    "defaultMode": "default"
+  },
+  "hooks": {
+    "PreToolUse": [{ "matcher": "Bash", "command": "./scripts/check-command.sh", "timeout": 10 }]
+  },
+  "models": { "main": "qwen3-vl-30b", "fast": "qwen3-vl-30b" },
+  "budget": { "tokens": 500000, "cr": 5 },
+  "compactAt": 0.8
+}
+```
+
+| Alan                                 | Tür                                              | Açıklama                                                                    |
+| ------------------------------------ | ------------------------------------------------ | --------------------------------------------------------------------------- |
+| `permissions.allow` / `deny` / `ask` | `string[]`                                       | [Kural sözdizimi](permissions.md#kural-sözdizimi)                           |
+| `permissions.defaultMode`            | `default` \| `acceptEdits` \| `plan` \| `bypass` | Başlangıç izin modu. `bypass` **yalnızca kullanıcı ayarlarında** geçerlidir |
+| `hooks.<Olay>`                       | `{matcher?, command, timeout?}[]`                | [Hook'lar](permissions.md#hooklar). `timeout` saniye, varsayılan 30         |
+| `models.main` / `models.fast`        | `string`                                         | Ana model ve özetleme modeli                                                |
+| `budget.tokens`                      | `int`                                            | Oturum boyunca işlenen toplam token üst sınırı (girdi + çıktı)              |
+| `budget.cr`                          | `number`                                         | Oturum kredi (CR) üst sınırı                                                |
+| `compactAt`                          | `0.3 – 0.95`                                     | Bağlam penceresinin bu oranına varınca otomatik özet (varsayılan 0.8)       |
+
+### Proje güven kapısı
+
+Repodan gelen `.usta/settings.json` dosyasını başkası yazmış olabilir. Bu yüzden dosyada **`allow` kuralı, hook, `defaultMode`, `models` veya `compactAt`** varsa, usta bunları siz içeriği onaylamadan **uygulamaz**. Açılışta ne tanımlandığını listeler ve sorar:
+
+```
+Bu proje /…/proje/.usta/settings.json dosyasında şunları tanımlıyor:
+  - allow: Bash
+  - hook PreToolUse: ./check.sh
+Bunlar bu bilgisayarda izin sormadan komut çalıştırabilir.
+Bu proje ayarlarına güveniyor musunuz? [e/H]
+```
+
+- Onay, dosyanın **içerik özetine (SHA-256)** bağlanır ve `~/.usta/trust.json` içinde saklanır; dosya değişirse yeniden sorulur.
+- `deny`, `ask` ve `budget` her zaman uygulanır (yalnızca kısıtlayıcıdırlar).
+- Etkileşimsiz çalıştırmada (`-p`, terminal yok) güvenilmeyen kısımlar uyarıyla atlanır. CI'da dosyaya güveniyorsanız `--trust-project` verin.
+
+## Komut satırı
+
+```
+usta [istem...]                    etkileşimli oturum (istemle başlar)
+usta doctor                        bağlantı, anahtar, şart kabulü, kota kontrolü
+usta terms [accept]                kullanım şartlarını göster / kabul et
+usta models                        gateway'deki modelleri listele
+```
+
+| Bayrak                        | Anlamı                                                                |
+| ----------------------------- | --------------------------------------------------------------------- |
+| `-p, --print <istem>`         | Etkileşimsiz çalıştır, sonucu yazdır, çık                             |
+| `--output-format text\|json`  | `-p` çıktı biçimi (varsayılan `text`)                                 |
+| `--model <ad>`                | Bu oturumun modeli                                                    |
+| `--max-turns <n>`             | `-p` için en fazla ajan turu (varsayılan 25; etkileşimli oturumda 50) |
+| `-c, --continue`              | Bu dizindeki son oturuma devam et                                     |
+| `-r, --resume [id]`           | Belirli (veya son) oturuma devam et                                   |
+| `--permission-mode <mod>`     | `default` \| `acceptEdits` \| `plan` \| `bypass`                      |
+| `--plan`                      | Plan modunda başla                                                    |
+| `--allow <kural...>`          | İzin kuralı ekle (tekrarlanabilir)                                    |
+| `--deny <kural...>`           | Yasak kuralı ekle (tekrarlanabilir)                                   |
+| `--trust-project`             | Repodaki `.usta/settings.json` dosyasına sormadan güven               |
+| `--budget <cr>`               | Oturum kredi bütçesi                                                  |
+| `--token-budget <n>`          | Oturum token bütçesi; `200k`, `1.5m` biçimleri geçerli                |
+| `-y, --yes`                   | `bypass` modu: **deny kuralları dışında her şeye izin verir**         |
+| `-V, --version`, `-h, --help` | Sürüm, yardım                                                         |
+
+## `~/.usta` dizini
+
+| Yol                   | İçerik                               | Notlar                            |
+| --------------------- | ------------------------------------ | --------------------------------- |
+| `credentials`         | `EVREN_*` değişkenleri               | `chmod 600` önerilir              |
+| `settings.json`       | Kullanıcı ayarları                   |                                   |
+| `trust.json`          | Güvenilen proje ayarlarının özetleri |                                   |
+| `sessions/<id>.jsonl` | Konuşma kayıtları                    | 0600; `-c`/`-r` ile devam         |
+| `checkpoints/<id>/`   | `/rewind` için dosya yedekleri       | 0600                              |
+| `outputs/<id>/`       | Bağlama sığmayan tam araç çıktıları  | 7 günden eskiler açılışta silinir |
+| `cache/models.json`   | Gateway model bilgisi önbelleği      | 1 saat geçerli                    |
+
+Oturum dosyaları araç çıktılarını içerebilir; paylaşmadan önce gözden geçirin.

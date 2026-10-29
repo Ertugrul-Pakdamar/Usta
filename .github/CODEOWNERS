@@ -1,0 +1,10 @@
+# Default owner for everything
+*                                   @Ertugrul-Pakdamar
+
+# Security-sensitive code always needs an owner review
+/packages/core/src/permissions.ts   @Ertugrul-Pakdamar
+/packages/core/src/gate.ts          @Ertugrul-Pakdamar
+/packages/core/src/settings.ts      @Ertugrul-Pakdamar
+/packages/core/src/hooks.ts         @Ertugrul-Pakdamar
+/packages/core/src/tools/           @Ertugrul-Pakdamar
+/SECURITY.md                        @Ertugrul-Pakdamar

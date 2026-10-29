@@ -1,0 +1,52 @@
+name: Hata bildirimi
+description: Beklenmedik bir davranışı bildirin
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Teşekkürler! Önce [sorun giderme](https://github.com/Ertugrul-Pakdamar/Usta/blob/main/docs/troubleshooting.md) sayfasına bakın.
+        **Güvenlik açığı mı buldunuz?** Burada değil, [özel kanaldan](https://github.com/Ertugrul-Pakdamar/Usta/security/advisories/new) bildirin.
+  - type: textarea
+    id: what
+    attributes:
+      label: Ne oldu?
+      description: Beklediğiniz ve gerçekleşen davranış.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Yeniden üretme adımları
+      placeholder: |
+        1. `usta` ile başlat
+        2. ... yaz
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: usta sürümü
+      description: "`usta --version` çıktısı veya commit"
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Ortam
+      description: İşletim sistemi ve `node --version`
+      placeholder: Fedora 44, Node v22.x
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: "`usta doctor` çıktısı"
+      description: Anahtar ve gateway adresini paylaşmayın.
+      render: text
+  - type: textarea
+    id: logs
+    attributes:
+      label: Ek bilgi
+      description: Hata iletisi, ekran görüntüsü. **API anahtarı, `.env` içeriği veya iç adresleri çıkarın.**

@@ -1,0 +1,155 @@
+# Mimari
+
+Bu belge usta'nın nasıl kurulduğunu ve **neden** öyle kurulduğunu anlatır. Katkı yapmadan önce okumanız önerilir; kararların gerekçeleri [ADR'lerde](adr/) kayıtlıdır.
+
+## Paketler
+
+```mermaid
+flowchart LR
+  CLI["@usta/cli"] --> CORE["@usta/core"]
+  CLI -.-> MCP["@usta/mcp"]
+  CORE --> SDK["@usta/sdk"]
+  MCP -.-> SDK
+  CORE -->|"OpenAI uyumlu HTTP"| GW[("EVREN LLM Gateway")]
+```
+
+| Paket        | Sorumluluk                                                                                                                                | Bağımlı olabileceği  |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| `@usta/sdk`  | **Genel API**: `Tool`, `defineTool`, `ToolError`, `ToolContext`, `ReviewRequest`. Plugin/araç yazarları yalnızca bunu görür               | yalnızca `zod`       |
+| `@usta/core` | Arayüzden bağımsız her şey: ajan döngüsü, provider, araçlar, izin motoru, kapı, hook'lar, ayarlar, oturumlar, checkpoint, token ekonomisi | `sdk`                |
+| `@usta/cli`  | Ink arayüzü, slash komutları, headless mod, `bin` girişi                                                                                  | `core`, `sdk`, `mcp` |
+| `@usta/mcp`  | MCP connector istemcisi _(M6; şimdilik boş)_                                                                                              | `core`, `sdk`        |
+
+**Kural:** `core` arayüzü (Ink/React) hiçbir şekilde bilmez. Böylece aynı çekirdek TUI'ı, headless modu ve ileride bir IDE eklentisini besler. `core`'un dışa açtığı her şey `index.ts` üzerinden gider; `sdk` ise tek kararlı (semver) yüzeydir.
+
+## Ajan döngüsü
+
+`runAgent` (`core/src/agent/loop.ts`) tek bir kullanıcı isteğini bitirene kadar modelle konuşur.
+
+```mermaid
+sequenceDiagram
+  participant U as Kullanıcı / arayüz
+  participant A as runAgent
+  participant E as Economy
+  participant G as Gateway
+  participant T as Araç kapısı + araçlar
+  U->>A: konuşma geçmişi + yeni istem
+  loop her tur (en fazla maxTurns)
+    A->>E: beforeRequest(mesajlar, araçlar)
+    Note over E: tahmin, gerekirse özet, bütçe
+    A->>G: sohbet isteği (akış)
+    G-->>A: metin parçaları + araç çağrıları + usage
+    A->>E: recordUsage(usage)
+    alt araç çağrısı yok
+      A-->>U: bitti (end_turn)
+    else araç çağrıları var
+      A->>T: bağımsız olanlar paralel, değiştirenler sırayla
+      T-->>A: sonuçlar (sınırlanmış)
+    end
+  end
+```
+
+Döngünün önemli sözleşmeleri:
+
+- **Hata modele döner, çökmez.** Geçersiz JSON, bilinmeyen araç, şemaya uymayan argüman, reddedilen izin: hepsi aracın _sonucu_ olarak modele iletilir ve model düzeltebilir.
+- **İptal güvenlidir.** Akış iptal edilirse yarım cevap geçmişe yazılmaz; geçmiş her zaman geçerli kalır (her araç çağrısının bir sonucu vardır).
+- **Metin olarak gelen araç çağrıları** (`<tool_call>{…}</tool_call>`) yedek ayrıştırıcıyla çağrıya çevrilir; bazı modeller/sunucular native `tool_calls` yerine bunu üretir.
+- **Salt okuma çağrıları paralel**, değiştirenler sıralı çalışır.
+- Döngü bir **bütçe hatası** fırlatılırsa `stopReason: "budget"` ile temiz biter.
+
+Önemli seçenekler: `tools` (dizi **veya** her turda değerlendirilen fonksiyon), `approve` (her çağrıdan önce), `review` (araçların toplu yazma onayı), `beforeRequest`, `volatileTail`, `limitOutput`, `afterTool`, `onMessage` (kalıcılık), `state` (araçlar arası paylaşılan önbellek).
+
+## Araç sözleşmesi (`@usta/sdk`)
+
+| Alan                  | Anlamı                                                                                   |
+| --------------------- | ---------------------------------------------------------------------------------------- |
+| `name`, `description` | Modele gider. **İngilizce ve kısa** olmalı: her araç her istekte ~110 token tutar        |
+| `input` (zod)         | Hem doğrulama hem model için JSON Schema; tek kaynak                                     |
+| `mutating`            | Durum değiştirir mi? Plan modunda yasaklanır, onay gerektirir                            |
+| `permission`          | `{ kind: "path" \| "command", target(input) }`: izin kuralları neyle eşleşecek           |
+| `preview?`            | Onay kutusunda gösterilecek diff/önizleme                                                |
+| `run(input, ctx)`     | `ctx.cwd`, `ctx.signal`, `ctx.state`, `ctx.review`. Beklenen hatada `ToolError` fırlatır |
+
+## Araç kapısı
+
+Her çağrı **tek** bir yoldan geçer (`core/src/gate.ts`); atlamanın bir yolu yoktur.
+
+```mermaid
+flowchart TD
+  A["Model araç çağırır"] --> B{"Argümanlar geçerli mi?"}
+  B -- hayır --> X["Hata modele döner"]
+  B -- evet --> C{"İzin motoru"}
+  C -- deny --> X
+  C -- "ask / allow" --> E{"PreToolUse hook'u engelledi mi?"}
+  E -- evet --> X
+  E -- hayır --> F{"Onay gerekiyor mu?"}
+  F -- evet --> D["Kullanıcıya diff ile sor"]
+  D -- reddet --> X
+  D -- onayla --> G["Checkpoint al"]
+  F -- hayır --> G
+  G --> H["Aracı çalıştır"]
+  H --> I["Çıktıyı sınırla · PostToolUse · sezgiler"]
+  I --> J["Sonuç modele döner"]
+```
+
+`Script` gibi kendi başına çok dosya yazan araçlar için kapı, ikinci bir kanal sunar: `ctx.review`. Araç, yazmadan önce tam diff'i ve dosya listesini gönderir; `createReviewer` her dosyayı `Edit`/`Write` kurallarına göre denetler (deny, korunan yol, çalışma dizini dışı), gerekirse kullanıcıya sorar ve dosyaları checkpoint'ler. Gerekçe: [ADR-0003](adr/0003-script-review-in-tool.md).
+
+İzin motoru (`permissions.ts`) saf bir fonksiyon gibidir: aynı kurallar ve girdi, aynı karar. Bu yüzden en yoğun test edilen modüldür.
+
+## Token ekonomisi katmanı
+
+`Economy` (`core/src/economy.ts`) bir konuşmanın token yönetimini tek yerde toplar:
+
+| Parça                                      | Dosya             | İş                                                        |
+| ------------------------------------------ | ----------------- | --------------------------------------------------------- |
+| `ModelRegistry`                            | `models.ts`       | `/v1/models`'tan pencere, fiyat, yetenek; diskte önbellek |
+| `TokenEstimator`, `GatewayTokenCounter`    | `tokens.ts`       | Kalibre tahmin, `count_tokens` ile tam sayım              |
+| `CostTracker`, `checkBudget`, `fetchQuota` | `cost.ts`         | Kullanım, önbellek oranı, bütçe, `/v1/quota`              |
+| `compactMessages`                          | `compaction.ts`   | Eski turları özetleme                                     |
+| `createOutputLimiter`                      | `output-limit.ts` | Büyük çıktıyı kısalt ve diske yaz                         |
+| `BulkEditNudge`                            | `nudge.ts`        | Toplu düzenleme sezgisi                                   |
+
+Arayüz (`cli`) `Economy`'yi kurar ve geri çağrılarını (`callbacks`) kendi ihtiyacına bağlar (uyarı göster, bütçe sor, özeti kaydet). Hesap mantığı arayüzde değil çekirdektedir.
+
+## Kalıcı veri biçimleri
+
+**Oturum** (`~/.usta/sessions/<id>.jsonl`): her satır bir JSON nesnesidir, yalnızca eklenir.
+
+| `type`     | Anlamı                                                         |
+| ---------- | -------------------------------------------------------------- |
+| `meta`     | İlk satır: `id`, `cwd`, `createdAt`, `model`                   |
+| `message`  | Bir konuşma mesajı (`user`/`assistant`/`tool`)                 |
+| `truncate` | `/rewind`: ilk `length` mesaj kalsın                           |
+| `compact`  | Otomatik/elle özet: ilk `keepFrom` mesaj `summary` ile değişti |
+
+Yükleyici satırları sırayla oynatır; yarım yazılmış son satırı yok sayar ve sonuçsuz kalmış son araç çağrısı turunu atar. Sistem istemi saklanmaz (devamda taze üretilir). API anahtarı yazılmadan önce maskelenir.
+
+**Checkpoint** (`~/.usta/checkpoints/<id>/index.json`): her tur için `{messageCount, prompt, files: [{path, backup|null}]}`; yedekler yanında `*.bak`. `backup: null` "dosya yoktu" demektir (geri alınca silinir).
+
+## Arayüz (Ink)
+
+- **`<Static>`** biten öğeleri (kullanıcı/asistan/araç) bir kez basar; yalnızca akan metin, onay kutusu ve giriş alanı yeniden çizilir (titremeyi önler).
+- Akan metin 50 ms'de bir güncellenir; en son 20 satırı gösterilir, bittiğinde markdown olarak çizilir.
+- Onay (`pending`) ve bütçe sorusu (`confirm`) ayrı durumlardır; açıkken giriş alanı kapalı, tuşlar onay kutusuna gider.
+- Yapıştırılan metin tek parça gelir ve içindeki satır sonları _gönderme sayılmaz_.
+- Uzun satırlarda önek simgeleri (`›`, `●`) `flexShrink={0}` ile korunur (aksi halde Yoga bunları kırpıyordu).
+
+## Test stratejisi
+
+| Katman       | Nasıl                                                                                                                                                                                          |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Birim        | Vitest. Saf modüller (izin motoru, ayrıştırıcılar, ekonomi) doğrudan; dosya sistemi için geçici dizinler                                                                                       |
+| Ajan döngüsü | `MockProvider` ile **senaryo** testleri: model cevapları önceden yazılır, istekler kaydedilir ve doğrulanır (hangi mesaj, hangi araç listesi, hangi önek)                                      |
+| Arayüz       | `ink-testing-library`: tuş vuruşları gönderilir, ekran metni beklenir. Metin ve Enter ayrı yazılır (yapıştırma davranışı yüzünden)                                                             |
+| Gerçek ortam | Birim testler yerleşim hatalarını yakalayamaz; bu yüzden arayüz değişiklikleri bir **pty** içinde gerçek gateway ile elle doğrulanır (örnek: uzun yolda banner kırpılması ancak böyle görüldü) |
+
+Hiçbir test gerçek API anahtarı veya ağ gerektirmez; gateway çağrıları sahte `fetch` ile test edilir.
+
+## Tasarım ilkeleri
+
+1. **Güvenli varsayılan, kapalı başarısızlık.** Emin olunamayan durumda sor veya reddet; asla sessizce izin verme.
+2. **`deny` her şeyin üstündedir.** Mod, hook, güven, sezgi: hiçbiri aşamaz.
+3. **Modele dönük metin kararlı ve kısadır** (İngilizce); kullanıcıya dönük metin yerelleştirilir.
+4. **Ölç, sonra karar ver.** Token ve davranış kararları gerçek ölçümle verilir ve ADR'ye yazılır.
+5. **Çekirdek arayüzden bağımsız**, genişletme yüzeyi küçük ve sürümlü.
+6. **Telemetri yok.** Veri yalnızca kullanıcının gateway'ine gider.

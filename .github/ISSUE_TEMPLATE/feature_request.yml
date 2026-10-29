@@ -1,0 +1,47 @@
+name: Özellik isteği
+description: Bir fikir veya iyileştirme önerin
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Önce [yol haritasına](https://github.com/Ertugrul-Pakdamar/Usta/blob/main/docs/roadmap.md) bakın; fikir zaten planlı olabilir.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Hangi sorunu çözüyor?
+      description: Çözmek istediğiniz ihtiyacı anlatın (çözümü değil).
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Önerdiğiniz çözüm
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Düşündüğünüz alternatifler
+  - type: dropdown
+    id: area
+    attributes:
+      label: İlgili alan
+      options:
+        [
+          Ajan ve araçlar,
+          İzinler ve güvenlik,
+          Token ekonomisi,
+          Arayüz,
+          Belgeler,
+          Genişletilebilirlik (skill/plugin/MCP),
+          Diğer,
+        ]
+    validations:
+      required: true
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Katkı
+      options:
+        - label: Bunu kendim geliştirmek isterim

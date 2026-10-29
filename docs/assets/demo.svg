@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="789" height="764" viewBox="0 0 789 764" role="img" aria-label="usta terminal oturumu: toplu değişiklik betikle yapılır, diff onaylanınca uygulanır">
+  <title>usta terminal oturumu</title>
+  <rect width="789" height="764" rx="12" fill="#0d1117" stroke="#30363d"/>
+  <path d="M0 12a12 12 0 0 1 12-12h765a12 12 0 0 1 12 12v24H0z" fill="#161b22"/>
+  <circle cx="22" cy="18" r="6" fill="#ff5f56"/><circle cx="42" cy="18" r="6" fill="#ffbd2e"/><circle cx="62" cy="18" r="6" fill="#27c93f"/>
+  <text x="394" y="23" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="12" fill="#6e7681">usta</text>
+  <g font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="13" fill="#c9d1d9">
+  <text x="24" y="56" xml:space="preserve"><tspan fill="#56d4dd" font-weight="700">usta</tspan><tspan fill="#6e7681"> v0.0.0 · qwen3-vl-30b · ~/proje</tspan></text>
+  <text x="24" y="96" xml:space="preserve"><tspan fill="#56d4dd">› </tspan><tspan fill="#c9d1d9">page*.txt dosyalarında foo yerine bar yaz</tspan></text>
+  <text x="24" y="136" xml:space="preserve"><tspan fill="#3fb950">⏺ </tspan><tspan fill="#c9d1d9" font-weight="700">Glob(page*.txt)</tspan></text>
+  <text x="24" y="156" xml:space="preserve"><tspan fill="#6e7681">  ⎿ page1.txt</tspan></text>
+  <text x="24" y="176" xml:space="preserve"><tspan fill="#6e7681">    page2.txt</tspan></text>
+  <text x="24" y="196" xml:space="preserve"><tspan fill="#6e7681">    page3.txt</tspan></text>
+  <text x="24" y="216" xml:space="preserve"><tspan fill="#6e7681">    … +5 satır</tspan></text>
+  <text x="24" y="256" xml:space="preserve"><tspan fill="#3fb950">⏺ </tspan><tspan fill="#c9d1d9" font-weight="700">Script(python)</tspan><tspan fill="#6e7681">  ← kod önce onayınıza sunuldu, sonra proje KOPYASINDA çalıştı</tspan></text>
+  <text x="24" y="296" xml:space="preserve"><tspan fill="#d29922">╭────────────────────────────────────────────────────────────────────────────╮</tspan></text>
+  <text x="24" y="316" xml:space="preserve"><tspan fill="#d29922">│ </tspan><tspan fill="#d29922" font-weight="700">Betiğin değişiklikleri uygulansın mı?</tspan><tspan fill="#d29922">                                      │</tspan></text>
+  <text x="24" y="336" xml:space="preserve"><tspan fill="#d29922">│ </tspan><tspan fill="#6e7681">8 files (8 modified, 0 added, 0 deleted)</tspan><tspan fill="#d29922">                                   │</tspan></text>
+  <text x="24" y="356" xml:space="preserve"><tspan fill="#d29922">│ </tspan><tspan fill="#d29922">                                                                           │</tspan></text>
+  <text x="24" y="376" xml:space="preserve"><tspan fill="#d29922">│ </tspan><tspan fill="#c9d1d9">modified: page1.txt</tspan><tspan fill="#d29922">                                                        │</tspan></text>
+  <text x="24" y="396" xml:space="preserve"><tspan fill="#d29922">│ </tspan><tspan fill="#56d4dd">@@ -1,3 +1,3 @@</tspan><tspan fill="#d29922">                                                            │</tspan></text>
+  <text x="24" y="416" xml:space="preserve"><tspan fill="#d29922">│ </tspan><tspan fill="#6e7681"> title: page 1</tspan><tspan fill="#d29922">                                                             │</tspan></text>
+  <text x="24" y="436" xml:space="preserve"><tspan fill="#d29922">│ </tspan><tspan fill="#f85149">-foo is here</tspan><tspan fill="#d29922">                                                               │</tspan></text>
+  <text x="24" y="456" xml:space="preserve"><tspan fill="#d29922">│ </tspan><tspan fill="#3fb950">+bar is here</tspan><tspan fill="#d29922">                                                               │</tspan></text>
+  <text x="24" y="476" xml:space="preserve"><tspan fill="#d29922">│ </tspan><tspan fill="#f85149">-more foo text</tspan><tspan fill="#d29922">                                                             │</tspan></text>
+  <text x="24" y="496" xml:space="preserve"><tspan fill="#d29922">│ </tspan><tspan fill="#3fb950">+more bar text</tspan><tspan fill="#d29922">                                                             │</tspan></text>
+  <text x="24" y="516" xml:space="preserve"><tspan fill="#d29922">│ </tspan><tspan fill="#6e7681">… +60 satır</tspan><tspan fill="#d29922">                                                                │</tspan></text>
+  <text x="24" y="536" xml:space="preserve"><tspan fill="#d29922">│ </tspan><tspan fill="#d29922">                                                                           │</tspan></text>
+  <text x="24" y="556" xml:space="preserve"><tspan fill="#d29922">│ </tspan><tspan fill="#3fb950">[y]</tspan><tspan fill="#c9d1d9"> uygula </tspan><tspan fill="#f85149">[n]</tspan><tspan fill="#c9d1d9"> uygulama (Esc)</tspan><tspan fill="#d29922">                                              │</tspan></text>
+  <text x="24" y="576" xml:space="preserve"><tspan fill="#d29922">╰────────────────────────────────────────────────────────────────────────────╯</tspan></text>
+  <text x="24" y="616" xml:space="preserve"><tspan fill="#d2a8ff">● </tspan><tspan fill="#c9d1d9">8 dosyada 'foo' kelimesi 'bar' ile değiştirildi.</tspan></text>
+  <text x="24" y="656" xml:space="preserve"><tspan fill="#56d4dd">╭────────────────────────────────────────────────────────────────────────────╮</tspan></text>
+  <text x="24" y="676" xml:space="preserve"><tspan fill="#56d4dd">│ </tspan><tspan fill="#56d4dd">› </tspan><tspan fill="#56d4dd">                                                                         │</tspan></text>
+  <text x="24" y="696" xml:space="preserve"><tspan fill="#56d4dd">╰────────────────────────────────────────────────────────────────────────────╯</tspan></text>
+  <text x="24" y="716" xml:space="preserve"><tspan fill="#6e7681">qwen3-vl-30b · izin sor (⇧Tab) · bağlam %1 · ↑3.8k ↓301 · önb. %64 · ücretsiz · 1010 CR · /help</tspan></text>
+  </g>
+</svg>
