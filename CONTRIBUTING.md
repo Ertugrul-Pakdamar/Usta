@@ -87,7 +87,7 @@ docs/    belgeler ve mimari karar kayıtları (ADR)
 - **Okunabilirlik önceliklidir.** Çevredeki kodun adlandırma ve yorum yoğunluğunu izleyin. Yorum "ne"yi değil **"neden"i** anlatsın.
 - **Küçük dosyalar, açık sorumluluk.** Bir modül tek bir şey yapsın (`permissions.ts` yalnızca karar verir, `gate.ts` yalnızca bağlar).
 - **Yeni bağımlılık eklemeden önce tartışın:** boyut, bakım durumu ve internetsiz (air-gapped) ortamda çalışması önemlidir. Çalışma zamanı bağımlılıkları kasıtlı olarak az tutulur.
-- **Metin dili:** Kod, yorum ve tanımlayıcılar İngilizce. _Modele giden_ metinler (sistem istemi, araç açıklamaları) kısa ve İngilizce, çünkü her istekte token harcar. _Kullanıcıya_ görünen metinler şimdilik Türkçe; [M4.5](docs/roadmap.md) ile `t()` üzerinden yerelleştirilecek, yeni metinleri tek yerde toplamaya özen gösterin.
+- **Metin dili:** Kod, yorum ve tanımlayıcılar İngilizce. Metinler **iki sınıftır**: _modele giden_ her şey (sistem istemi, araç açıklamaları, araç sonuçları ve hata iletileri, ret sebepleri) kısa **İngilizce sabit** metindir ve kodda düz yazılır; _kullanıcıya görünen_ her şey `t("anahtar")` ile kataloktan gelir (`packages/core/src/i18n`: önce `en.ts`, sonra `tr.ts`; eksik çeviri derlemeyi kırar). Ayrıntı: [Mimari → Yerelleştirme](docs/architecture.md#yerelleştirme-i18n).
 - **Telemetri ekleme.** usta hiçbir veriyi gateway dışına göndermez; bu bir ürün garantisidir.
 
 ## Test
@@ -124,6 +124,7 @@ Hata düzelten her PR, o hatayı yeniden üretip düzeltmeyi kanıtlayan bir tes
 - [ ] `pnpm lint && pnpm build && pnpm test` yeşil
 - [ ] Yeni davranış için test eklendi (hata düzeltmesi için yeniden üreten test)
 - [ ] Belge ve CHANGELOG güncellendi
+- [ ] Kullanıcıya görünen yeni metinler kataloğa eklendi (`en.ts` + `tr.ts`); modele giden metinler İngilizce
 - [ ] Gizli bilgi (anahtar, `.env`, iç adresler) içermiyor
 - [ ] Güvenlik hassas alanlara dokunuyorsa: atlatma testleri var, `deny` önceliği korunuyor
 - [ ] Mimari etkisi varsa ADR eklendi

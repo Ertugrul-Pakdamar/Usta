@@ -114,7 +114,7 @@ export const grepTool = defineTool({
     try {
       new RegExp(pattern); // surface syntax errors identically regardless of the engine
     } catch (err) {
-      throw new ToolError(`Geçersiz düzenli ifade: ${(err as Error).message}`);
+      throw new ToolError(`Invalid regular expression: ${(err as Error).message}`);
     }
     const search = {
       pattern,
@@ -125,10 +125,10 @@ export const grepTool = defineTool({
     const lines = sortMatches(
       (rgAvailable() ? await searchWithRg(search) : undefined) ?? (await searchWithJs(search)),
     );
-    if (!lines.length) return "Eşleşme yok.";
+    if (!lines.length) return "No matches.";
     const shown = lines.slice(0, MAX_MATCHES).join("\n");
     return lines.length > MAX_MATCHES
-      ? `${shown}\n… ${lines.length - MAX_MATCHES} eşleşme daha`
+      ? `${shown}\n… ${lines.length - MAX_MATCHES} more matches`
       : shown;
   },
 });

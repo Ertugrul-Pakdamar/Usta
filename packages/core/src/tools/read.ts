@@ -29,7 +29,7 @@ export const readTool = defineTool({
     try {
       info = await stat(abs);
     } catch (err) {
-      throw new ToolError(`Dosya okunamadı (${path}): ${(err as NodeJS.ErrnoException).code}`);
+      throw new ToolError(`Cannot read ${path}: ${(err as NodeJS.ErrnoException).code}`);
     }
     // Re-reading an unchanged range only repeats tokens already in the conversation.
     const key = `read:${abs}:${offset}:${limit}`;
@@ -42,9 +42,9 @@ export const readTool = defineTool({
     try {
       text = await readFile(abs, "utf8");
     } catch (err) {
-      throw new ToolError(`Dosya okunamadı (${path}): ${(err as NodeJS.ErrnoException).code}`);
+      throw new ToolError(`Cannot read ${path}: ${(err as NodeJS.ErrnoException).code}`);
     }
-    if (text.includes("\0")) throw new ToolError(`${path} ikili (binary) bir dosya.`);
+    if (text.includes("\0")) throw new ToolError(`${path} is a binary file.`);
 
     const lines = text.split("\n");
     const last = Math.min(lines.length, offset - 1 + Math.min(limit, MAX_LINES));

@@ -1,8 +1,12 @@
 import { createInterface } from "node:readline/promises";
 import {
+  detectLanguage,
   Economy,
   GatewayError,
+  gatewayError,
   HookRunner,
+  LANGUAGES,
+  type Lang,
   type LoadedSettings,
   loadSettings,
   ModelRegistry,
@@ -10,7 +14,11 @@ import {
   PermissionEngine,
   type PermissionMode,
   type Provider,
+  parseLanguage,
   parseRule,
+  readLanguageSetting,
+  setLanguage,
+  t,
   trustProject,
   type UstaConfig,
 } from "@usta/core";
@@ -28,7 +36,9 @@ export async function askYesNo(question: string): Promise<boolean> {
   if (!process.stdin.isTTY) return false;
   const rl = createInterface({ input: process.stdin, output: process.stderr });
   try {
-    return /^(e|evet|y|yes)$/i.test((await rl.question(`${question} [e/H] `)).trim());
+    return /^(e|evet|y|yes)$/i.test(
+      (await rl.question(`${question} ${t("prompt.yesNo")} `)).trim(),
+    );
   } finally {
     rl.close();
   }
@@ -42,10 +52,10 @@ export async function setupRuntime(cwd: string, flags: RuntimeFlags, canPrompt: 
   let settings = loadSettings(cwd, undefined, { trustProject: flags.trustProject });
   const info = settings.project;
   if (info && !info.trusted && canPrompt) {
-    console.error(`\nBu proje ${info.path} dosyasında şunları tanımlıyor:`);
+    console.error(`\n${t("trust.header", { path: info.path })}`);
     for (const line of info.summary) console.error(`  - ${line}`);
-    console.error("Bunlar bu bilgisayarda izin sormadan komut çalıştırabilir.");
-    if (await askYesNo("Bu proje ayarlarına güveniyor musunuz?")) {
+    console.error(t("trust.warning"));
+    if (await askYesNo(t("trust.question"))) {
       trustProject(info, cwd);
       settings = loadSettings(cwd);
     }
@@ -55,9 +65,10 @@ export async function setupRuntime(cwd: string, flags: RuntimeFlags, canPrompt: 
     flags.permissionMode &&
     !(PERMISSION_MODES as readonly string[]).includes(flags.permissionMode)
   ) {
-    throw new GatewayError(
-      `Geçersiz --permission-mode: ${flags.permissionMode} (${PERMISSION_MODES.join(" | ")})`,
-    );
+    throw gatewayError("error.invalidPermissionMode", {
+      mode: flags.permissionMode,
+      modes: PERMISSION_MODES.join(" | "),
+    });
   }
   const mode: PermissionMode = flags.yes
     ? "bypass"
@@ -69,7 +80,7 @@ export async function setupRuntime(cwd: string, flags: RuntimeFlags, canPrompt: 
   const deny = [...settings.deny, ...(flags.deny ?? [])];
   const warnings = [...settings.warnings];
   for (const rule of [...allow, ...deny, ...settings.ask]) {
-    if (!parseRule(rule)) warnings.push(`Geçersiz kural yok sayıldı: ${rule}`);
+    if (!parseRule(rule)) warnings.push(t("warn.invalidRule", { rule }));
   }
   return {
     engine: new PermissionEngine({ cwd, mode, allow, deny, ask: settings.ask }),
@@ -87,7 +98,7 @@ export interface EconomyFlags {
 /** "200k", "1.5m", "50000" → tokens. */
 export function parseTokens(value: string): number {
   const m = /^(\d+(?:\.\d+)?)([km]?)$/i.exec(value.trim());
-  if (!m) throw new GatewayError(`Geçersiz token sayısı: ${value} (örnek: 200k, 1.5m, 50000)`);
+  if (!m) throw gatewayError("error.invalidTokenCount", { value });
   return Math.round(
     Number(m[1]) * ({ k: 1_000, m: 1_000_000 }[(m[2] ?? "").toLowerCase() as "k" | "m"] ?? 1),
   );
@@ -117,4 +128,19 @@ export async function createEconomy(opts: {
     budget: budget.cr !== undefined || budget.tokens !== undefined ? budget : undefined,
     compactAt: settings.compactAt,
   });
+}
+
+/**
+ * Chooses and applies the interface language. Runs before anything is printed, so it reads
+ * `--lang` straight from argv (commander has not parsed yet) and the setting leniently.
+ */
+export function initLanguage(argv: string[] = process.argv, cwd = process.cwd()): Lang {
+  const i = argv.findIndex((a) => a === "--lang" || a.startsWith("--lang="));
+  const flag = i < 0 ? undefined : argv[i]?.includes("=") ? argv[i]?.split("=")[1] : argv[i + 1];
+  if (flag !== undefined && !parseLanguage(flag)) {
+    throw gatewayError("error.invalidLanguage", { value: flag, languages: LANGUAGES.join(", ") });
+  }
+  const lang = detectLanguage({ flag, setting: readLanguageSetting(cwd) });
+  setLanguage(lang);
+  return lang;
 }

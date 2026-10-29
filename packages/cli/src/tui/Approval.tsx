@@ -1,46 +1,42 @@
-import type { AskRequest } from "@usta/core";
+import { type AskRequest, t } from "@usta/core";
 import { Box, Text } from "ink";
 import { DiffView } from "./DiffView.js";
 import { summarizeCall } from "./format.js";
 import { renderMarkdown } from "./markdown.js";
 
+function Frame({ children }: { children: React.ReactNode }) {
+  return (
+    <Box flexDirection="column" borderStyle="round" borderColor="yellow" paddingX={1} marginTop={1}>
+      {children}
+    </Box>
+  );
+}
+
 export function Approval({ request, width }: { request: AskRequest; width: number }) {
   if (request.kind === "plan") {
     return (
-      <Box
-        flexDirection="column"
-        borderStyle="round"
-        borderColor="yellow"
-        paddingX={1}
-        marginTop={1}
-      >
+      <Frame>
         <Text color="yellow" bold>
-          Plan onayı
+          {t("tui.plan.title")}
         </Text>
         <Box marginTop={1}>
           <Text>{renderMarkdown(request.plan ?? "", Math.max(40, width - 6))}</Text>
         </Box>
         <Box marginTop={1}>
           <Text>
-            <Text color="green">[y]</Text> onayla, düzenlemeleri otomatik kabul et{" "}
-            <Text color="cyan">[e]</Text> onayla, her değişikliği sor <Text color="red">[n]</Text>{" "}
-            revize et (Esc)
+            <Text color="green">[y]</Text> {t("tui.plan.approveAccept")}{" "}
+            <Text color="cyan">[e]</Text> {t("tui.plan.approveAsk")} <Text color="red">[n]</Text>{" "}
+            {t("tui.plan.revise")}
           </Text>
         </Box>
-      </Box>
+      </Frame>
     );
   }
   if (request.kind === "review") {
     return (
-      <Box
-        flexDirection="column"
-        borderStyle="round"
-        borderColor="yellow"
-        paddingX={1}
-        marginTop={1}
-      >
+      <Frame>
         <Text color="yellow" bold>
-          Betiğin değişiklikleri uygulansın mı?
+          {t("tui.review.title")}
         </Text>
         {request.reason && <Text dimColor>{request.reason}</Text>}
         {request.diff && (
@@ -50,16 +46,19 @@ export function Approval({ request, width }: { request: AskRequest; width: numbe
         )}
         <Box marginTop={1}>
           <Text>
-            <Text color="green">[y]</Text> uygula <Text color="red">[n]</Text> uygulama (Esc)
+            <Text color="green">[y]</Text> {t("tui.review.apply")} <Text color="red">[n]</Text>{" "}
+            {t("tui.review.skip")}
           </Text>
         </Box>
-      </Box>
+      </Frame>
     );
   }
   return (
-    <Box flexDirection="column" borderStyle="round" borderColor="yellow" paddingX={1} marginTop={1}>
+    <Frame>
       <Text color="yellow" bold>
-        İzin gerekiyor: {summarizeCall(request.tool.name, request.call.arguments)}
+        {t("tui.approval.title", {
+          call: summarizeCall(request.tool.name, request.call.arguments),
+        })}
       </Text>
       {request.reason && <Text dimColor>{request.reason}</Text>}
       {request.diff && (
@@ -69,10 +68,11 @@ export function Approval({ request, width }: { request: AskRequest; width: numbe
       )}
       <Box marginTop={1}>
         <Text>
-          <Text color="green">[y]</Text> evet <Text color="cyan">[a]</Text>{" "}
-          {request.rememberLabel ?? "bu oturumda hep"} <Text color="red">[n]</Text> hayır (Esc)
+          <Text color="green">[y]</Text> {t("tui.yes")} <Text color="cyan">[a]</Text>{" "}
+          {request.rememberLabel ?? t("tui.alwaysSession")} <Text color="red">[n]</Text>{" "}
+          {t("tui.no")}
         </Text>
       </Box>
-    </Box>
+    </Frame>
   );
 }

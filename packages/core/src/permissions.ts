@@ -3,14 +3,24 @@ import { homedir } from "node:os";
 import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
 import type { Tool } from "@usta/sdk";
 import picomatch from "picomatch";
+import type { Localized, MessageKey, Params } from "./i18n/index.js";
 
 export const PERMISSION_MODES = ["default", "acceptEdits", "plan", "bypass"] as const;
 export type PermissionMode = (typeof PERMISSION_MODES)[number];
 
+/**
+ * `reason` is English and goes to the model; `reasonKey` is the same reason for the user,
+ * translated when it is shown (approval prompt, denied-call line).
+ */
 export type Decision =
   | { decision: "allow" }
-  | { decision: "deny"; reason: string }
-  | { decision: "ask"; reason?: string };
+  | { decision: "deny"; reason: string; reasonKey?: Localized }
+  | { decision: "ask"; reason?: string; reasonKey?: Localized };
+
+const why = (reason: string, key: MessageKey, params?: Params) => ({
+  reason,
+  reasonKey: { key, params },
+});
 
 export interface ParsedRule {
   raw: string;
@@ -201,19 +211,29 @@ export class PermissionEngine {
     const kind = tool.permission?.kind;
 
     const denied = this.matching("deny", tool, target)[0];
-    if (denied) return { decision: "deny", reason: `Kural engelledi: ${denied.raw}` };
+    if (denied) {
+      return {
+        decision: "deny",
+        ...why(`Denied by rule: ${denied.raw}`, "perm.deniedByRule", { rule: denied.raw }),
+      };
+    }
 
     if (this.current === "plan" && tool.mutating) {
       return {
         decision: "deny",
-        reason:
-          "Plan modunda değişiklik yapılamaz. Araştırmayı bitirince ExitPlanMode ile planı sunun.",
+        ...why(
+          "Plan mode: changes are not allowed. Present your plan with ExitPlanMode when research is done.",
+          "perm.planNoChanges",
+        ),
       };
     }
     if (tool.name === "ExitPlanMode") {
       return this.current === "plan"
         ? { decision: "ask" }
-        : { decision: "deny", reason: "Plan modunda değilsiniz; ExitPlanMode kullanılamaz." };
+        : {
+            decision: "deny",
+            ...why("Not in plan mode; ExitPlanMode is unavailable.", "perm.notPlanMode"),
+          };
     }
 
     if (
@@ -223,11 +243,19 @@ export class PermissionEngine {
       target !== undefined &&
       PROTECTED.some((p) => pathMatches(p, target, this.cwd, this.home))
     ) {
-      return { decision: "ask", reason: "Korunan yol (ayar / .git); onay gerekli." };
+      return {
+        decision: "ask",
+        ...why("Protected path (settings or .git); approval required.", "perm.protectedPath"),
+      };
     }
 
     const asked = this.matching("ask", tool, target)[0];
-    if (asked) return { decision: "ask", reason: `Kural onay istiyor: ${asked.raw}` };
+    if (asked) {
+      return {
+        decision: "ask",
+        ...why(`A rule requires approval: ${asked.raw}`, "perm.askRule", { rule: asked.raw }),
+      };
+    }
 
     if (this.isAllowed(tool, target)) return { decision: "allow" };
     if (this.current === "bypass") return { decision: "allow" };
@@ -246,7 +274,10 @@ export class PermissionEngine {
       target !== undefined &&
       !resolveTarget(target, this.cwd, this.home).insideCwd
     ) {
-      return { decision: "ask", reason: "Çalışma dizini dışında bir yol." };
+      return {
+        decision: "ask",
+        ...why("Path is outside the working directory.", "perm.outsideCwd"),
+      };
     }
     if (!tool.mutating) return { decision: "allow" };
     if (this.current === "acceptEdits" && kind === "path") return { decision: "allow" };
@@ -265,17 +296,34 @@ export class PermissionEngine {
           names.includes(r.tool) &&
           (r.spec === undefined || pathMatches(r.spec, p, this.cwd, this.home)),
       );
-      if (rule) return { decision: "deny", reason: `Kural engelledi: ${rule.raw} (${p})` };
+      if (rule) {
+        return {
+          decision: "deny",
+          ...why(`Denied by rule: ${rule.raw} (${p})`, "perm.deniedByRulePath", {
+            rule: rule.raw,
+            path: p,
+          }),
+        };
+      }
     }
     if (this.current === "plan") {
-      return { decision: "deny", reason: "Plan modunda değişiklik yapılamaz." };
+      return {
+        decision: "deny",
+        ...why("Plan mode: changes are not allowed.", "perm.planNoChangesShort"),
+      };
     }
     if (this.current === "bypass") return { decision: "allow" };
     if (paths.some((p) => PROTECTED.some((pp) => pathMatches(pp, p, this.cwd, this.home)))) {
-      return { decision: "ask", reason: "Korunan yol (ayar / .git); onay gerekli." };
+      return {
+        decision: "ask",
+        ...why("Protected path (settings or .git); approval required.", "perm.protectedPath"),
+      };
     }
     if (paths.some((p) => !resolveTarget(p, this.cwd, this.home).insideCwd)) {
-      return { decision: "ask", reason: "Çalışma dizini dışında bir yol." };
+      return {
+        decision: "ask",
+        ...why("Path is outside the working directory.", "perm.outsideCwd"),
+      };
     }
     const allow = this.rules.allow.filter((r) => names.includes(r.tool));
     if (

@@ -14,7 +14,7 @@ export const writeTool = defineTool({
     const abs = resolvePath(ctx.cwd, path);
     await mkdir(dirname(abs), { recursive: true });
     await writeFile(abs, content, "utf8");
-    return `${path} yazıldı (${content.split("\n").length} satır).`;
+    return `Wrote ${path} (${content.split("\n").length} lines).`;
   },
   async preview({ path, content }, ctx) {
     try {

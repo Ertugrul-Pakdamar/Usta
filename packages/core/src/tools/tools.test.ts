@@ -28,7 +28,7 @@ describe("Read", () => {
   it("refuses secrets but allows .env.example", async () => {
     await writeFile(join(cwd, ".env"), "KEY=1");
     await writeFile(join(cwd, ".env.example"), "KEY=");
-    await expect(readTool.run({ path: ".env" }, { cwd })).rejects.toThrow("Erişim engellendi");
+    await expect(readTool.run({ path: ".env" }, { cwd })).rejects.toThrow("Access denied");
     await expect(readTool.run({ path: ".env.example" }, { cwd })).resolves.toContain("KEY=");
   });
 });
@@ -42,7 +42,7 @@ describe("Write/Edit", () => {
   it("requires a unique match unless replace_all", async () => {
     await writeFile(join(cwd, "a.txt"), "a a");
     const input = { path: "a.txt", old_string: "a", new_string: "b" };
-    await expect(editTool.run(input, { cwd })).rejects.toThrow("2 yerde");
+    await expect(editTool.run(input, { cwd })).rejects.toThrow("occurs 2 times");
     await editTool.run({ ...input, replace_all: true }, { cwd });
     expect(await readFile(join(cwd, "a.txt"), "utf8")).toBe("b b");
   });
@@ -57,7 +57,7 @@ describe("Write/Edit", () => {
     await writeFile(join(cwd, "a.txt"), "foo");
     await expect(
       editTool.run({ path: "a.txt", old_string: "bar", new_string: "x" }, { cwd }),
-    ).rejects.toThrow("bulunamadı");
+    ).rejects.toThrow("was not found");
   });
 });
 
@@ -73,18 +73,18 @@ describe("Glob/Grep", () => {
   });
 
   it("rejects an invalid regex with a ToolError", async () => {
-    await expect(grepTool.run({ pattern: "(" }, { cwd })).rejects.toThrow("Geçersiz");
+    await expect(grepTool.run({ pattern: "(" }, { cwd })).rejects.toThrow("Invalid regular");
   });
 });
 
 describe("Bash", () => {
   it("returns output and exit code", async () => {
-    expect(await bashTool.run({ command: "echo hi; exit 3" }, { cwd })).toBe("hi\n[çıkış kodu 3]");
+    expect(await bashTool.run({ command: "echo hi; exit 3" }, { cwd })).toBe("hi\n[exit code 3]");
   });
 
   it("kills the process tree on timeout", async () => {
     const out = await bashTool.run({ command: "sleep 30 & sleep 30", timeout_ms: 200 }, { cwd });
-    expect(out).toContain("zaman aşımı");
+    expect(out).toContain("timed out");
   });
 
   it("bounds memory for runaway output, keeping head and tail", async () => {

@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import type { UstaConfig } from "../config.js";
-import { GatewayError, MISSING_BASE_URL } from "../errors.js";
+import { gatewayError } from "../errors.js";
 import type { ChatRequest, Message, Provider, ProviderEvent, ToolCall, Usage } from "../types.js";
 
 function toWire(m: Message): OpenAI.Chat.ChatCompletionMessageParam {
@@ -28,18 +28,15 @@ function toGatewayError(err: unknown): unknown {
   if (!(err instanceof OpenAI.APIError)) return err;
   switch (err.code) {
     case "terms_not_accepted":
-      return new GatewayError(
-        "Kullanım şartları kabul edilmemiş. Okumak için `usta terms`, kabul etmek için `usta terms accept` çalıştırın.",
-        err.code,
-      );
+      return gatewayError("error.termsNotAccepted", undefined, err.code);
     case "content_guard":
-      return new GatewayError(`İçerik güvenlik katmanı isteği reddetti: ${err.message}`, err.code);
+      return gatewayError("error.contentGuard", { message: err.message }, err.code);
   }
-  if (err.status === 401) return new GatewayError("API anahtarı geçersiz (HTTP 401).", "auth");
-  if (err.status === 429)
-    return new GatewayError("Hız sınırı veya kota aşıldı (HTTP 429).", "rate_limit");
-  return new GatewayError(
-    `Gateway hatası (HTTP ${err.status}): ${err.message}`,
+  if (err.status === 401) return gatewayError("error.unauthorized", undefined, "auth");
+  if (err.status === 429) return gatewayError("error.rateLimited", undefined, "rate_limit");
+  return gatewayError(
+    "error.gateway",
+    { status: err.status ?? "?", message: err.message },
     err.code ?? undefined,
   );
 }
@@ -48,8 +45,8 @@ export class OpenAICompatibleProvider implements Provider {
   private readonly client: OpenAI;
 
   constructor(config: Pick<UstaConfig, "apiKey" | "baseUrl">) {
-    if (!config.apiKey) throw new GatewayError("EVREN_API_KEY tanımlı değil.", "no_key");
-    if (!config.baseUrl) throw new GatewayError(MISSING_BASE_URL, "no_base_url");
+    if (!config.apiKey) throw gatewayError("error.noApiKey", undefined, "no_key");
+    if (!config.baseUrl) throw gatewayError("error.noBaseUrl", undefined, "no_base_url");
     this.client = new OpenAI({ apiKey: config.apiKey, baseURL: config.baseUrl });
   }
 

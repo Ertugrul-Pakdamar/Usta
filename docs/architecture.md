@@ -134,6 +134,25 @@ Yükleyici satırları sırayla oynatır; yarım yazılmış son satırı yok sa
 - Yapıştırılan metin tek parça gelir ve içindeki satır sonları _gönderme sayılmaz_.
 - Uzun satırlarda önek simgeleri (`›`, `●`) `flexShrink={0}` ile korunur (aksi halde Yoga bunları kırpıyordu).
 
+## Yerelleştirme (i18n)
+
+usta'daki her metin **iki sınıftan birine** girer ve bu ayrım tasarımın temelidir:
+
+| Sınıf                 | Örnekler                                                                                                                                             | Dil                            | Nerede yaşar             |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ------------------------ |
+| **Kullanıcıya dönük** | Arayüz metinleri, onay kutuları, `doctor`/`terms` çıktısı, slash komutu açıklamaları, raporlar (`/cost`, `/context`), uyarılar, komut satırı yardımı | Kullanıcının dili (`tr`/`en`)  | Katalog: `core/src/i18n` |
+| **Modele dönük**      | Sistem istemi, araç açıklamaları, **araç sonuçları ve hata iletileri**, izin/hook ret sebepleri, özet istemi, ipuçları                               | **İngilizce, sabit**           | Kodda düz metin          |
+
+Modele dönük metin dile bağlanmaz çünkü (1) model her dilde aynı davranmalı, (2) Türkçe daha çok token tüketir, (3) istem önekinin bayt bayt aynı kalması önbellek için şarttır ([ADR-0005](adr/0005-stable-prompt-prefix.md)). Gerekçe ve alternatifler: [ADR-0006](adr/0006-localization.md).
+
+**Katalog.** `en.ts` kaynaktır ve anahtar kümesini (`MessageKey`) tanımlar; `tr.ts` `Record<MessageKey, …>` olduğu için **eksik bir anahtar derlemeyi kırar**. `t(anahtar, {parametreler})` `{ad}` yer tutucularını doldurur; çoğul için `{one, other}` biçimi `{count}` ile seçilir (`Intl.PluralRules`). Testler iki katalogda aynı anahtarları ve aynı yer tutucuları, boş metin olmadığını doğrular.
+
+**İki yüzlü karar.** Bir metnin hem modele hem kullanıcıya gitmesi gerektiğinde (ör. reddedilen araç çağrısı), kaynak İngilizce `reason` ve çevrilebilir bir `reasonKey` üretir: izin motoru `Decision`'da, kapı `ApprovalVerdict`'te ikisini taşır. Döngü modele İngilizceyi yollar, `tool_result` olayına kullanıcının dilindeki karşılığı `display` olarak koyar; arayüz `display`'i gösterir.
+
+**Dil seçimi** `detectLanguage` ile yapılır ([Yapılandırma → Dil](configuration.md#dil)); `setLanguage` modül düzeyinde tek bir durumu değiştirir, bu yüzden `/lang` anında etkilidir. Biten (basılmış) arayüz satırları değişmez, yeni çizimler yeni dilde olur.
+
+**Yeni metin eklemek:** önce `en.ts`'e anahtarı ekleyin, `tr.ts` derleyici uyarısıyla tamamlanır, kodda `t("anahtar", {…})` kullanın. Modele gidecek metni kataloğa **koymayın**.
+
 ## Test stratejisi
 
 | Katman       | Nasıl                                                                                                                                                                                          |
@@ -149,7 +168,7 @@ Hiçbir test gerçek API anahtarı veya ağ gerektirmez; gateway çağrıları s
 
 1. **Güvenli varsayılan, kapalı başarısızlık.** Emin olunamayan durumda sor veya reddet; asla sessizce izin verme.
 2. **`deny` her şeyin üstündedir.** Mod, hook, güven, sezgi: hiçbiri aşamaz.
-3. **Modele dönük metin kararlı ve kısadır** (İngilizce); kullanıcıya dönük metin yerelleştirilir.
+3. **Modele dönük metin kararlı ve kısadır** (İngilizce); kullanıcıya dönük metin yerelleştirilir ([Yerelleştirme](#yerelleştirme-i18n)).
 4. **Ölç, sonra karar ver.** Token ve davranış kararları gerçek ölçümle verilir ve ADR'ye yazılır.
 5. **Çekirdek arayüzden bağımsız**, genişletme yüzeyi küçük ve sürümlü.
 6. **Telemetri yok.** Veri yalnızca kullanıcının gateway'ine gider.

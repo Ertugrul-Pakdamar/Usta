@@ -6,6 +6,14 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 
 ### Eklendi
 
+**M4.5: Lokalizasyon**
+- Türkçe ve İngilizce arayüz: `t()` ve katalog (`core/src/i18n`); `en.ts` kaynak, `tr.ts` derleme zamanında eksiksiz olmak zorunda.
+- Dil seçimi: `--lang` > `USTA_LANG` > ayar (`language`) > sistem yereli > `tr`; tanınan başka dil `en`'e düşer. `/lang` oturum sırasında dili değiştirir.
+- Kullanıcıya dönük tüm metinler taşındı: arayüz, onay kutuları, `doctor`, `terms`, komut satırı yardımı, slash komutları, raporlar, uyarılar, hata iletileri.
+- Sayı ve tarih biçimleri dile göre (`Intl`): `1.010 CR` / `1,010 CR`, `1 Aralık 2026` / `December 1, 2026`; çoğul biçimleri.
+- Reddedilen araç çağrıları kullanıcıya kendi dilinde gösterilir (`display`), modele İngilizce nedeni gider (`reasonKey`).
+- İngilizce terminal görüntüsü (`docs/assets/demo.en.svg`), ADR-0006.
+
 **M4: Token ekonomisi**
 - Model kaydı (`/v1/models`, diskte 1 saatlik önbellek); kalibre token tahmini ve gateway `count_tokens` ile tam sayım.
 - Maliyet ve kota takibi (`/v1/quota`), oturum bütçeleri (`--budget`, `--token-budget`, ayarlarda `budget`); aşımda sorar veya çıkış kodu 3 ile durur.
@@ -39,6 +47,8 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 
 ### Değişti
 
+- **Modele giden tüm metinler İngilizce sabit oldu:** araç sonuçları ve hata iletileri (`Cannot read …`, `old_string was not found …`), izin ve hook ret sebepleri, döngü hataları. Önceden Türkçeydi; model davranışı dilden bağımsız, token tüketimi düşük.
+- Geçersiz `--lang` değeri yığın izi yerine anlaşılır hata verir.
 - Gateway adresi artık yerleşik varsayılana sahip değil; `EVREN_BASE_URL` zorunludur.
 - Headless JSON çıktısındaki `usage` alanları snake_case'tir (`prompt_tokens`, `completion_tokens`, `cached_tokens`, `cache_ratio`).
 

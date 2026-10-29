@@ -46,7 +46,8 @@ Adımlar:
 
 Araç yazma kuralları:
 
-- **Hatalar:** Beklenen her hata `ToolError` olmalı; mesaj modele döner ve model düzeltebilir. Beklenmeyenler yakalanıp "Beklenmeyen hata" olur, çökmez.
+- **Hatalar:** Beklenen her hata `ToolError` olmalı; mesaj modele döner ve model düzeltebilir. **Mesajlar İngilizce yazılır** (model her dilde aynı davranmalı); kataloğa girmezler. Beklenmeyenler yakalanıp `Unexpected error: …` olur, çökmez.
+- **Kullanıcıya görünen metin** (örneğin yeni bir slash komutunun açıklaması veya bir uyarı) kataloğa girer: `core/src/i18n/en.ts` + `tr.ts`, kodda `t("anahtar")`. Ayrıntı: [Mimari → Yerelleştirme](architecture.md#yerelleştirme-i18n).
 - **Çıktı boyutu:** Sınırlayıcı sizi korur ama gereksiz büyük çıktı üretmeyin; devam için `offset` gibi bir mekanizma sunun (bkz. `Read`).
 - **Yazan araçlar** (`mutating: true`): `preview` ile diff gösterin; yol tabanlıysa `permission: { kind: "path", … }` verin ki checkpoint ve `acceptEdits` doğru çalışsın.
 - **Kendi başına çok dosya yazan araçlar:** yazmadan önce `ctx.review({summary, diff, paths})` çağırın ve cevabı beklemeden hiçbir şey yazmayın (`Script`'e bakın). `ctx.review` yoksa yazmayın.

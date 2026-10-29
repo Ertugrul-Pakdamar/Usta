@@ -14,20 +14,20 @@ async function load(abs: string, path: string): Promise<string> {
   try {
     return await readFile(abs, "utf8");
   } catch (err) {
-    throw new ToolError(`Dosya okunamadı (${path}): ${(err as NodeJS.ErrnoException).code}`);
+    throw new ToolError(`Cannot read ${path}: ${(err as NodeJS.ErrnoException).code}`);
   }
 }
 
 function applyEdit(text: string, { old_string, new_string, replace_all }: z.infer<typeof input>) {
-  if (old_string === new_string) throw new ToolError("old_string ve new_string aynı.");
+  if (old_string === new_string) throw new ToolError("old_string and new_string are identical.");
   const count = text.split(old_string).length - 1;
   if (count === 0) {
-    throw new ToolError("old_string dosyada bulunamadı (boşluk/girinti birebir aynı mı?).");
+    throw new ToolError(
+      "old_string was not found in the file (whitespace and indentation must match exactly).",
+    );
   }
   if (count > 1 && !replace_all) {
-    throw new ToolError(
-      `old_string ${count} yerde geçiyor; daha fazla bağlam ekleyin veya replace_all kullanın.`,
-    );
+    throw new ToolError(`old_string occurs ${count} times; add more context or set replace_all.`);
   }
   // split/join avoids `$` replacement patterns being interpreted.
   return { next: text.split(old_string).join(new_string), count: replace_all ? count : 1 };
@@ -44,7 +44,7 @@ export const editTool = defineTool({
     const abs = resolvePath(ctx.cwd, args.path);
     const { next, count } = applyEdit(await load(abs, args.path), args);
     await writeFile(abs, next, "utf8");
-    return `${args.path}: ${count} değişiklik uygulandı.`;
+    return `${args.path}: ${count} replacement${count === 1 ? "" : "s"} applied.`;
   },
   async preview(args, ctx) {
     try {

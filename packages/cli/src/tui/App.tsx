@@ -25,6 +25,7 @@ import {
   type Provider,
   runAgent,
   type Session,
+  t,
   toolsForMode,
   toToolSpec,
   truncateSession,
@@ -33,7 +34,7 @@ import {
 import type { Tool } from "@usta/sdk";
 import { Box, Static, Text, useApp, useInput, useStdout } from "ink";
 import { useEffect, useRef, useState } from "react";
-import { parseSlash, slashCommands } from "../slash.js";
+import { describeCommand, parseSlash, slashCommands } from "../slash.js";
 import { Approval } from "./Approval.js";
 import { Confirm } from "./Confirm.js";
 import { formatContextReport, formatCostReport, summarizeCall, summarizeOutput } from "./format.js";
@@ -116,7 +117,7 @@ export function App(props: AppProps) {
         ? [
             {
               kind: "info",
-              text: `Oturum devam ediyor: ${props.resume.session.meta.id}`,
+              text: t("tui.resumed", { id: props.resume.session.meta.id }),
             } as NewItem,
             ...historyItems(props.resume.messages),
           ]
@@ -161,7 +162,12 @@ export function App(props: AppProps) {
     messages.current = r.messages;
     if (session.current) appendCompaction(session.current, r.summary, r.keepFrom);
     checkpoints.current?.shiftAfterCompaction(r.keepFrom);
-    info(`Bağlam özetlendi: ${r.before} mesaj → ${r.messages.length}.`);
+    info(
+      t("tui.compacted", {
+        before: t("unit.messages", { count: r.before }),
+        after: t("unit.messages", { count: r.messages.length }),
+      }),
+    );
   };
   economy.callbacks = {
     onWarning: (text) => info(`⚠ ${text}`),
@@ -243,7 +249,10 @@ export function App(props: AppProps) {
     for (const w of submit.warnings) info(`⚠ ${w}`);
     if (submit.blocked) {
       addItem({ kind: "user", text });
-      return addItem({ kind: "error", text: `Hook istemi engelledi: ${submit.blocked.reason}` });
+      return addItem({
+        kind: "error",
+        text: t("tui.hookBlockedPrompt", { reason: submit.blocked.reason }),
+      });
     }
     context.push(...submit.context);
 
@@ -300,7 +309,7 @@ export function App(props: AppProps) {
             addItem({
               kind: "tool",
               summary: summarizeCall(ev.call.name, ev.call.arguments),
-              output: summarizeOutput(ev.output),
+              output: summarizeOutput(ev.display ?? ev.output),
               isError: ev.isError,
               diff: ev.isError ? undefined : diff,
             });
@@ -308,9 +317,10 @@ export function App(props: AppProps) {
         },
       });
       flushStream(true);
-      if (result.stopReason === "aborted") info("İptal edildi.");
-      if (result.stopReason === "max_turns") info("Tur sınırına ulaşıldı; devam etmek için yazın.");
-      if (result.stopReason === "budget") info(`Durduruldu: ${result.stopDetail}`);
+      if (result.stopReason === "aborted") info(t("tui.cancelled"));
+      if (result.stopReason === "max_turns") info(t("tui.maxTurns"));
+      if (result.stopReason === "budget")
+        info(t("tui.stopped", { detail: result.stopDetail ?? "" }));
       if (result.stopReason === "end_turn") {
         const stop = await hooks.run("Stop", { sessionId: sess.meta.id });
         for (const w of stop.warnings) info(`⚠ ${w}`);
@@ -344,44 +354,50 @@ export function App(props: AppProps) {
 
   const rewindList = () => {
     const turns = checkpoints.current?.list() ?? [];
-    if (!turns.length) return "Geri alınacak tur yok.";
+    if (!turns.length) return t("tui.nothingToRewind");
     const lines = [...turns]
       .reverse()
       .slice(0, 10)
-      .map(
-        (t, i) =>
-          `${String(i + 1).padStart(2)}. ${t.prompt}${t.files.length ? ` · ${t.files.length} dosya` : ""}`,
+      .map((turn, i) =>
+        t("tui.rewindItem", {
+          index: String(i + 1).padStart(2),
+          prompt: turn.prompt,
+          files: turn.files.length ? ` · ${t("unit.files", { count: turn.files.length })}` : "",
+        }),
       );
-    return `Geri alınabilir turlar (en yeni üstte). Son N turu geri almak için /rewind N:\n${lines.join("\n")}\nNot: Bash ile yapılan dosya değişiklikleri izlenmez.`;
+    return t("tui.rewindList", { list: lines.join("\n") });
   };
 
   const rewind = (n: number) => {
     const store = checkpoints.current;
     const sess = session.current;
-    if (busy || !store || !sess)
-      return info(busy ? "Çalışırken geri alınamaz." : "Geri alınacak tur yok.");
+    if (busy || !store || !sess) return info(t(busy ? "tui.busyRewind" : "tui.nothingToRewind"));
     const r = store.rewind(n);
-    if (!r) return info("Geri alınacak tur yok.");
+    if (!r) return info(t("tui.nothingToRewind"));
     messages.current.length = Math.min(messages.current.length, r.messageCount);
     truncateSession(sess, r.messageCount);
     economy.invalidate();
     info(
-      `${r.turns.length} tur geri alındı · ${r.restored.length} dosya geri yüklendi · ${r.deleted.length} dosya silindi (konuşma da o noktaya döndü).`,
+      t("tui.rewindDone", {
+        turns: t("unit.turns", { count: r.turns.length }),
+        restored: t("unit.files", { count: r.restored.length }),
+        deleted: t("unit.files", { count: r.deleted.length }),
+      }),
     );
   };
 
   const compact = async (instruction?: string) => {
-    if (busy) return info("Çalışırken özetlenemez.");
-    info("Bağlam özetleniyor…");
+    if (busy) return info(t("tui.busyCompact"));
+    info(t("tui.compacting"));
     setBusy(true);
     try {
       if (!(await economy.compactNow(messages.current, instruction))) {
-        info("Özetlenecek kadar eski konuşma yok.");
+        info(t("tui.nothingToCompact"));
       }
     } catch (err) {
       addItem({
         kind: "error",
-        text: `Özetlenemedi: ${err instanceof Error ? err.message : String(err)}`,
+        text: t("tui.compactFailed", { message: err instanceof Error ? err.message : String(err) }),
       });
     } finally {
       setBusy(false);
@@ -393,7 +409,7 @@ export function App(props: AppProps) {
     const cmd = slashCommands.find(
       (c) => c.name === parsed?.name || (parsed?.name === "quit" && c.name === "exit"),
     );
-    if (!parsed || !cmd) return info(`Bilinmeyen komut: ${text}. /help yazın.`);
+    if (!parsed || !cmd) return info(t("tui.unknownCommand", { command: text }));
     try {
       await cmd.run(parsed.args, {
         model,
@@ -429,7 +445,9 @@ export function App(props: AppProps) {
           economy.reset();
           economy.setSession(undefined);
           bump();
-          setItems([{ kind: "banner", text: `yeni konuşma · ${model}`, id: nextId.current++ }]);
+          setItems([
+            { kind: "banner", text: t("tui.newConversation", { model }), id: nextId.current++ },
+          ]);
         },
         listModels: async () => (await props.provider.listModels?.()) ?? [],
       });
@@ -462,7 +480,7 @@ export function App(props: AppProps) {
         exit();
       } else {
         lastCtrlC.current = Date.now();
-        info("Çıkmak için Ctrl+C'ye tekrar basın.");
+        info(t("tui.ctrlCAgain"));
       }
       return;
     }
@@ -497,7 +515,7 @@ export function App(props: AppProps) {
       ? slashCommands.filter((c) => c.name.startsWith(input.slice(1)))
       : [];
   const streamTail = streaming.split("\n").slice(-20).join("\n");
-  const t = economy.tracker;
+  const tracker = economy.tracker;
 
   return (
     <>
@@ -514,12 +532,14 @@ export function App(props: AppProps) {
       )}
       {Object.entries(running).map(([id, summary]) => (
         <Text key={id} dimColor>
-          ⏺ {summary} çalışıyor…
+          {t("tui.running", { summary })}
         </Text>
       ))}
       {pending && <Approval request={pending.request} width={width} />}
       {confirm && <Confirm message={confirm.message} />}
-      {busy && !pending && !confirm && <Spinner label={streaming ? "Yazıyor" : "Düşünüyor"} />}
+      {busy && !pending && !confirm && (
+        <Spinner label={t(streaming ? "tui.spinner.writing" : "tui.spinner.thinking")} />
+      )}
       <Box
         borderStyle="round"
         borderColor={busy ? "gray" : mode === "plan" ? "yellow" : "cyan"}
@@ -530,17 +550,17 @@ export function App(props: AppProps) {
       </Box>
       {suggestions.map((c) => (
         <Text key={c.name} dimColor>
-          {"  "}/{c.name.padEnd(11)} {c.description}
+          {"  "}/{c.name.padEnd(11)} {describeCommand(c)}
         </Text>
       ))}
       <StatusBar
         model={model}
         mode={mode}
-        promptTokens={t.promptTokens}
-        completionTokens={t.completionTokens}
+        promptTokens={tracker.promptTokens}
+        completionTokens={tracker.completionTokens}
         contextRatio={economy.usageRatio()}
-        cacheRatio={t.cacheRatio}
-        remainingCr={t.quota?.remainingCr}
+        cacheRatio={tracker.cacheRatio}
+        remainingCr={tracker.quota?.remainingCr}
         free={economy.model.promptPrice === 0 && economy.model.completionPrice === 0}
         sessionId={session.current?.meta.id}
       />
@@ -553,10 +573,15 @@ function describe(engine: PermissionEngine, hooks: HookRunner): string {
   const list = (title: string, rules: string[]) =>
     `${title}: ${rules.length ? rules.join(", ") : "—"}`;
   return [
-    `Mod: ${engine.mode}`,
+    t("report.permissions.mode", { mode: engine.mode }),
     list("deny", r.deny),
     list("ask", r.ask),
     list("allow", r.allow),
-    `Hook'lar: ${(["PreToolUse", "PostToolUse", "UserPromptSubmit", "SessionStart", "Stop"] as const).filter((e) => hooks.has(e)).join(", ") || "—"}`,
+    t("report.permissions.hooks", {
+      hooks:
+        (["PreToolUse", "PostToolUse", "UserPromptSubmit", "SessionStart", "Stop"] as const)
+          .filter((e) => hooks.has(e))
+          .join(", ") || "—",
+    }),
   ].join("\n");
 }

@@ -1,5 +1,5 @@
 import type { UstaConfig } from "./config.js";
-import { GatewayError, MISSING_BASE_URL } from "./errors.js";
+import { GatewayError, gatewayError } from "./errors.js";
 
 export interface Terms {
   version: number;
@@ -7,8 +7,8 @@ export interface Terms {
 }
 
 async function call(config: UstaConfig, path: string, init: RequestInit, fetchImpl: typeof fetch) {
-  if (!config.apiKey) throw new GatewayError("EVREN_API_KEY tanımlı değil.", "no_key");
-  if (!config.baseUrl) throw new GatewayError(MISSING_BASE_URL, "no_base_url");
+  if (!config.apiKey) throw gatewayError("error.noApiKey", undefined, "no_key");
+  if (!config.baseUrl) throw gatewayError("error.noBaseUrl", undefined, "no_base_url");
   const res = await fetchImpl(`${config.baseUrl}${path}`, {
     ...init,
     headers: { Authorization: `Bearer ${config.apiKey}`, "Content-Type": "application/json" },
@@ -17,7 +17,9 @@ async function call(config: UstaConfig, path: string, init: RequestInit, fetchIm
   const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
   if (!res.ok) {
     const message = (body.error as { message?: string } | undefined)?.message;
-    throw new GatewayError(message ?? `Gateway hatası (HTTP ${res.status})`);
+    throw message
+      ? new GatewayError(message)
+      : gatewayError("error.gatewayStatus", { status: res.status });
   }
   return body;
 }

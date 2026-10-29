@@ -16,6 +16,8 @@ import {
   fetchTerms,
   findSession,
   GatewayError,
+  gatewayError,
+  getLanguage,
   loadEnvFiles,
   loadSession,
   type Message,
@@ -25,34 +27,44 @@ import {
   runAgent,
   runDoctor,
   type Session,
+  t,
   toolsForMode,
 } from "@usta/core";
 import { Command } from "commander";
-import { askYesNo, createEconomy, parseTokens, setupRuntime } from "./runtime.js";
+import { askYesNo, createEconomy, initLanguage, parseTokens, setupRuntime } from "./runtime.js";
 
 loadEnvFiles();
 pruneOldOutputs();
+try {
+  initLanguage();
+} catch (err) {
+  console.error(err instanceof GatewayError ? t("cli.error", { message: err.message }) : err);
+  process.exit(1);
+}
 
 const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 
 const program = new Command("usta")
-  .description("EVREN modelleri için ajan tabanlı kodlama CLI'ı")
-  .version(pkg.version)
-  .option("-p, --print <prompt>", "istemi çalıştır, sonucu yazdır ve çık (headless)")
-  .option("--output-format <format>", "text | json", "text")
-  .option("--model <model>", "kullanılacak model")
-  .option("--max-turns <n>", "en fazla ajan turu", (v) => Number.parseInt(v, 10), 25)
-  .option("-c, --continue", "bu dizindeki son oturuma devam et")
-  .option("-r, --resume [id]", "belirli bir oturuma (veya sonuncusuna) devam et")
-  .argument("[prompt...]", "etkileşimli oturumu bu istemle başlat")
-  .option("--permission-mode <mode>", "default | acceptEdits | plan | bypass")
-  .option("--plan", "plan modunda başla (salt okuma; plan onayına kadar değişiklik yok)")
-  .option("--allow <rule...>", "izin kuralı ekle, ör. 'Bash(git status:*)'")
-  .option("--deny <rule...>", "yasak kuralı ekle, ör. 'Read(.env)'")
-  .option("--trust-project", "repodaki .usta/settings.json dosyasına sormadan güven")
-  .option("--budget <cr>", "oturum için kredi (CR) bütçesi", (v) => Number.parseFloat(v))
-  .option("--token-budget <n>", "oturum için toplam token bütçesi (örn. 200k)", parseTokens)
-  .option("-y, --yes", "bypass modu: deny kuralları dışında her şeye izin ver (dikkat)")
+  .description(t("cli.description"))
+  .version(pkg.version, "-V, --version", t("cli.opt.version"))
+  .helpOption("-h, --help", t("cli.opt.help"))
+  .helpCommand("help [command]", t("cli.cmd.help"))
+  .option("-p, --print <prompt>", t("cli.opt.print"))
+  .option("--output-format <format>", t("cli.opt.outputFormat"), "text")
+  .option("--model <model>", t("cli.opt.model"))
+  .option("--max-turns <n>", t("cli.opt.maxTurns"), (v) => Number.parseInt(v, 10), 25)
+  .option("-c, --continue", t("cli.opt.continue"))
+  .option("-r, --resume [id]", t("cli.opt.resume"))
+  .argument("[prompt...]", t("cli.arg.prompt"))
+  .option("--permission-mode <mode>", t("cli.opt.permissionMode"))
+  .option("--plan", t("cli.opt.plan"))
+  .option("--allow <rule...>", t("cli.opt.allow"))
+  .option("--deny <rule...>", t("cli.opt.deny"))
+  .option("--trust-project", t("cli.opt.trustProject"))
+  .option("--budget <cr>", t("cli.opt.budget"), (v) => Number.parseFloat(v))
+  .option("--token-budget <n>", t("cli.opt.tokenBudget"), parseTokens)
+  .option("-y, --yes", t("cli.opt.yes"))
+  .option("--lang <lang>", t("cli.opt.lang"))
   .action(async (promptWords: string[], opts) => {
     if (opts.print) return runHeadless(opts);
     if (!process.stdin.isTTY || !process.stdout.isTTY) return program.help();
@@ -61,51 +73,46 @@ const program = new Command("usta")
 
 program
   .command("doctor")
-  .description("Bağlantı, anahtar ve şart kabul durumunu kontrol eder")
+  .description(t("cli.cmd.doctor"))
   .action(async () => {
     const checks = await runDoctor(configFromEnv());
     for (const c of checks) console.log(`${c.ok ? "✓" : "✗"} ${c.name}: ${c.detail}`);
     if (checks.some((c) => !c.ok)) process.exitCode = 1;
   });
 
-const terms = program
-  .command("terms")
-  .description("Gateway kullanım şartlarını gösterir; `terms accept` ile kabul edilir");
+const terms = program.command("terms").description(t("cli.cmd.terms"));
 
 terms.action(async () => {
-  const t = await fetchTerms(configFromEnv());
-  console.log(`${t.content}\n\nŞart sürümü: v${t.version}. Kabul etmek için: usta terms accept`);
+  const doc = await fetchTerms(configFromEnv());
+  console.log(`${doc.content}\n\n${t("terms.footer", { version: doc.version })}`);
 });
 
 terms
   .command("accept")
-  .description("Şartları okuyup açıkça onaylayarak kabul eder (etkileşimli terminal gerekir)")
+  .description(t("cli.cmd.termsAccept"))
   .action(async () => {
     if (!process.stdin.isTTY) {
-      throw new GatewayError(
-        "Şartlar yalnızca etkileşimli bir terminalde, sizin onayınızla kabul edilebilir.",
-      );
+      throw gatewayError("error.termsNeedTerminal");
     }
     const config = configFromEnv();
-    const t = await fetchTerms(config);
-    console.log(`${t.content}\n`);
+    const doc = await fetchTerms(config);
+    console.log(`${doc.content}\n`);
     const rl = createInterface({ input: process.stdin, output: process.stdout });
-    const answer = await rl.question(
-      `Yukarıdaki v${t.version} şartlarını okudum ve kabul ediyorum. Onaylamak için "kabul ediyorum" yazın: `,
-    );
+    const word = t("terms.confirmWord");
+    const answer = await rl.question(t("terms.confirmPrompt", { version: doc.version, word }));
     rl.close();
-    if (answer.trim().toLocaleLowerCase("tr") !== "kabul ediyorum") {
-      console.log("Onaylanmadı; hiçbir değişiklik yapılmadı.");
+    if (answer.trim().toLocaleLowerCase(getLanguage()) !== word.toLocaleLowerCase(getLanguage())) {
+      console.log(t("terms.notConfirmed"));
       process.exitCode = 1;
       return;
     }
-    await acceptTerms(config, t.version);
-    console.log(`✓ Şartlar (v${t.version}) kabul edildi. Kontrol için: usta doctor`);
+    await acceptTerms(config, doc.version);
+    console.log(t("terms.accepted", { version: doc.version }));
   });
 
 program
   .command("models")
-  .description("Gateway'deki modelleri listeler")
+  .description(t("cli.cmd.models"))
   .action(async () => {
     const provider = new OpenAICompatibleProvider(configFromEnv());
     console.log((await provider.listModels()).join("\n"));
@@ -131,7 +138,7 @@ async function runInteractive(opts: InteractiveOptions, initialPrompt?: string):
   let resume: { session: Session; messages: Message[] } | undefined;
   if (opts.continue || opts.resume) {
     const found = findSession(cwd, typeof opts.resume === "string" ? opts.resume : undefined);
-    if (!found) throw new GatewayError("Devam edilecek oturum bulunamadı.");
+    if (!found) throw gatewayError("error.noSessionToResume");
     resume = loadSession(found.path);
   }
   const { engine, hooks, warnings, settings } = await setupRuntime(cwd, opts, true);
@@ -179,7 +186,13 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
   economy.callbacks = {
     onWarning: warn,
     askBudget: interactive ? (m) => askYesNo(m) : undefined,
-    onCompact: (r) => warn(`Bağlam özetlendi: ${r.before} mesaj → ${r.messages.length}.`),
+    onCompact: (r) =>
+      warn(
+        t("cli.compacted", {
+          before: t("unit.messages", { count: r.before }),
+          after: t("unit.messages", { count: r.messages.length }),
+        }),
+      ),
   };
   await economy.refreshQuota();
 
@@ -187,16 +200,16 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
     ? async (req: AskRequest) => {
         if (req.kind === "plan") {
           console.error(`\n${req.plan}\n`);
-          const ok = await askYesNo(
-            "Planı onaylıyor musunuz? (onaylanırsa düzenlemeler otomatik kabul edilir)",
-          );
+          const ok = await askYesNo(t("cli.planPrompt"));
           return { allow: ok, mode: ok ? ("acceptEdits" as const) : undefined };
         }
         if (req.diff) console.error(req.diff);
         const what =
           req.kind === "review"
-            ? "Betiğin değişiklikleri uygulansın mı?"
-            : `${req.tool.name} ${JSON.stringify(req.input).slice(0, 200)} çalıştırılsın mı?`;
+            ? t("cli.reviewPrompt")
+            : t("cli.runPrompt", {
+                call: `${req.tool.name} ${JSON.stringify(req.input).slice(0, 200)}`,
+              });
         return { allow: await askYesNo(`${what}${req.reason ? ` (${req.reason})` : ""}`) };
       }
     : undefined;
@@ -204,7 +217,9 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
   const start = await hooks.run("SessionStart");
   const submit = await hooks.run("UserPromptSubmit", { prompt: opts.print });
   for (const w of [...start.warnings, ...submit.warnings]) warn(w);
-  if (submit.blocked) throw new GatewayError(`Hook istemi engelledi: ${submit.blocked.reason}`);
+  if (submit.blocked) {
+    throw new GatewayError(t("tui.hookBlockedPrompt", { reason: submit.blocked.reason }));
+  }
   const context = [...start.context, ...submit.context];
   const prompt = context.length
     ? `${opts.print}\n\n<hook-context>\n${context.join("\n")}\n</hook-context>`
@@ -234,13 +249,14 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
       if (ev.type === "usage") economy.recordUsage(ev.usage, ev.sentMessages);
       if (ev.type === "tool_start")
         console.error(`⏺ ${ev.call.name} ${ev.call.arguments.slice(0, 120)}`);
-      if (ev.type === "tool_result" && ev.isError) console.error(`  ✗ ${ev.output.split("\n")[0]}`);
+      if (ev.type === "tool_result" && ev.isError)
+        console.error(`  ✗ ${(ev.display ?? ev.output).split("\n")[0]}`);
     },
   });
   if (result.stopReason === "end_turn") for (const w of (await hooks.run("Stop")).warnings) warn(w);
   await economy.refreshQuota();
 
-  const t = economy.tracker;
+  const tracker = economy.tracker;
   if (json) {
     console.log(
       JSON.stringify({
@@ -252,15 +268,18 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
           prompt_tokens: result.usage.promptTokens,
           completion_tokens: result.usage.completionTokens,
           cached_tokens: result.usage.cachedTokens ?? 0,
-          cache_ratio: Number(t.cacheRatio.toFixed(3)),
+          cache_ratio: Number(tracker.cacheRatio.toFixed(3)),
         },
-        ...(t.spentCr !== undefined && { spent_cr: t.spentCr }),
-        ...(t.quota?.remainingCr !== undefined && { remaining_cr: t.quota.remainingCr }),
+        ...(tracker.spentCr !== undefined && { spent_cr: tracker.spentCr }),
+        ...(tracker.quota?.remainingCr !== undefined && {
+          remaining_cr: tracker.quota.remainingCr,
+        }),
       }),
     );
   } else {
     process.stdout.write("\n");
-    if (result.stopReason === "budget") console.error(`Durduruldu: ${result.stopDetail}`);
+    if (result.stopReason === "budget")
+      console.error(t("cli.stopped", { detail: result.stopDetail ?? "" }));
   }
   if (result.stopReason === "budget") process.exitCode = 3;
   else if (result.stopReason !== "end_turn") process.exitCode = 2;
@@ -269,6 +288,6 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
 try {
   await program.parseAsync();
 } catch (err) {
-  console.error(err instanceof GatewayError ? `Hata: ${err.message}` : err);
+  console.error(err instanceof GatewayError ? t("cli.error", { message: err.message }) : err);
   process.exitCode = 1;
 }
