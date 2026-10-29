@@ -1,0 +1,7 @@
+# Normalize line endings
+* text=auto eol=lf
+
+# Keep generated and vendored files out of language statistics and noisy diffs
+pnpm-lock.yaml -diff linguist-generated
+docs/assets/*.svg linguist-documentation
+*.svg text

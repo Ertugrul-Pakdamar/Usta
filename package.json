@@ -1,0 +1,43 @@
+{
+  "name": "usta-monorepo",
+  "description": "Terminal coding agent for the EVREN LLM Gateway: token-aware, permission-gated, extensible.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ertugrul-Pakdamar/Usta.git"
+  },
+  "homepage": "https://github.com/Ertugrul-Pakdamar/Usta#readme",
+  "bugs": {
+    "url": "https://github.com/Ertugrul-Pakdamar/Usta/issues"
+  },
+  "keywords": [
+    "cli",
+    "coding-agent",
+    "llm",
+    "tui",
+    "ink",
+    "evren",
+    "mcp",
+    "developer-tools"
+  ],
+  "private": true,
+  "packageManager": "pnpm@12.16.1",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "vitest run",
+    "typecheck": "tsc -b",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "usta": "node packages/cli/dist/bin.js"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.3",
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  }
+}
