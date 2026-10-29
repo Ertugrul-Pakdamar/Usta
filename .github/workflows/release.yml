@@ -33,9 +33,7 @@ jobs:
       - run: pnpm build
       - name: Check the tag matches the package version
         shell: bash
-        run: |
-          v="$(node -p "require('./packages/cli/package.json').version")"
-          [ "v$v" = "$GITHUB_REF_NAME" ] || { echo "tag $GITHUB_REF_NAME != package version v$v"; exit 1; }
+        run: node scripts/check-versions.mjs "$GITHUB_REF_NAME"
       - run: pnpm build:binary
       - name: Smoke test
         shell: bash

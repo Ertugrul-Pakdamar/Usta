@@ -4,8 +4,11 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 
 ## [Yayımlanmamış]
 
+## [0.1.1] — 2026-10-29
+
 ### Düzeltildi
 
+- Sürüm: `v0.1.1` etiketi, paket sürümleri `0.1.0`'da kaldığı için release iş akışını durdurmuştu. Dört paket de `0.1.1`; `scripts/check-versions.mjs` artık hem CI'da (paketler aynı sürümde mi) hem release'te (etiket = sürüm mü) çalışır.
 - Bilinmeyen dilli kod bloğunda ekrana sızan `Could not find the language 'env'` uyarısı (`usta -c` ile geçmiş yüklerken de; release binary'sinde de görülüyordu): bilinmeyen diller `plaintext`'e çevrilir; iç içe listelerdeki fazladan boş satırlar temizlenir.
 
 ### Eklendi
