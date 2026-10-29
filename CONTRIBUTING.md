@@ -22,7 +22,7 @@ _English version: [docs/en/contributing.md](docs/en/contributing.md)._
 - **Küçük düzeltmeler** (yazım hatası, belge, açık bir hata) için doğrudan PR açabilirsiniz.
 - **Yeni özellik veya davranış değişikliği** için önce bir [issue](https://github.com/Ertugrul-Pakdamar/Usta/issues/new/choose) açın. Böylece emeğiniz, [yol haritasıyla](docs/roadmap.md) çelişen bir yöne gitmez.
 - **Güvenlik açığı** buldunuz mu? Herkese açık issue açmayın; [SECURITY.md](SECURITY.md)'ye bakın.
-- Ne üzerinde çalışılabileceğini görmek için `good first issue` ve `help wanted` etiketlerine bakın, [yol haritasındaki](docs/roadmap.md) sıradaki aşamayı inceleyin.
+- Ne üzerinde çalışılabileceğini görmek için `good first issue` ve `help wanted` etiketlerine bakın, [yol haritasındaki](docs/roadmap.md) aşamalara ve [karşılaştırma sayfasındaki aday iş listesine](docs/comparison.md#sonraki-adımlar-aday-liste) (N1–N12) bakın.
 
 ## Geliştirme ortamı
 

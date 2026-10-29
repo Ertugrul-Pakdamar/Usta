@@ -15,7 +15,7 @@ Planlama, kod analizi, dosya düzenleme ve terminal erişimini **en az token, en
 
 **Türkçe** · [English](README.en.md) · [Docs (English)](docs/en/README.md)
 
-[Hızlı başlangıç](#hızlı-başlangıç) · [Belgeler](docs/README.md) · [Mimari](docs/architecture.md) · [Yol haritası](docs/roadmap.md) · [Katkı](CONTRIBUTING.md)
+[Hızlı başlangıç](#hızlı-başlangıç) · [Belgeler](docs/README.md) · [Mimari](docs/architecture.md) · [Yol haritası](docs/roadmap.md) · [Claude Code ile karşılaştırma](docs/comparison.md) · [Katkı](CONTRIBUTING.md)
 
 <img src="docs/assets/demo.svg" alt="usta oturumu: model tek bir betikle 8 dosyayı değiştirir, diff onaylanınca uygulanır" width="720">
 

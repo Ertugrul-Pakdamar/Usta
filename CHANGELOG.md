@@ -4,11 +4,13 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 
 ## [Yayımlanmamış]
 
-## [0.1.0] — 2026-10-29 (etiket bekliyor)
+## [0.1.0] — 2026-10-29 (yayımlandı)
 
 İlk sürüm: aşağıdaki M0–M7 çalışmalarının tamamı.
 
 ### Eklendi
+
+**Belgeler:** `docs/comparison.md` (TR/EN): Claude Code ile özellik karşılaştırması, usta'nın farkları, olgunluk sınırları ve katkıcılar için numaralı aday iş listesi (N1–N12).
 
 **M7c: Tek dosya binary ve uygulama içinden giriş**
 - `usta login`: gateway adresi ve API anahtarı etkileşimli sorulur (anahtar ekrana yazılmaz), `~/.usta/credentials` dosyasına 0600 ile kaydedilir, bağlantı denetlenir. İlk çalıştırmada yapılandırma yoksa sihirbaz kendiliğinden açılır. `--base-url`, `--key-stdin` (betikler), `--model`, `--max-tokens`; `usta logout [--all]`; düz `http://` için açık onay.
