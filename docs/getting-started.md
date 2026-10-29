@@ -93,7 +93,7 @@ usta
 Bir hedef yazın, örneğin _"src/ altındaki TODO yorumlarını listele ve en acil olanı düzelt"_. Model araçları kullanır; dosya değiştirecek her çağrı için sizden diff'li onay ister:
 
 - `y` bir kez izin verir, `a` aynı türden çağrılara oturum boyunca izin verir, `n` reddeder.
-- ⇧Tab izin modunu döndürür: _izin sor_ → _düzenlemeleri kabul_ → _plan modu_.
+- ⇧Tab izin modunu döndürür: _izin sor_ → _düzenlemeleri kabul_ → _auto_ → _plan modu_.
 - `Esc` çalışan işi iptal eder; `Ctrl+C` iptal eder veya (boştayken) çıkar.
 - `/help` komutların tamamını listeler.
 

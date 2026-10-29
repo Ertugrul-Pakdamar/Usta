@@ -15,12 +15,14 @@ import {
   type CompactResult,
   composeAfterTool,
   createAfterTool,
+  createAutoClassifier,
   createNudgeAfterTool,
   createReviewer,
   createSession,
   createTaskTools,
   createToolGate,
   Economy,
+  formatAutoReport,
   formatReport,
   HookRunner,
   type Message,
@@ -85,7 +87,7 @@ interface PendingConfirm {
 
 type NewItem = Item extends infer I ? (I extends { id: number } ? Omit<I, "id"> : never) : never;
 
-const MODE_CYCLE: PermissionMode[] = ["default", "acceptEdits", "plan"];
+const MODE_CYCLE: PermissionMode[] = ["default", "acceptEdits", "auto", "plan"];
 
 function historyItems(messages: Message[]): NewItem[] {
   const out: NewItem[] = [];
@@ -216,9 +218,18 @@ export function App(props: AppProps) {
       { cancelled: () => abort.current?.signal.aborted ?? false },
     ),
   );
+  const [auto] = useState(() =>
+    createAutoClassifier({
+      provider: props.provider,
+      economy,
+      context: () => messages.current,
+      sessionId: () => session.current?.meta.id,
+    }),
+  );
   const [gate] = useState(() =>
     createToolGate({
       engine,
+      auto,
       hooks,
       checkpoints: () => checkpoints.current,
       sessionId: () => session.current?.meta.id,
@@ -243,6 +254,7 @@ export function App(props: AppProps) {
           provider: props.provider,
           cwd: props.cwd,
           engine,
+          auto,
           economy,
           tools: () => tools,
           hooks,
@@ -514,6 +526,7 @@ export function App(props: AppProps) {
         mode,
         setMode: (m) => engine.setMode(m),
         describePermissions: () => describe(engine, hooks),
+        autoReport: () => formatAutoReport(auto),
         rewindList,
         rewind,
         costReport: () => formatCostReport(economy),
@@ -534,6 +547,7 @@ export function App(props: AppProps) {
           checkpoints.current = undefined;
           sessionStarted.current = false;
           manager.stopAll();
+          auto.reset();
           economy.reset();
           economy.setSession(undefined);
           bump();

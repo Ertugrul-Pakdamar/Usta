@@ -46,16 +46,16 @@ Katmanlar birleştirilir: listeler (`allow`, `deny`, `ask`, hook'lar) birbirine 
 }
 ```
 
-| Alan                                 | Tür                                              | Açıklama                                                                    |
-| ------------------------------------ | ------------------------------------------------ | --------------------------------------------------------------------------- |
-| `permissions.allow` / `deny` / `ask` | `string[]`                                       | [Kural sözdizimi](permissions.md#kural-sözdizimi)                           |
-| `permissions.defaultMode`            | `default` \| `acceptEdits` \| `plan` \| `bypass` | Başlangıç izin modu. `bypass` **yalnızca kullanıcı ayarlarında** geçerlidir |
-| `hooks.<Olay>`                       | `{matcher?, command, timeout?}[]`                | [Hook'lar](permissions.md#hooklar). `timeout` saniye, varsayılan 30         |
-| `models.main` / `models.fast`        | `string`                                         | Ana model ve özetleme modeli                                                |
-| `budget.tokens`                      | `int`                                            | Oturum boyunca işlenen toplam token üst sınırı (girdi + çıktı)              |
-| `budget.cr`                          | `number`                                         | Oturum kredi (CR) üst sınırı                                                |
-| `compactAt`                          | `0.3 – 0.95`                                     | Bağlam penceresinin bu oranına varınca otomatik özet (varsayılan 0.8)       |
-| `language`                           | `tr` \| `en`                                     | Arayüz dili ([Dil](#dil)). Zararsız olduğu için her katmandan uygulanır     |
+| Alan                                 | Tür                                                        | Açıklama                                                                    |
+| ------------------------------------ | ---------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `permissions.allow` / `deny` / `ask` | `string[]`                                                 | [Kural sözdizimi](permissions.md#kural-sözdizimi)                           |
+| `permissions.defaultMode`            | `default` \| `acceptEdits` \| `auto` \| `plan` \| `bypass` | Başlangıç izin modu. `bypass` **yalnızca kullanıcı ayarlarında** geçerlidir |
+| `hooks.<Olay>`                       | `{matcher?, command, timeout?}[]`                          | [Hook'lar](permissions.md#hooklar). `timeout` saniye, varsayılan 30         |
+| `models.main` / `models.fast`        | `string`                                                   | Ana model ve özetleme modeli                                                |
+| `budget.tokens`                      | `int`                                                      | Oturum boyunca işlenen toplam token üst sınırı (girdi + çıktı)              |
+| `budget.cr`                          | `number`                                                   | Oturum kredi (CR) üst sınırı                                                |
+| `compactAt`                          | `0.3 – 0.95`                                               | Bağlam penceresinin bu oranına varınca otomatik özet (varsayılan 0.8)       |
+| `language`                           | `tr` \| `en`                                               | Arayüz dili ([Dil](#dil)). Zararsız olduğu için her katmandan uygulanır     |
 
 ### Proje güven kapısı
 
@@ -91,7 +91,7 @@ usta models                        gateway'deki modelleri listele
 | `--max-turns <n>`             | `-p` için en fazla ajan turu (varsayılan 25; etkileşimli oturumda 50) |
 | `-c, --continue`              | Bu dizindeki son oturuma devam et                                     |
 | `-r, --resume [id]`           | Belirli (veya son) oturuma devam et                                   |
-| `--permission-mode <mod>`     | `default` \| `acceptEdits` \| `plan` \| `bypass`                      |
+| `--permission-mode <mod>`     | `default` \| `acceptEdits` \| `auto` \| `plan` \| `bypass`            |
 | `--plan`                      | Plan modunda başla                                                    |
 | `--allow <kural...>`          | İzin kuralı ekle (tekrarlanabilir)                                    |
 | `--deny <kural...>`           | Yasak kuralı ekle (tekrarlanabilir)                                   |
@@ -120,16 +120,17 @@ Oturum içinde `/lang en` veya `/lang tr` dili anında değiştirir (o oturum i�
 
 ## `~/.usta` dizini
 
-| Yol                   | İçerik                               | Notlar                                   |
-| --------------------- | ------------------------------------ | ---------------------------------------- |
-| `credentials`         | `EVREN_*` değişkenleri               | `chmod 600` önerilir                     |
-| `settings.json`       | Kullanıcı ayarları                   |                                          |
-| `trust.json`          | Güvenilen proje ayarlarının özetleri |                                          |
-| `sessions/<id>.jsonl` | Konuşma kayıtları                    | 0600; `-c`/`-r` ile devam                |
-| `checkpoints/<id>/`   | `/rewind` için dosya yedekleri       | 0600                                     |
-| `outputs/<id>/`       | Bağlama sığmayan tam araç çıktıları  | 7 günden eskiler açılışta silinir        |
-| `cache/models.json`   | Gateway model bilgisi önbelleği      | 1 saat geçerli                           |
-| `agents/*.md`         | Kullanıcının özel alt ajanları       | [Alt ajanlar](subagents.md#özel-ajanlar) |
-| `subagents/<oturum>/` | Alt ajan konuşma kayıtları           | 0600; denetim için                       |
+| Yol                    | İçerik                               | Notlar                                             |
+| ---------------------- | ------------------------------------ | -------------------------------------------------- |
+| `credentials`          | `EVREN_*` değişkenleri               | `chmod 600` önerilir                               |
+| `settings.json`        | Kullanıcı ayarları                   |                                                    |
+| `trust.json`           | Güvenilen proje ayarlarının özetleri |                                                    |
+| `sessions/<id>.jsonl`  | Konuşma kayıtları                    | 0600; `-c`/`-r` ile devam                          |
+| `checkpoints/<id>/`    | `/rewind` için dosya yedekleri       | 0600                                               |
+| `outputs/<id>/`        | Bağlama sığmayan tam araç çıktıları  | 7 günden eskiler açılışta silinir                  |
+| `cache/models.json`    | Gateway model bilgisi önbelleği      | 1 saat geçerli                                     |
+| `agents/*.md`          | Kullanıcının özel alt ajanları       | [Alt ajanlar](subagents.md#özel-ajanlar)           |
+| `subagents/<oturum>/`  | Alt ajan konuşma kayıtları           | 0600; denetim için                                 |
+| `audit/<oturum>.jsonl` | Auto modu kararları                  | 0600; [Auto modu](auto-mode.md#denetim-ve-maliyet) |
 
 Oturum dosyaları araç çıktılarını içerebilir; paylaşmadan önce gözden geçirin.

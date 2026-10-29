@@ -280,6 +280,17 @@ export const en = {
   "tasks.usage": "Usage: /tasks [show <id> | stop <id>]",
   "tui.approval.titleAgent": "Permission required ({agent}): {call}",
   "tui.status.tasks": { one: "{count} task", other: "{count} tasks" },
+  // --- auto mode
+  "auto.risky": "Auto mode: this call looks risky: {reason}",
+  "auto.unsure": "Auto mode could not tell whether this call is safe: {reason}",
+  "auto.tripped": "Auto mode paused after {count} calls it could not approve; back to ask mode.",
+  "auto.none": "Auto mode has not decided anything yet.",
+  "auto.line": "{verdict}  {tool} {input} · {reason}{outcome}",
+  "auto.outcome.allowed": " → allowed",
+  "auto.outcome.denied": " → denied",
+  "auto.stats": "safe {safe} · risky {risky} · unsure {unsure} · classifier calls {calls}",
+  "slash.desc.auto": "Show what auto mode decided: /auto",
+  "tui.mode.auto": "AUTO",
   "report.permissions.mode": "Mode: {mode}",
   "report.permissions.hooks": "Hooks: {hooks}",
 } as const satisfies Record<string, Message>;

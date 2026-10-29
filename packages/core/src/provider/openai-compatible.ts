@@ -70,6 +70,7 @@ export class OpenAICompatibleProvider implements Provider {
           stream: true,
           stream_options: { include_usage: true },
           ...(req.maxTokens && { max_tokens: req.maxTokens }),
+          ...(req.temperature !== undefined && { temperature: req.temperature }),
           ...(req.tools?.length && {
             tools: req.tools.map((t) => ({
               type: "function" as const,

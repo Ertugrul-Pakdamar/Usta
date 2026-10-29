@@ -147,6 +147,25 @@ describe("modes", () => {
     expect(e.decide(bashTool, { command: "ls" }).decision).toBe("ask");
   });
 
+  it("auto: edits inside cwd pass; bash and outside paths go to the classifier", () => {
+    const e = engine("auto");
+    expect(e.decide(writeTool, { path: "a.ts", content: "" }).decision).toBe("allow");
+    expect(e.decide(readTool, { path: "a.ts" }).decision).toBe("allow");
+    expect(e.decide(bashTool, { command: "pnpm test" }).decision).toBe("classify");
+    expect(e.decide(writeTool, { path: "/tmp/outside-usta.txt", content: "" }).decision).toBe(
+      "classify",
+    );
+    expect(e.decide(readTool, { path: "/etc/hostname" }).decision).toBe("classify");
+  });
+
+  it("auto: deny rules, ask rules and protected paths never reach the classifier", () => {
+    const e = engine("auto", { deny: ["Bash(rm:*)"], ask: ["Bash(git push:*)"] });
+    expect(e.decide(bashTool, { command: "rm -rf x" }).decision).toBe("deny");
+    expect(e.decide(bashTool, { command: "git push" }).decision).toBe("ask");
+    expect(e.decide(writeTool, { path: ".git/config", content: "" }).decision).toBe("ask");
+    expect(e.decide(writeTool, { path: ".usta/settings.json", content: "" }).decision).toBe("ask");
+  });
+
   it("plan: mutating tools are denied, reads allowed, ExitPlanMode asks", () => {
     const e = engine("plan", { allow: ["Bash", "Write"] });
     expect(e.decide(writeTool, { path: "a", content: "" })).toMatchObject({ decision: "deny" });

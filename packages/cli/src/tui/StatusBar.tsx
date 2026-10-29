@@ -20,6 +20,7 @@ interface Props {
 const MODE_COLOR: Record<PermissionMode, string | undefined> = {
   default: undefined,
   acceptEdits: "green",
+  auto: "cyan",
   plan: "yellow",
   bypass: "red",
 };

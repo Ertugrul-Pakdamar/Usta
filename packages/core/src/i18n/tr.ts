@@ -261,6 +261,19 @@ export const tr: Record<MessageKey, Message> = {
   "tasks.usage": "Kullanım: /tasks [show <id> | stop <id>]",
   "tui.approval.titleAgent": "İzin gerekiyor ({agent}): {call}",
   "tui.status.tasks": { one: "{count} görev", other: "{count} görev" },
+  // --- auto modu
+  "auto.risky": "Auto modu: bu çağrı riskli görünüyor: {reason}",
+  "auto.unsure": "Auto modu bu çağrının güvenli olup olmadığını anlayamadı: {reason}",
+  "auto.tripped":
+    "Auto modu, onaylayamadığı {count} çağrıdan sonra duraklatıldı; izin sor moduna dönüldü.",
+  "auto.none": "Auto modu henüz bir karar vermedi.",
+  "auto.line": "{verdict}  {tool} {input} · {reason}{outcome}",
+  "auto.outcome.allowed": " → izin verildi",
+  "auto.outcome.denied": " → reddedildi",
+  "auto.stats":
+    "güvenli {safe} · riskli {risky} · belirsiz {unsure} · sınıflandırıcı çağrısı {calls}",
+  "slash.desc.auto": "Auto modunun kararlarını gösterir: /auto",
+  "tui.mode.auto": "AUTO",
   "report.permissions.mode": "Mod: {mode}",
   "report.permissions.hooks": "Hook'lar: {hooks}",
 };

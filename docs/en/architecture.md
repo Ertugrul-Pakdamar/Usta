@@ -123,6 +123,17 @@ Under `core/src/agents`: `definitions.ts` (built-in and custom `agents/*.md` age
 
 Reasoning and measurements: [ADR-0007](adr/0007-subagents.md).
 
+## Auto mode
+
+Under `core/src/auto`: `rules.ts` (local dangerous-pattern and read-only lists), `classifier.ts` (`AutoClassifier`: input narrowing, the `models.fast` call, circuit breaker, audit log), `factory.ts` (wiring to the session), `report.ts` (`/auto`).
+
+- **Engine → gate:** in `auto` mode `PermissionEngine.decide` returns `classify` instead of "ask"; `createToolGate` takes it to the classifier. `deny`, protected paths and `ask` rules finish before the classifier.
+- **Fail closed:** with no classifier, an error, or anything but `safe`, the call goes to the user (denied if nobody can be asked).
+- **Circuit breaker:** after 3 in a row / 10 in total `risky`/`unsure` verdicts the gate switches the mode to `default` and warns.
+- Subagents share the classifier through `SubagentRuntime.auto`.
+
+Rationale and measurements: [ADR-0008](adr/0008-auto-mode.md); user guide: [Auto mode](auto-mode.md).
+
 ## Localization (i18n)
 
 Every piece of text in usta falls into **one of two classes**, and this split is the foundation of the design:

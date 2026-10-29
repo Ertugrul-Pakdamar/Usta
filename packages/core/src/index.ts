@@ -1,6 +1,7 @@
 export * from "./agent/loop.js";
 export * from "./agent/prompt.js";
 export * from "./agents/index.js";
+export * from "./auto/index.js";
 export * from "./checkpoint.js";
 export * from "./compaction.js";
 export * from "./config.js";

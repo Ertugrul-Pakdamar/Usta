@@ -5,7 +5,7 @@ import type { Tool } from "@usta/sdk";
 import picomatch from "picomatch";
 import type { Localized, MessageKey, Params } from "./i18n/index.js";
 
-export const PERMISSION_MODES = ["default", "acceptEdits", "plan", "bypass"] as const;
+export const PERMISSION_MODES = ["default", "acceptEdits", "auto", "plan", "bypass"] as const;
 export type PermissionMode = (typeof PERMISSION_MODES)[number];
 
 /**
@@ -15,7 +15,12 @@ export type PermissionMode = (typeof PERMISSION_MODES)[number];
 export type Decision =
   | { decision: "allow" }
   | { decision: "deny"; reason: string; reasonKey?: Localized }
-  | { decision: "ask"; reason?: string; reasonKey?: Localized };
+  | { decision: "ask"; reason?: string; reasonKey?: Localized }
+  /**
+   * Auto mode only: neither a rule nor the mode settles it, so the classifier decides whether
+   * it may run without asking. Without a classifier this behaves like "ask".
+   */
+  | { decision: "classify"; reason?: string; reasonKey?: Localized };
 
 const why = (reason: string, key: MessageKey, params?: Params) => ({
   reason,
@@ -275,13 +280,15 @@ export class PermissionEngine {
       !resolveTarget(target, this.cwd, this.home).insideCwd
     ) {
       return {
-        decision: "ask",
+        decision: this.current === "auto" ? "classify" : "ask",
         ...why("Path is outside the working directory.", "perm.outsideCwd"),
       };
     }
     if (!tool.mutating) return { decision: "allow" };
-    if (this.current === "acceptEdits" && kind === "path") return { decision: "allow" };
-    return { decision: "ask" };
+    if ((this.current === "acceptEdits" || this.current === "auto") && kind === "path") {
+      return { decision: "allow" };
+    }
+    return { decision: this.current === "auto" ? "classify" : "ask" };
   }
 
   /**
@@ -333,7 +340,9 @@ export class PermissionEngine {
     ) {
       return { decision: "allow" };
     }
-    return this.current === "acceptEdits" ? { decision: "allow" } : { decision: "ask" };
+    return this.current === "acceptEdits" || this.current === "auto"
+      ? { decision: "allow" }
+      : { decision: "ask" };
   }
 
   private isAllowed(tool: Tool, target: string | undefined): boolean {

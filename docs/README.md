@@ -4,14 +4,15 @@ Bu dizin hem kullanıcılar hem katkıcılar içindir. Proje alfa aşamasındad�
 
 ## Kullanıcılar için
 
-| Belge                                 | İçerik                                                                                   |
-| ------------------------------------- | ---------------------------------------------------------------------------------------- |
-| [Başlangıç](getting-started.md)       | Kurulum, yapılandırma, kullanım şartları, ilk oturum, headless kullanım                  |
-| [Yapılandırma](configuration.md)      | Ortam değişkenleri, ayar dosyaları ve katmanları, tüm CLI bayrakları, `~/.usta` içeriği  |
-| [İzinler ve güvenlik](permissions.md) | Modlar, kural sözdizimi, Bash güvenliği, proje güven kapısı, plan modu, hook'lar, rewind |
-| [Token ekonomisi](token-economy.md)   | Maliyet görünürlüğü, önbellek, çıktı sınırlama, özetleme, bütçe, Script-first            |
-| [Alt ajanlar](subagents.md)           | `Task`, dahili ve özel ajanlar, arka plan görevleri, izinler, ölçülmüş maliyet           |
-| [Sorun giderme](troubleshooting.md)   | Sık karşılaşılan hatalar ve çözümleri                                                    |
+| Belge                                 | İçerik                                                                                    |
+| ------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [Başlangıç](getting-started.md)       | Kurulum, yapılandırma, kullanım şartları, ilk oturum, headless kullanım                   |
+| [Yapılandırma](configuration.md)      | Ortam değişkenleri, ayar dosyaları ve katmanları, tüm CLI bayrakları, `~/.usta` içeriği   |
+| [İzinler ve güvenlik](permissions.md) | Modlar, kural sözdizimi, Bash güvenliği, proje güven kapısı, plan modu, hook'lar, rewind  |
+| [Token ekonomisi](token-economy.md)   | Maliyet görünürlüğü, önbellek, çıktı sınırlama, özetleme, bütçe, Script-first             |
+| [Auto modu](auto-mode.md)             | Sınıflandırıcı destekli izin modu, yerel katman, devre kesici, denetim, ölçülmüş doğruluk |
+| [Alt ajanlar](subagents.md)           | `Task`, dahili ve özel ajanlar, arka plan görevleri, izinler, ölçülmüş maliyet            |
+| [Sorun giderme](troubleshooting.md)   | Sık karşılaşılan hatalar ve çözümleri                                                     |
 
 ## Katkıcılar için
 

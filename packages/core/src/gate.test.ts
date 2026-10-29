@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
 import { runAgent } from "./agent/loop.js";
+import { AutoClassifier } from "./auto/classifier.js";
 import { CheckpointStore } from "./checkpoint.js";
 import { type AskAnswer, type AskRequest, createAfterTool, createToolGate } from "./gate.js";
 import { HookRunner } from "./hooks.js";
@@ -19,7 +20,9 @@ beforeEach(async () => {
 
 const setup = (
   opts: {
-    mode?: "default" | "plan" | "acceptEdits";
+    mode?: "default" | "plan" | "acceptEdits" | "auto";
+    auto?: AutoClassifier;
+    onWarning?: (t: string) => void;
     deny?: string[];
     allow?: string[];
     hooks?: object;
@@ -38,6 +41,8 @@ const setup = (
   const gate = createToolGate({
     engine,
     hooks,
+    auto: opts.auto,
+    onWarning: opts.onWarning,
     ask: opts.answer ? async (r) => (asked.push(r), opts.answer as AskAnswer) : undefined,
   });
   return { engine, gate, asked, hooks };
@@ -199,5 +204,89 @@ describe("createAfterTool", () => {
       afterTool: createAfterTool(hooks),
     });
     expect(toolOutputs(provider)).toContain("[PostToolUse hook] lint hatası");
+  });
+});
+
+describe("auto mode in the gate", () => {
+  const classifier = (...verdicts: string[]) =>
+    new AutoClassifier({
+      provider: new MockProvider(
+        verdicts.map((v) => ({ text: `{"verdict":"${v}","reason":"r"}` })),
+      ),
+      model: () => "fast",
+      context: () => [{ role: "user", content: "run it" }],
+    });
+  const bash = (command: string) => [
+    { toolCalls: [{ name: "Bash", args: { command } }] },
+    { text: "ok" },
+  ];
+
+  it("safe: runs without asking, and the outcome is recorded as allowed", async () => {
+    const auto = classifier("safe");
+    const s = setup({ mode: "auto", auto, answer: { allow: false } });
+    const { provider } = await run(bash("echo hi-from-auto"), s);
+    expect(s.asked).toHaveLength(0);
+    expect(toolOutputs(provider)).toContain("hi-from-auto");
+    expect(auto.recent[0]?.outcome).toBe("allowed");
+  });
+
+  it("risky/unsure: the user is asked, with the classifier's reason", async () => {
+    const auto = classifier("risky");
+    const s = setup({ mode: "auto", auto, answer: { allow: false } });
+    const { provider } = await run(bash("echo nope"), s);
+    expect(s.asked).toHaveLength(1);
+    expect(s.asked[0]?.reason).toContain("r");
+    expect(toolOutputs(provider)).toContain("not allowed");
+    expect(auto.recent[0]?.outcome).toBe("denied");
+  });
+
+  it("risky with nobody to ask is denied, and the model is told why", async () => {
+    const s = setup({ mode: "auto", auto: classifier("unsure") });
+    const { provider } = await run(bash("echo nope"), s);
+    expect(toolOutputs(provider)).toContain("auto mode did not approve");
+  });
+
+  it("local rules decide dangerous commands without the model, and the user decides", async () => {
+    const auto = classifier("safe");
+    const s = setup({ mode: "auto", auto, answer: { allow: false } });
+    await run(bash("rm -rf /"), s);
+    expect(s.asked).toHaveLength(1);
+    expect(auto.stats.modelCalls).toBe(0);
+  });
+
+  it("a deny rule beats auto mode; the classifier is never consulted", async () => {
+    const auto = classifier("safe");
+    const s = setup({ mode: "auto", auto, deny: ["Bash(echo:*)"] });
+    const { provider } = await run(bash("echo hi"), s);
+    expect(auto.stats.modelCalls).toBe(0);
+    expect(toolOutputs(provider)).toContain("Denied by rule");
+  });
+
+  it("without a classifier, 'classify' degrades to asking the user", async () => {
+    const s = setup({ mode: "auto", answer: { allow: true } });
+    await run(bash("echo hi"), s);
+    expect(s.asked).toHaveLength(1);
+  });
+
+  it("the circuit breaker drops back to default mode and warns", async () => {
+    const warnings: string[] = [];
+    const auto = classifier("unsure", "unsure", "unsure");
+    const s = setup({
+      mode: "auto",
+      auto,
+      answer: { allow: false },
+      onWarning: (w) => warnings.push(w),
+    });
+    await run(
+      [
+        { toolCalls: [{ name: "Bash", args: { command: "echo a1" } }] },
+        { toolCalls: [{ name: "Bash", args: { command: "echo a2" } }] },
+        { toolCalls: [{ name: "Bash", args: { command: "echo a3" } }] },
+        { text: "done" },
+      ],
+      s,
+    );
+    expect(s.engine.mode).toBe("default");
+    expect(warnings).toHaveLength(1);
   });
 });
