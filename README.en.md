@@ -110,7 +110,7 @@ Details and method: [Token economy](docs/en/token-economy.md). Real A/B results:
 
 <p align="center"><img src="docs/assets/roadmap.en.svg" alt="Roadmap: M0–M7 done" width="720"></p>
 
-All stages M0–M7 are done (skeleton, core, TUI, security, token economy, localization, subagents, auto mode, skills, MCP, plugins, `@file`, evals, single-file binary). `v0.1.0` is released. See [docs/en/roadmap.md](docs/en/roadmap.md) and what is next in [docs/en/comparison.md](docs/en/comparison.md).
+All stages M0–M7 are done (skeleton, core, TUI, security, token economy, localization, subagents, auto mode, skills, MCP, plugins, `@file`, evals, single-file binary). `v0.1.1` is released. See [docs/en/roadmap.md](docs/en/roadmap.md) and what is next in [docs/en/comparison.md](docs/en/comparison.md).
 
 ## Contributing and license
 
