@@ -124,6 +124,45 @@ describe("App", () => {
     ui.unmount();
   });
 
+  it("custom commands expand $ARGUMENTS into the prompt; /skills lists skills; the model can load a skill", async () => {
+    const provider = new MockProvider([
+      { toolCalls: [{ name: "Skill", args: { name: "review" } }] },
+      { text: "tamam" },
+    ]);
+    const extensions = {
+      skills: [
+        {
+          name: "review",
+          description: "Review a diff",
+          body: "SKILL-BODY-XYZ",
+          source: "user" as const,
+        },
+      ],
+      commands: [
+        {
+          name: "fix",
+          description: "Fix an issue",
+          template: "Fix this: $ARGUMENTS",
+          source: "user" as const,
+        },
+      ],
+      warnings: [],
+    };
+    const ui = render(
+      <App provider={provider} config={config} cwd={cwd} model="m" extensions={extensions} />,
+    );
+    await type(ui, "/skills");
+    await waitFor(ui, "Review a diff");
+    await waitFor(ui, "/fix");
+    await type(ui, "/fix the login bug");
+    await waitFor(ui, "tamam");
+    const first = provider.requests[0];
+    expect(JSON.stringify(first?.messages)).toContain("Fix this: the login bug");
+    expect(first?.tools?.map((t) => t.name)).toContain("Skill");
+    expect(JSON.stringify(provider.requests[1]?.messages)).toContain("SKILL-BODY-XYZ");
+    ui.unmount();
+  });
+
   it("runs !shell commands directly", async () => {
     const ui = mount([]);
     await type(ui, "!echo selam-shell");

@@ -19,12 +19,15 @@ import {
   createNudgeAfterTool,
   createReviewer,
   createSession,
+  createSkillTool,
   createTaskTools,
   createToolGate,
   Economy,
+  expandCommand,
   formatAutoReport,
   formatReport,
   HookRunner,
+  type LoadedExtensions,
   type Message,
   ModelRegistry,
   PermissionEngine,
@@ -47,7 +50,13 @@ import { useEffect, useRef, useState } from "react";
 import { describeCommand, parseSlash, slashCommands } from "../slash.js";
 import { Approval } from "./Approval.js";
 import { Confirm } from "./Confirm.js";
-import { formatContextReport, formatCostReport, summarizeCall, summarizeOutput } from "./format.js";
+import {
+  formatContextReport,
+  formatCostReport,
+  formatExtensions,
+  summarizeCall,
+  summarizeOutput,
+} from "./format.js";
 import { Spinner } from "./Spinner.js";
 import { StatusBar } from "./StatusBar.js";
 import { TextInput } from "./TextInput.js";
@@ -67,6 +76,8 @@ export interface AppProps {
   warnings?: string[];
   /** Subagents available this session (built-in + custom). Defaults to the built-in ones. */
   agents?: AgentDefinition[];
+  /** Skills and custom commands. */
+  extensions?: LoadedExtensions;
   /** Existing transcript when resuming. */
   resume?: { session: Session; messages: Message[] };
   initialPrompt?: string;
@@ -270,7 +281,8 @@ export function App(props: AppProps) {
       }),
   );
   const [taskTools] = useState(() => createTaskTools(manager, agents));
-  const allTools = [...tools, ...taskTools];
+  const [skillTool] = useState(() => createSkillTool(props.extensions?.skills ?? []));
+  const allTools = [...tools, ...taskTools, ...(skillTool ? [skillTool] : [])];
 
   const elapsed = (rec: { startedAt: number; endedAt?: number }) =>
     `${Math.round(((rec.endedAt ?? Date.now()) - rec.startedAt) / 1000)}s`;
@@ -512,6 +524,8 @@ export function App(props: AppProps) {
     const cmd = slashCommands.find(
       (c) => c.name === parsed?.name || (parsed?.name === "quit" && c.name === "exit"),
     );
+    const custom = !cmd && props.extensions?.commands.find((c) => c.name === parsed?.name);
+    if (custom && parsed) return runTurn(expandCommand(custom, parsed.args));
     if (!parsed || !cmd) return info(t("tui.unknownCommand", { command: text }));
     try {
       await cmd.run(parsed.args, {
@@ -527,6 +541,7 @@ export function App(props: AppProps) {
         setMode: (m) => engine.setMode(m),
         describePermissions: () => describe(engine, hooks),
         autoReport: () => formatAutoReport(auto),
+        extensionsReport: () => formatExtensions(props.extensions),
         rewindList,
         rewind,
         costReport: () => formatCostReport(economy),
@@ -631,7 +646,13 @@ export function App(props: AppProps) {
 
   const suggestions =
     input.startsWith("/") && !input.includes(" ")
-      ? slashCommands.filter((c) => c.name.startsWith(input.slice(1)))
+      ? [
+          ...slashCommands.map((c) => ({ name: c.name, text: describeCommand(c) })),
+          ...(props.extensions?.commands ?? []).map((c) => ({
+            name: c.name,
+            text: c.description,
+          })),
+        ].filter((c) => c.name.startsWith(input.slice(1)))
       : [];
   const streamTail = streaming.split("\n").slice(-20).join("\n");
   const tracker = economy.tracker;
@@ -669,7 +690,7 @@ export function App(props: AppProps) {
       </Box>
       {suggestions.map((c) => (
         <Text key={c.name} dimColor>
-          {"  "}/{c.name.padEnd(11)} {describeCommand(c)}
+          {"  "}/{c.name.padEnd(11)} {c.text}
         </Text>
       ))}
       <StatusBar

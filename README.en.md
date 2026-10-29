@@ -43,7 +43,7 @@ Coding agents are powerful but can be expensive and unsupervised. **usta** tackl
 - **Subagents:** delegate wide exploration to a separate context with `Task` (parallel, background, `/tasks`); built-in `explore`/`plan`/`general` plus your own `agents/*.md`; the same permission gate. Measured: reading a big file through a subagent cut the main context by 60%, but one small search is cheaper inline ([details](docs/en/subagents.md)).
 - **Localization:** Turkish and English interface (`--lang`, `USTA_LANG`, `/lang`); everything sent to the model stays English regardless of the interface language.
 - **Headless:** `usta -p "..." --output-format json` for CI and scripts, with meaningful exit codes (`0` ok, `1` error, `2` unfinished, `3` budget).
-- **Extensibility:** tools via `@usta/sdk` today; skills, plugins and MCP connectors in [M6](docs/en/roadmap.md).
+- **Extensibility:** tools via `@usta/sdk`, Markdown **skills** and **custom commands** ([docs](docs/en/skills.md)) today; plugins and MCP connectors in [M6](docs/en/roadmap.md).
 
 ## Quick start
 

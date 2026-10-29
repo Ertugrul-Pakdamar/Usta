@@ -12,6 +12,7 @@ _Turkish documentation: [docs/README.md](../README.md)._
 | [Configuration](configuration.md)          | Environment variables, settings files and their layers, every CLI flag, the language, the `~/.usta` directory |
 | [Permissions and security](permissions.md) | Modes, rule syntax, Bash safety, project trust gate, plan mode, hooks, rewind                                 |
 | [Token economy](token-economy.md)          | Cost visibility, caching, output limiting, summarization, budgets, Script-first                               |
+| [Skills and commands](skills.md)           | `SKILL.md`, `commands/*.md`, on-demand loading, trust gate                                                    |
 | [Auto mode](auto-mode.md)                  | Classifier-backed permission mode, local layer, circuit breaker, audit, measured accuracy                     |
 | [Subagents](subagents.md)                  | `Task`, built-in and custom agents, background tasks, permissions, measured cost                              |
 | [Troubleshooting](troubleshooting.md)      | Common problems and their fixes                                                                               |

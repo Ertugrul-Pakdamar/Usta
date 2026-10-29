@@ -1,14 +1,15 @@
 # Genişletme
 
-usta'yı bugün üç yolla genişletebilirsiniz; geri kalanı [M6](roadmap.md) ile gelir.
+usta'yı bugün beş yolla genişletebilirsiniz; plugin ve MCP [M6](roadmap.md)'nın sonraki parçalarıyla gelir.
 
-| Yol                                        | Durum    | Kullanım                                                           |
-| ------------------------------------------ | -------- | ------------------------------------------------------------------ |
-| Yeni dahili araç                           | ✅ bugün | Kod katkısı: `packages/core/src/tools`                             |
-| Hook'lar                                   | ✅ bugün | Ayar dosyasında kabuk komutu: [Hook'lar](permissions.md#hooklar)   |
-| Özel alt ajan                              | ✅ bugün | `agents/<ad>.md` dosyası: [Alt ajanlar](subagents.md#özel-ajanlar) |
-| İzin kuralları                             | ✅ bugün | Ayar dosyasında: [İzinler](permissions.md)                         |
-| Skill, slash komutu, plugin, MCP connector | 🔜 M6    | Aşağıda taslak                                                     |
+| Yol                        | Durum    | Kullanım                                                           |
+| -------------------------- | -------- | ------------------------------------------------------------------ |
+| Yeni dahili araç           | ✅ bugün | Kod katkısı: `packages/core/src/tools`                             |
+| Hook'lar                   | ✅ bugün | Ayar dosyasında kabuk komutu: [Hook'lar](permissions.md#hooklar)   |
+| Özel alt ajan              | ✅ bugün | `agents/<ad>.md` dosyası: [Alt ajanlar](subagents.md#özel-ajanlar) |
+| İzin kuralları             | ✅ bugün | Ayar dosyasında: [İzinler](permissions.md)                         |
+| Skill'ler ve özel komutlar | ✅ bugün | Markdown dosyası: [Skill'ler ve komutlar](skills.md)               |
+| Plugin, MCP connector      | 🔜 M6    | Aşağıda taslak                                                     |
 
 ## Yeni bir araç eklemek
 
@@ -59,15 +60,13 @@ Araç yazma kuralları:
 
 Kod yazmadan davranış eklemek için en kolay yol hook'tur: komut engelleme, otomatik biçimlendirme, bağlam ekleme, denetim günlüğü. Protokol ve örnek: [İzinler → Hook'lar](permissions.md#hooklar).
 
-## Planlanan: skill, plugin ve connector (M6)
+## Planlanan: plugin ve connector (M6)
 
 > **Taslak:** Aşağıdaki biçimler tasarım hedefidir; uygulanana kadar değişebilir. Mevcut Claude Code skill/plugin biçimlerine yakın tutulacaktır ki taşıma kolay olsun.
 
-| Kavram           | Biçim                                                          | Not                                                                                                  |
-| ---------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| **Skill**        | `skills/<ad>/SKILL.md` (`name`, `description` frontmatter'ı)   | Başta yalnızca açıklaması bağlama girer; tetiklenince tam içerik yüklenir (token dostu)              |
-| **Slash komutu** | `commands/<ad>.md` (`$ARGUMENTS` desteğiyle)                   |                                                                                                      |
-| **Connector**    | MCP sunucuları (stdio / HTTP)                                  | `usta mcp add\|list\|remove`; araçlar `mcp__sunucu__araç` adıyla, izin kuralları onlara da uygulanır |
-| **Plugin**       | `usta-plugin.json` manifesti: yukarıdakilerin hepsini paketler | Yerel klasör, git URL'si veya npm kaynağından `usta plugin install`                                  |
+| Kavram        | Biçim                                                          | Not                                                                                                  |
+| ------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| **Connector** | MCP sunucuları (stdio / HTTP)                                  | `usta mcp add\|list\|remove`; araçlar `mcp__sunucu__araç` adıyla, izin kuralları onlara da uygulanır |
+| **Plugin**    | `usta-plugin.json` manifesti: yukarıdakilerin hepsini paketler | Yerel klasör, git URL'si veya npm kaynağından `usta plugin install`                                  |
 
 Fikriniz veya ihtiyacınız varsa bir [özellik isteği](https://github.com/Ertugrul-Pakdamar/Usta/issues/new?template=feature_request.yml) açın; M6 tasarımını şekillendirebilirsiniz.

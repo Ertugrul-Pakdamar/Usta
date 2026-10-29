@@ -244,6 +244,21 @@ export const tr: Record<MessageKey, Message> = {
   "trust.agentsWarning":
     "Yönergeleri modeli yönlendirir ve araç kullanabilirler (izin kurallarınız içinde).",
   "trust.agentsQuestion": "Bu proje ajanlarına güveniyor musunuz?",
+  "ext.invalidName": '{label}: geçersiz ad "{name}" (küçük harf, rakam ve tire)',
+  "ext.emptyBody": "{label}: dosyada içerik yok",
+  "ext.noDescription": "{label}: skill için açıklama gerekli",
+  "ext.untrusted":
+    "{dir}: proje güvenilir olmadığı için {count} proje skill/komut dosyası yüklenmedi.",
+  "trust.extHeader": "Bu proje {dir} içinde skill veya komut tanımlıyor:",
+  "trust.extWarning":
+    "Skill'ler modeli yönlendirir, komutlar sizin gönderdiğiniz istem olur; onaylamadan önce okuyun.",
+  "trust.extQuestion": "Bu proje skill ve komutlarına güveniyor musunuz?",
+  "slash.desc.skills": "Yüklü skill'leri ve özel komutları listeler",
+  "ext.none":
+    "Skill veya özel komut yok. ~/.usta ya da .usta altına skills/<ad>/SKILL.md veya commands/<ad>.md ekleyin.",
+  "ext.skillsHeader": "Skill'ler:",
+  "ext.commandsHeader": "Komutlar:",
+  "ext.unknownCommand": "Bilinmeyen komut: {command}",
   "slash.desc.tasks": "Alt ajan görevleri: /tasks, /tasks show <id>, /tasks stop <id>",
   "tasks.none": "Görev yok.",
   "tasks.line": "{id}  {status}  {agent}: {description} · {elapsed}",

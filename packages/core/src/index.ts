@@ -9,6 +9,7 @@ export * from "./cost.js";
 export * from "./doctor.js";
 export * from "./economy.js";
 export * from "./errors.js";
+export * from "./extensions/index.js";
 export * from "./gate.js";
 export * from "./hooks.js";
 export * from "./i18n/index.js";

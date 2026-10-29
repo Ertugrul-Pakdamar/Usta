@@ -1,14 +1,15 @@
 # Extending
 
-You can extend usta in three ways today; the rest arrives with [M6](roadmap.md).
+You can extend usta in five ways today; plugins and MCP arrive with the next parts of [M6](roadmap.md).
 
-| Way                                         | Status   | Use                                                                 |
-| ------------------------------------------- | -------- | ------------------------------------------------------------------- |
-| A new built-in tool                         | ✅ today | A code contribution: `packages/core/src/tools`                      |
-| Hooks                                       | ✅ today | A shell command in a settings file: [Hooks](permissions.md#hooks)   |
-| A custom subagent                           | ✅ today | An `agents/<name>.md` file: [Subagents](subagents.md#custom-agents) |
-| Permission rules                            | ✅ today | In a settings file: [Permissions](permissions.md)                   |
-| Skill, slash command, plugin, MCP connector | 🔜 M6    | Draft below                                                         |
+| Way                        | Status   | Use                                                                 |
+| -------------------------- | -------- | ------------------------------------------------------------------- |
+| A new built-in tool        | ✅ today | A code contribution: `packages/core/src/tools`                      |
+| Hooks                      | ✅ today | A shell command in a settings file: [Hooks](permissions.md#hooks)   |
+| A custom subagent          | ✅ today | An `agents/<name>.md` file: [Subagents](subagents.md#custom-agents) |
+| Permission rules           | ✅ today | In a settings file: [Permissions](permissions.md)                   |
+| Skills and custom commands | ✅ today | A Markdown file: [Skills and commands](skills.md)                   |
+| Plugin, MCP connector      | 🔜 M6    | Draft below                                                         |
 
 ## Adding a new tool
 
@@ -59,15 +60,13 @@ Rules for writing tools:
 
 The easiest way to add behavior without writing code is a hook: blocking commands, auto-formatting, adding context, audit logs. Protocol and example: [Permissions → Hooks](permissions.md#hooks).
 
-## Planned: skills, plugins and connectors (M6)
+## Planned: plugins and connectors (M6)
 
 > **Draft:** The formats below are design goals; they may change until implemented. They will be kept close to existing Claude Code skill/plugin formats so that migration is easy.
 
-| Concept           | Format                                                       | Note                                                                                                           |
-| ----------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| **Skill**         | `skills/<name>/SKILL.md` (`name`, `description` frontmatter) | At first only its description enters the context; the full content loads when it is triggered (token-friendly) |
-| **Slash command** | `commands/<name>.md` (with `$ARGUMENTS` support)             |                                                                                                                |
-| **Connector**     | MCP servers (stdio / HTTP)                                   | `usta mcp add\|list\|remove`; tools appear as `mcp__server__tool`, permission rules apply to them too          |
-| **Plugin**        | `usta-plugin.json` manifest: packages all of the above       | `usta plugin install` from a local folder, git URL or npm                                                      |
+| Concept       | Format                                                 | Note                                                                                                  |
+| ------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| **Connector** | MCP servers (stdio / HTTP)                             | `usta mcp add\|list\|remove`; tools appear as `mcp__server__tool`, permission rules apply to them too |
+| **Plugin**    | `usta-plugin.json` manifest: packages all of the above | `usta plugin install` from a local folder, git URL or npm                                             |
 
 If you have an idea or a need, open a [feature request](https://github.com/Ertugrul-Pakdamar/Usta/issues/new?template=feature_request.yml); you can shape the M6 design.

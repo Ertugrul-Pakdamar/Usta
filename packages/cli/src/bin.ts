@@ -15,8 +15,10 @@ import {
   createAutoClassifier,
   createNudgeAfterTool,
   createReviewer,
+  createSkillTool,
   createTaskTools,
   createToolGate,
+  expandCommand,
   fetchTerms,
   findSession,
   GatewayError,
@@ -42,6 +44,7 @@ import {
   createEconomy,
   initLanguage,
   loadSessionAgents,
+  loadSessionExtensions,
   parseTokens,
   setupRuntime,
 } from "./runtime.js";
@@ -159,6 +162,7 @@ async function runInteractive(opts: InteractiveOptions, initialPrompt?: string):
   const model = opts.model ?? resume?.session.meta.model ?? settings.models.main ?? config.model;
   const economy = await createEconomy({ config, provider, settings, flags: opts, model });
   const loadedAgents = await loadSessionAgents(cwd, opts, true);
+  const extensions = await loadSessionExtensions(cwd, opts, true);
   const { startTui } = await import("./tui/start.js");
   await startTui({
     provider,
@@ -171,7 +175,8 @@ async function runInteractive(opts: InteractiveOptions, initialPrompt?: string):
     hooks,
     economy,
     agents: loadedAgents.agents,
-    warnings: [...warnings, ...loadedAgents.warnings],
+    extensions,
+    warnings: [...warnings, ...loadedAgents.warnings, ...extensions.warnings],
     version: `v${pkg.version}`,
   });
 }
@@ -260,18 +265,28 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
       logDir: () => join(homedir(), ".usta", "subagents", headlessId),
     },
   });
-  const allTools = [...builtinTools, ...createTaskTools(manager, loadedAgents.agents)];
+  const extensions = await loadSessionExtensions(cwd, opts, interactive);
+  for (const w of extensions.warnings) warn(w);
+  const slashMatch = /^\/(\S+)\s*(.*)$/s.exec(opts.print.trim());
+  const custom = slashMatch && extensions.commands.find((c) => c.name === slashMatch[1]);
+  const userText = custom ? expandCommand(custom, (slashMatch?.[2] ?? "").trim()) : opts.print;
+  const skillTool = createSkillTool(extensions.skills);
+  const allTools = [
+    ...builtinTools,
+    ...createTaskTools(manager, loadedAgents.agents),
+    ...(skillTool ? [skillTool] : []),
+  ];
 
   const start = await hooks.run("SessionStart");
-  const submit = await hooks.run("UserPromptSubmit", { prompt: opts.print });
+  const submit = await hooks.run("UserPromptSubmit", { prompt: userText });
   for (const w of [...start.warnings, ...submit.warnings]) warn(w);
   if (submit.blocked) {
     throw new GatewayError(t("tui.hookBlockedPrompt", { reason: submit.blocked.reason }));
   }
   const context = [...start.context, ...submit.context];
   const prompt = context.length
-    ? `${opts.print}\n\n<hook-context>\n${context.join("\n")}\n</hook-context>`
-    : opts.print;
+    ? `${userText}\n\n<hook-context>\n${context.join("\n")}\n</hook-context>`
+    : userText;
 
   conversation.push({ role: "user", content: prompt });
   const result = await runAgent(prompt, {

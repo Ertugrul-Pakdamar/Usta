@@ -1,4 +1,12 @@
-import { type ContextReport, type Economy, formatDate, formatNumber, isFree, t } from "@usta/core";
+import {
+  type ContextReport,
+  type Economy,
+  formatDate,
+  formatNumber,
+  isFree,
+  type LoadedExtensions,
+  t,
+} from "@usta/core";
 
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
@@ -111,4 +119,17 @@ export function formatCostReport(economy: Economy): string {
     );
   }
   return lines.join("\n");
+}
+
+/** The loaded skills and custom commands (`/skills`). */
+export function formatExtensions(ext: LoadedExtensions | undefined): string {
+  if (!ext || (!ext.skills.length && !ext.commands.length)) return t("ext.none");
+  return [
+    ...(ext.skills.length
+      ? [t("ext.skillsHeader"), ...ext.skills.map((s) => `  ${s.name} · ${s.description}`)]
+      : []),
+    ...(ext.commands.length
+      ? [t("ext.commandsHeader"), ...ext.commands.map((c) => `  /${c.name} · ${c.description}`)]
+      : []),
+  ].join("\n");
 }
