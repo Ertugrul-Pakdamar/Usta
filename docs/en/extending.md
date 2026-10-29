@@ -2,12 +2,13 @@
 
 You can extend usta in three ways today; the rest arrives with [M6](roadmap.md).
 
-| Way                                         | Status   | Use                                                               |
-| ------------------------------------------- | -------- | ----------------------------------------------------------------- |
-| A new built-in tool                         | ✅ today | A code contribution: `packages/core/src/tools`                    |
-| Hooks                                       | ✅ today | A shell command in a settings file: [Hooks](permissions.md#hooks) |
-| Permission rules                            | ✅ today | In a settings file: [Permissions](permissions.md)                 |
-| Skill, slash command, plugin, MCP connector | 🔜 M6    | Draft below                                                       |
+| Way                                         | Status   | Use                                                                 |
+| ------------------------------------------- | -------- | ------------------------------------------------------------------- |
+| A new built-in tool                         | ✅ today | A code contribution: `packages/core/src/tools`                      |
+| Hooks                                       | ✅ today | A shell command in a settings file: [Hooks](permissions.md#hooks)   |
+| A custom subagent                           | ✅ today | An `agents/<name>.md` file: [Subagents](subagents.md#custom-agents) |
+| Permission rules                            | ✅ today | In a settings file: [Permissions](permissions.md)                   |
+| Skill, slash command, plugin, MCP connector | 🔜 M6    | Draft below                                                         |
 
 ## Adding a new tool
 
@@ -66,7 +67,6 @@ The easiest way to add behavior without writing code is a hook: blocking command
 | ----------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
 | **Skill**         | `skills/<name>/SKILL.md` (`name`, `description` frontmatter) | At first only its description enters the context; the full content loads when it is triggered (token-friendly) |
 | **Slash command** | `commands/<name>.md` (with `$ARGUMENTS` support)             |                                                                                                                |
-| **Custom agent**  | `agents/<name>.md` (model, tools, prompt)                    | Together with the M5 subagents                                                                                 |
 | **Connector**     | MCP servers (stdio / HTTP)                                   | `usta mcp add\|list\|remove`; tools appear as `mcp__server__tool`, permission rules apply to them too          |
 | **Plugin**        | `usta-plugin.json` manifest: packages all of the above       | `usta plugin install` from a local folder, git URL or npm                                                      |
 

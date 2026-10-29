@@ -36,12 +36,12 @@ The gateway caches the **prefix** of the prompt (`usage.prompt_tokens_details.ca
 - The tool list is fixed. `ExitPlanMode` enters the list only in plan mode; switching modes costs one cache miss.
 - The mode-dependent reminder (plan mode) is not put into the system prompt but appended to the **end** of the request as a temporary message that is not stored in the history.
 
-| Measurement                          | Result                                          |
-| ------------------------------------ | ----------------------------------------------- |
-| Fixed cost (system + 8 tool schemas) | **1.07k tokens** (1.19k before the improvement) |
-| A 2-request turn                     | 49% from cache                                  |
-| A 3-request Script turn              | 64%                                             |
-| A 6-request session (`/cost`)        | 97%                                             |
+| Measurement                          | Result                                                                                     |
+| ------------------------------------ | ------------------------------------------------------------------------------------------ |
+| Fixed cost (system + 7 tool schemas) | **0.99k tokens** (1.19k before the improvement); the subagent tools (M5) add 0.29k → 1.28k |
+| A 2-request turn                     | 49% from cache                                                                             |
+| A 3-request Script turn              | 64%                                                                                        |
+| A 6-request session (`/cost`)        | 97%                                                                                        |
 
 Reducing the fixed cost: tool descriptions are short English (Turkish costs more tokens), and noise is removed from the JSON schema (`additionalProperties:false`, safe-integer bounds; we validate arguments ourselves anyway).
 
@@ -110,6 +110,19 @@ Details:
 >
 > **Observation:** A two-tool design (first `Script`, then `ApplyChanges`) was tried with the real model; it did not call the second tool. So approval and applying were merged into one call: [ADR-0003](adr/0003-script-review-in-tool.md).
 
+## Subagents: protect the main context
+
+A wide or multi-step exploration fills the main context with intermediate output, and that output is **billed again on every later request**. The `Task` tool gives such work to a subagent running in its own context; only its report returns to the main context.
+
+| Scenario (real model, 2026-10-29)        | Main context (input) | Whole session (input + output) |
+| ---------------------------------------- | -------------------- | ------------------------------ |
+| Read a big file and summarize it, inline | 7406                 | 7610                           |
+| The same with `Task(explore)`            | **2973** (−60%)      | **5925**                       |
+| One small `grep`, inline                 | 3316                 | 3440                           |
+| The same with `Task(explore)`            | 3545                 | **6268** (more expensive)      |
+
+Delegating shrinks the main context for large/multi-step work and can even be cheaper overall; **for one small search it is more expensive**. The `Task` + `TaskOutput` schemas also add ~0.29k tokens to the fixed cost (0.99k → 1.28k; served from the cache). Details and limits: [Subagents](subagents.md#cost-when-to-use-it).
+
 ## Model routing
 
-`models.main` (the main work) and `models.fast` (light work such as summaries) can be set separately; both default to `EVREN_DEFAULT_MODEL`. The gateway currently has one model, so `fast` is only used for summarizing; real routing (search/exploration subagents) arrives with [M5](roadmap.md).
+`models.main` (the main work) and `models.fast` (light work such as summaries and the `explore` subagent) can be set separately; both default to `EVREN_DEFAULT_MODEL`. The gateway currently has one model, so the difference has no effect yet, but the routing is wired: when a second model is added, `explore` and summarizing go to it automatically.

@@ -30,6 +30,11 @@ export interface SlashContext {
   /** Recent turns that /rewind can undo, newest first. */
   rewindList(): string;
   rewind(turns: number): void;
+  tasks: {
+    report(): string;
+    show(id: string): string;
+    stop(id: string): string;
+  };
 }
 
 export interface SlashCommand {
@@ -151,6 +156,17 @@ export const slashCommands: SlashCommand[] = [
       if (!lang) return ctx.info(t("slash.langUnknown", { value: args, languages: languages() }));
       setLanguage(lang);
       ctx.info(t("slash.langSet", { lang }));
+    },
+  },
+  {
+    name: "tasks",
+    description: "slash.desc.tasks",
+    run(args, ctx) {
+      const [sub, id] = args.split(/\s+/);
+      if (!args) return ctx.info(ctx.tasks.report());
+      if (sub === "show" && id) return ctx.info(ctx.tasks.show(id));
+      if (sub === "stop" && id) return ctx.info(ctx.tasks.stop(id));
+      ctx.info(t("tasks.usage"));
     },
   },
   { name: "exit", description: "slash.desc.exit", run: (_, ctx) => ctx.exit() },

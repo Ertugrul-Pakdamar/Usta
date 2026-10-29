@@ -20,6 +20,8 @@ export interface AskRequest {
   plan?: string;
   /** What answering "remember" would do, for the prompt label. */
   rememberLabel?: string;
+  /** Set when a subagent (not the main agent) is asking. */
+  agent?: string;
 }
 
 export interface AskAnswer {
@@ -39,6 +41,8 @@ export interface GateOptions {
   onWarning?: (text: string) => void;
   /** Receives the diff computed for each mutating call (to show with the result). */
   onPreview?: (callId: string, diff: string) => void;
+  /** Name of the subagent this gate belongs to, shown in approval prompts. */
+  agent?: string;
 }
 
 /** What "always allow" means for this call, and how to apply it. */
@@ -125,6 +129,7 @@ export function createToolGate(opts: GateOptions) {
         diff,
         plan: isPlan ? String((input as { plan?: string }).plan ?? "") : undefined,
         rememberLabel: mem.label,
+        agent: opts.agent,
       });
       if (!answer.allow) {
         return {
@@ -151,7 +156,9 @@ export function createToolGate(opts: GateOptions) {
  * deny rules and protected paths are checked per file, the user sees the diff when
  * approval is needed, and every file is checkpointed before the tool writes it.
  */
-export function createReviewer(opts: Pick<GateOptions, "engine" | "ask" | "checkpoints">) {
+export function createReviewer(
+  opts: Pick<GateOptions, "engine" | "ask" | "checkpoints" | "agent">,
+) {
   return async (tool: Tool<any>, call: ToolCall, req: ReviewRequest): Promise<ReviewVerdict> => {
     const verdict = opts.engine.decideWrites(req.paths, tool.name);
     if (verdict.decision === "deny") return { ok: false, reason: verdict.reason };
@@ -168,6 +175,7 @@ export function createReviewer(opts: Pick<GateOptions, "engine" | "ask" | "check
         call,
         reason: verdict.reasonKey ? tl(verdict.reasonKey) : (verdict.reason ?? req.summary),
         diff: req.diff,
+        agent: opts.agent,
       });
       if (!answer.allow) return { ok: false, reason: "the user declined" };
     }
@@ -215,5 +223,22 @@ export function composeAfterTool(...fns: (AfterToolFn | undefined)[]): AfterTool
       if (extra) extras.push(extra);
     }
     return extras.length ? extras.join("\n") : undefined;
+  };
+}
+
+/**
+ * Lets only one approval prompt be open at a time. Several subagents (and the main agent)
+ * can ask at once; their questions are answered in order. `cancelled` denies whatever is
+ * still queued after the user aborted the run.
+ */
+export function serializeAsk(
+  ask: (req: AskRequest) => Promise<AskAnswer>,
+  opts: { cancelled?: () => boolean } = {},
+): (req: AskRequest) => Promise<AskAnswer> {
+  let tail: Promise<unknown> = Promise.resolve();
+  return (req) => {
+    const run = tail.then(() => (opts.cancelled?.() ? { allow: false } : ask(req)));
+    tail = run.catch(() => undefined);
+    return run;
   };
 }

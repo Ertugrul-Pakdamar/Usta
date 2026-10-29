@@ -72,6 +72,7 @@ Do you trust these project settings? [y/N]
 - Approval is bound to the file's **content digest (SHA-256)** and stored in `~/.usta/trust.json`; if the file changes, you are asked again.
 - `deny`, `ask` and `budget` always apply (they can only restrict).
 - In non-interactive runs (`-p`, no terminal) the untrusted parts are skipped with a warning. In CI, if you trust the file, pass `--trust-project`.
+- The same gate applies to **project agents** (`.usta/agents/*.md`): they are not loaded until their exact content is approved, and `--trust-project` trusts both ([Subagents](subagents.md#custom-agents)).
 
 ## Command line
 
@@ -119,14 +120,16 @@ Inside a session, `/lang en` or `/lang tr` switches the language immediately (fo
 
 ## The `~/.usta` directory
 
-| Path                  | Contents                                       | Notes                                    |
-| --------------------- | ---------------------------------------------- | ---------------------------------------- |
-| `credentials`         | `EVREN_*` variables                            | `chmod 600` recommended                  |
-| `settings.json`       | User settings                                  |                                          |
-| `trust.json`          | Digests of trusted project settings            |                                          |
-| `sessions/<id>.jsonl` | Conversation records                           | 0600; continue with `-c`/`-r`            |
-| `checkpoints/<id>/`   | File backups for `/rewind`                     | 0600                                     |
-| `outputs/<id>/`       | Full tool outputs that did not fit the context | Older than 7 days are deleted at startup |
-| `cache/models.json`   | Cache of gateway model info                    | Valid for 1 hour                         |
+| Path                   | Contents                                       | Notes                                    |
+| ---------------------- | ---------------------------------------------- | ---------------------------------------- |
+| `credentials`          | `EVREN_*` variables                            | `chmod 600` recommended                  |
+| `settings.json`        | User settings                                  |                                          |
+| `trust.json`           | Digests of trusted project settings            |                                          |
+| `sessions/<id>.jsonl`  | Conversation records                           | 0600; continue with `-c`/`-r`            |
+| `checkpoints/<id>/`    | File backups for `/rewind`                     | 0600                                     |
+| `outputs/<id>/`        | Full tool outputs that did not fit the context | Older than 7 days are deleted at startup |
+| `cache/models.json`    | Cache of gateway model info                    | Valid for 1 hour                         |
+| `agents/*.md`          | The user's custom subagents                    | [Subagents](subagents.md#custom-agents)  |
+| `subagents/<session>/` | Subagent conversation records                  | 0600; for auditing                       |
 
 Session files may contain tool output; review them before sharing.

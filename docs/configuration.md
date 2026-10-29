@@ -72,6 +72,7 @@ Bu proje ayarlarına güveniyor musunuz? [e/H]
 - Onay, dosyanın **içerik özetine (SHA-256)** bağlanır ve `~/.usta/trust.json` içinde saklanır; dosya değişirse yeniden sorulur.
 - `deny`, `ask` ve `budget` her zaman uygulanır (yalnızca kısıtlayıcıdırlar).
 - Etkileşimsiz çalıştırmada (`-p`, terminal yok) güvenilmeyen kısımlar uyarıyla atlanır. CI'da dosyaya güveniyorsanız `--trust-project` verin.
+- Aynı kapı **proje ajanları** (`.usta/agents/*.md`) için de geçerlidir: tam içerikleri onaylanmadan yüklenmez, `--trust-project` her ikisine de güvenir ([Alt ajanlar](subagents.md#özel-ajanlar)).
 
 ## Komut satırı
 
@@ -119,14 +120,16 @@ Oturum içinde `/lang en` veya `/lang tr` dili anında değiştirir (o oturum i�
 
 ## `~/.usta` dizini
 
-| Yol                   | İçerik                               | Notlar                            |
-| --------------------- | ------------------------------------ | --------------------------------- |
-| `credentials`         | `EVREN_*` değişkenleri               | `chmod 600` önerilir              |
-| `settings.json`       | Kullanıcı ayarları                   |                                   |
-| `trust.json`          | Güvenilen proje ayarlarının özetleri |                                   |
-| `sessions/<id>.jsonl` | Konuşma kayıtları                    | 0600; `-c`/`-r` ile devam         |
-| `checkpoints/<id>/`   | `/rewind` için dosya yedekleri       | 0600                              |
-| `outputs/<id>/`       | Bağlama sığmayan tam araç çıktıları  | 7 günden eskiler açılışta silinir |
-| `cache/models.json`   | Gateway model bilgisi önbelleği      | 1 saat geçerli                    |
+| Yol                   | İçerik                               | Notlar                                   |
+| --------------------- | ------------------------------------ | ---------------------------------------- |
+| `credentials`         | `EVREN_*` değişkenleri               | `chmod 600` önerilir                     |
+| `settings.json`       | Kullanıcı ayarları                   |                                          |
+| `trust.json`          | Güvenilen proje ayarlarının özetleri |                                          |
+| `sessions/<id>.jsonl` | Konuşma kayıtları                    | 0600; `-c`/`-r` ile devam                |
+| `checkpoints/<id>/`   | `/rewind` için dosya yedekleri       | 0600                                     |
+| `outputs/<id>/`       | Bağlama sığmayan tam araç çıktıları  | 7 günden eskiler açılışta silinir        |
+| `cache/models.json`   | Gateway model bilgisi önbelleği      | 1 saat geçerli                           |
+| `agents/*.md`         | Kullanıcının özel alt ajanları       | [Alt ajanlar](subagents.md#özel-ajanlar) |
+| `subagents/<oturum>/` | Alt ajan konuşma kayıtları           | 0600; denetim için                       |
 
 Oturum dosyaları araç çıktılarını içerebilir; paylaşmadan önce gözden geçirin.

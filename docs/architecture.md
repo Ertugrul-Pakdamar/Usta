@@ -134,6 +134,18 @@ Yükleyici satırları sırayla oynatır; yarım yazılmış son satırı yok sa
 - Yapıştırılan metin tek parça gelir ve içindeki satır sonları _gönderme sayılmaz_.
 - Uzun satırlarda önek simgeleri (`›`, `●`) `flexShrink={0}` ile korunur (aksi halde Yoga bunları kırpıyordu).
 
+## Alt ajanlar
+
+`core/src/agents` altında: `definitions.ts` (dahili ve `agents/*.md` özel ajanlar, güven özeti), `runner.ts` (`runSubagent`: yeni bağlamda `runAgent`), `manager.ts` (`TaskManager`: kuyruk, eşzamanlılık, arka plan, bildirim) ve `task-tool.ts` (`Task`, `TaskOutput`).
+
+- **Yalıtım:** Alt ajanın mesajları, araç listesi (`resolveAgentTools`), durumu (`state`) ve okuma önbelleği kendisine aittir; ana konuşmaya yalnızca `formatReport` çıktısı döner.
+- **Paylaşılan kapı:** `runSubagent` aynı `PermissionEngine` ile `createToolGate`/`createReviewer` kurar; arka planda `ask` verilmediği için onay gerektiren çağrı reddedilir. Ön plan soruları `serializeAsk` ile tek kuyrukta toplanır.
+- **Eşzamanlılık:** `TaskManager` bir sayaç semaforu (en fazla 3) ve yazma yapabilen ajanlar için ayrı bir kilit (1) kullanır.
+- **Maliyet:** `Economy.trackSubagentUsage` kullanımı oturum toplamına ekler ama ana bağlamın ölçümüne dokunmaz; `subagentGuard` bütçeyi denetler.
+- **Teslimat:** Biten arka plan görevi `drainNotices()` ile bir sonraki turun başında `pendingMessages` üzerinden konuşmaya eklenir.
+
+Gerekçe ve ölçümler: [ADR-0007](adr/0007-subagents.md).
+
 ## Yerelleştirme (i18n)
 
 usta'daki her metin **iki sınıftan birine** girer ve bu ayrım tasarımın temelidir:
@@ -160,7 +172,7 @@ Modele dönük metin dile bağlanmaz çünkü (1) model her dilde aynı davranma
 | Arayüz       | `ink-testing-library`: tuş vuruşları gönderilir, ekran metni beklenir. Metin ve Enter ayrı yazılır (yapıştırma davranışı yüzünden)                                                             |
 | Gerçek ortam | Birim testler yerleşim hatalarını yakalayamaz; bu yüzden arayüz değişiklikleri bir **pty** içinde gerçek gateway ile elle doğrulanır (örnek: uzun yolda banner kırpılması ancak böyle görüldü) |
 
-Hiçbir test gerçek API anahtarı veya ağ gerektirmez; gateway çağrıları sahte `fetch` ile test edilir.
+Ana ve alt ajan aynı sahte sağlayıcıyı paylaştığında istek sırası yarışır; testler istekleri sistem istemine göre yönlendirir. Hiçbir test gerçek API anahtarı veya ağ gerektirmez; gateway çağrıları sahte `fetch` ile test edilir.
 
 ## Tasarım ilkeleri
 

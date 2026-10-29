@@ -2,12 +2,13 @@
 
 usta'yı bugün üç yolla genişletebilirsiniz; geri kalanı [M6](roadmap.md) ile gelir.
 
-| Yol                                        | Durum    | Kullanım                                                         |
-| ------------------------------------------ | -------- | ---------------------------------------------------------------- |
-| Yeni dahili araç                           | ✅ bugün | Kod katkısı: `packages/core/src/tools`                           |
-| Hook'lar                                   | ✅ bugün | Ayar dosyasında kabuk komutu: [Hook'lar](permissions.md#hooklar) |
-| İzin kuralları                             | ✅ bugün | Ayar dosyasında: [İzinler](permissions.md)                       |
-| Skill, slash komutu, plugin, MCP connector | 🔜 M6    | Aşağıda taslak                                                   |
+| Yol                                        | Durum    | Kullanım                                                           |
+| ------------------------------------------ | -------- | ------------------------------------------------------------------ |
+| Yeni dahili araç                           | ✅ bugün | Kod katkısı: `packages/core/src/tools`                             |
+| Hook'lar                                   | ✅ bugün | Ayar dosyasında kabuk komutu: [Hook'lar](permissions.md#hooklar)   |
+| Özel alt ajan                              | ✅ bugün | `agents/<ad>.md` dosyası: [Alt ajanlar](subagents.md#özel-ajanlar) |
+| İzin kuralları                             | ✅ bugün | Ayar dosyasında: [İzinler](permissions.md)                         |
+| Skill, slash komutu, plugin, MCP connector | 🔜 M6    | Aşağıda taslak                                                     |
 
 ## Yeni bir araç eklemek
 
@@ -66,7 +67,6 @@ Kod yazmadan davranış eklemek için en kolay yol hook'tur: komut engelleme, ot
 | ---------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | **Skill**        | `skills/<ad>/SKILL.md` (`name`, `description` frontmatter'ı)   | Başta yalnızca açıklaması bağlama girer; tetiklenince tam içerik yüklenir (token dostu)              |
 | **Slash komutu** | `commands/<ad>.md` (`$ARGUMENTS` desteğiyle)                   |                                                                                                      |
-| **Özel ajan**    | `agents/<ad>.md` (model, araçlar, istem)                       | M5 subagent'larıyla birlikte                                                                         |
 | **Connector**    | MCP sunucuları (stdio / HTTP)                                  | `usta mcp add\|list\|remove`; araçlar `mcp__sunucu__araç` adıyla, izin kuralları onlara da uygulanır |
 | **Plugin**       | `usta-plugin.json` manifesti: yukarıdakilerin hepsini paketler | Yerel klasör, git URL'si veya npm kaynağından `usta plugin install`                                  |
 

@@ -56,8 +56,9 @@ export function Approval({ request, width }: { request: AskRequest; width: numbe
   return (
     <Frame>
       <Text color="yellow" bold>
-        {t("tui.approval.title", {
+        {t(request.agent ? "tui.approval.titleAgent" : "tui.approval.title", {
           call: summarizeCall(request.tool.name, request.call.arguments),
+          agent: request.agent ?? "",
         })}
       </Text>
       {request.reason && <Text dimColor>{request.reason}</Text>}

@@ -33,18 +33,19 @@ Kod ajanları güçlüdür ama pahalı ve denetimsiz olabilir. **usta** üç şe
 
 ## Özellikler
 
-|                         |                                                                                                                                                          |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Ajan ve araçlar**     | `Read` `Write` `Edit` `Glob` `Grep` `Bash` `Script`; bağımsız çağrılar paralel; akışlı cevap; bozuk araç çağrısı onarımı                                 |
-| **Planlama**            | Plan modu (salt okuma) → `ExitPlanMode` ile plan onayı → uygulama; ⇧Tab ile mod değiştirme                                                               |
-| **İzinler**             | `default` · `acceptEdits` · `plan` · `bypass`; `Bash(git status:*)`, `Edit(src/**)`, `Read(.env)` kuralları; katmanlı ayar dosyaları; proje güven kapısı |
-| **Geri alma**           | Her Write/Edit/Script öncesi checkpoint; `/rewind N` dosyaları **ve** konuşmayı geri alır                                                                |
-| **Hook'lar**            | `PreToolUse` `PostToolUse` `UserPromptSubmit` `SessionStart` `Stop`; kabuk komutu, JSON protokolü                                                        |
-| **Token ekonomisi**     | `/cost` `/context` `/compact`; bütçe (`--budget`, `--token-budget`); önbellek dostu istem; çıktı sınırlayıcı; okuma önbelleği                            |
-| **Oturumlar**           | JSONL, 0600 izinli; `usta -c` / `usta -r <id>` ile devam; otomatik özet devamda da geçerli                                                               |
-| **Dil**                 | Türkçe ve İngilizce arayüz ve belgeler (`--lang`, `USTA_LANG`, `/lang`); modele giden metin dilden bağımsız, sabit İngilizce                             |
-| **Headless**            | `usta -p "..." --output-format json` — CI ve betikler için; çıkış kodları anlamlı                                                                        |
-| **Genişletilebilirlik** | `@usta/sdk` ile araç tanımlama bugün; skill, plugin ve MCP connector'ları [M6](docs/roadmap.md)                                                          |
+|                         |                                                                                                                                                                 |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Ajan ve araçlar**     | `Read` `Write` `Edit` `Glob` `Grep` `Bash` `Script`; bağımsız çağrılar paralel; akışlı cevap; bozuk araç çağrısı onarımı                                        |
+| **Planlama**            | Plan modu (salt okuma) → `ExitPlanMode` ile plan onayı → uygulama; ⇧Tab ile mod değiştirme                                                                      |
+| **İzinler**             | `default` · `acceptEdits` · `plan` · `bypass`; `Bash(git status:*)`, `Edit(src/**)`, `Read(.env)` kuralları; katmanlı ayar dosyaları; proje güven kapısı        |
+| **Geri alma**           | Her Write/Edit/Script öncesi checkpoint; `/rewind N` dosyaları **ve** konuşmayı geri alır                                                                       |
+| **Hook'lar**            | `PreToolUse` `PostToolUse` `UserPromptSubmit` `SessionStart` `Stop` `SubagentStop`; kabuk komutu, JSON protokolü                                                |
+| **Token ekonomisi**     | `/cost` `/context` `/compact`; bütçe (`--budget`, `--token-budget`); önbellek dostu istem; çıktı sınırlayıcı; okuma önbelleği                                   |
+| **Oturumlar**           | JSONL, 0600 izinli; `usta -c` / `usta -r <id>` ile devam; otomatik özet devamda da geçerli                                                                      |
+| **Alt ajanlar**         | `Task` ile geniş keşfi ayrı bağlamda yürüt (paralel, arka plan, `/tasks`); dahili `explore`/`plan`/`general` ve kendi `agents/*.md` ajanların; aynı izin kapısı |
+| **Dil**                 | Türkçe ve İngilizce arayüz ve belgeler (`--lang`, `USTA_LANG`, `/lang`); modele giden metin dilden bağımsız, sabit İngilizce                                    |
+| **Headless**            | `usta -p "..." --output-format json` — CI ve betikler için; çıkış kodları anlamlı                                                                               |
+| **Genişletilebilirlik** | `@usta/sdk` ile araç tanımlama bugün; skill, plugin ve MCP connector'ları [M6](docs/roadmap.md)                                                                 |
 
 ## Hızlı başlangıç
 
@@ -86,6 +87,7 @@ Oturum içinde `/help` tüm komutları listeler:
 | `/cost`                                            | Token, önbellek isabeti, kalan kredi, günlük kota ve bütçe             |
 | `/compact [odak]`                                  | Eski turları özetleyip bağlamı küçültür                                |
 | `/rewind [N]`                                      | Son N turun dosya değişikliklerini ve konuşmayı geri alır              |
+| `/tasks`                                           | Alt ajan görevlerini listeler; `/tasks show <id>`, `/tasks stop <id>`  |
 | `/permissions`                                     | Geçerli kuralları, hook'ları ve ayar dosyalarını gösterir              |
 | `/model`, `/models`, `/clear`, `/session`, `/exit` | Model, konuşma ve oturum yönetimi                                      |
 | `!komut`                                           | Doğrudan kabuk komutu (modele gitmez)                                  |
@@ -127,7 +129,7 @@ Aşağıdaki sayılar `qwen3-vl-30b` ile, gateway'in kendi `count_tokens` ve `us
 
 | Ölçüm                                                   | Değer                                                                           |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Her istekteki sabit yük (sistem istemi + 8 araç şeması) | **~1.07k token** (M1–M3'te 1.19k idi; iki araç eklenmesine rağmen düştü)        |
+| Her istekteki sabit yük (sistem istemi + 7 araç şeması) | **~0.99k token** (M1–M3'te 1.19k idi); alt ajan araçlarıyla (M5) ~1.28k         |
 | Aynı oturumun ikinci isteğinde önbellekten gelen pay    | **%49 – %97** (iş yüküne göre)                                                  |
 | 8 dosyada aynı değişiklik                               | 3 model turu, tek betik, 3.8k girdi token'ı (%64 önbellekten)                   |
 | 80 KB'lık komut çıktısı                                 | Bağlama ~12k karakter girer, tamamı diske kaydedilir, model `Read` ile açabilir |
@@ -154,7 +156,7 @@ usta **alfa** aşamasındadır: çekirdek, arayüz, güvenlik ve token ekonomisi
 | ✅  | M3 Güvenlik: izinler, plan modu, rewind, hook'lar | Tamamlandı |
 | ✅  | M4 Token ekonomisi: bütçe, önbellek, özet, Script | Tamamlandı |
 | ✅  | M4.5 Lokalizasyon (TR/EN arayüz ve belgeler)      | Tamamlandı |
-| 🔜  | M5 Subagent'lar ve arka plan görevleri            | Planlandı  |
+| ✅  | M5 Subagent'lar ve arka plan görevleri            | Tamamlandı |
 | 🔜  | M5.5 Auto modu (sınıflandırıcı destekli izin)     | Planlandı  |
 | 🔜  | M6 Skill, plugin ve MCP connector'ları            | Planlandı  |
 | 🔜  | M7 Tek dosya binary, eval raporu, v0.1.0          | Planlandı  |

@@ -13,6 +13,8 @@ interface Props {
   remainingCr?: number;
   free: boolean;
   sessionId: string | undefined;
+  /** Subagent tasks running or queued. */
+  tasks?: number;
 }
 
 const MODE_COLOR: Record<PermissionMode, string | undefined> = {
@@ -39,6 +41,7 @@ export function StatusBar(p: Props) {
         ? ` · ${t("tui.status.cache", { percent: Math.round(p.cacheRatio * 100) })}`
         : ""}
       {p.free ? ` · ${t("tui.status.free")}` : ""}
+      {p.tasks ? ` · ⚙ ${t("tui.status.tasks", { count: p.tasks })}` : ""}
       {p.remainingCr !== undefined ? ` · ${p.remainingCr} CR` : ""}
       {p.sessionId ? ` · ${p.sessionId}` : ""} · /help
     </Text>

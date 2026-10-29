@@ -1,5 +1,7 @@
 import { createInterface } from "node:readline/promises";
 import {
+  agentsTrustKey,
+  builtinTools,
   detectLanguage,
   Economy,
   GatewayError,
@@ -8,6 +10,7 @@ import {
   LANGUAGES,
   type Lang,
   type LoadedSettings,
+  loadAgents,
   loadSettings,
   ModelRegistry,
   PERMISSION_MODES,
@@ -19,6 +22,7 @@ import {
   readLanguageSetting,
   setLanguage,
   t,
+  trustDigest,
   trustProject,
   type UstaConfig,
 } from "@usta/core";
@@ -143,4 +147,31 @@ export function initLanguage(argv: string[] = process.argv, cwd = process.cwd())
   const lang = detectLanguage({ flag, setting: readLanguageSetting(cwd) });
   setLanguage(lang);
   return lang;
+}
+
+/** Tools a custom agent may name: the built-in ones plus the delegation tools. */
+export const KNOWN_TOOL_NAMES = [...builtinTools.map((tool) => tool.name), "Task", "TaskOutput"];
+
+/**
+ * Loads built-in, user and (once trusted) project agents. Project agents come from the
+ * repository, so their exact content must be approved first, like project settings.
+ */
+export async function loadSessionAgents(
+  cwd: string,
+  flags: Pick<RuntimeFlags, "trustProject">,
+  canPrompt: boolean,
+) {
+  const opts = { knownTools: KNOWN_TOOL_NAMES, trustProject: flags.trustProject };
+  let loaded = loadAgents(cwd, undefined, opts);
+  const info = loaded.project;
+  if (info && !info.trusted && canPrompt) {
+    console.error(`\n${t("trust.agentsHeader", { dir: info.dir })}`);
+    for (const line of info.summary) console.error(`  - ${line}`);
+    console.error(t("trust.agentsWarning"));
+    if (await askYesNo(t("trust.agentsQuestion"))) {
+      trustDigest(agentsTrustKey(cwd), info.hash);
+      loaded = loadAgents(cwd, undefined, { knownTools: KNOWN_TOOL_NAMES });
+    }
+  }
+  return loaded;
 }

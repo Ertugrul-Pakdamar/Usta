@@ -14,6 +14,8 @@ export interface ToolContext {
    * decision before writing. Absent when nobody can answer (then the tool must not write).
    */
   review?: (req: ReviewRequest) => Promise<ReviewVerdict>;
+  /** Reports what a long-running tool is doing right now (shown next to the running call). */
+  progress?: (text: string) => void;
 }
 
 export interface ReviewRequest {

@@ -33,7 +33,7 @@ Karar "sor" ise ve etkileşimli onay yoksa (`-p` ve terminal yok) çağrı **red
 
 ## Kural sözdizimi
 
-`Araç` veya `Araç(belirteç)`. Araç adları: `Read` `Write` `Edit` `Glob` `Grep` `Bash` `Script` `ExitPlanMode`.
+`Araç` veya `Araç(belirteç)`. Araç adları: `Read` `Write` `Edit` `Glob` `Grep` `Bash` `Script` `Task` `TaskOutput` `ExitPlanMode`.
 
 ```
 Bash                       tüm Bash çağrıları
@@ -43,6 +43,7 @@ Read(.env)                 her dizindeki .env
 Edit(src/**)               src/ altındaki her dosya
 Read(~/.ssh/**)            ev dizini yolu
 Script(python)             python betikleri
+Task(general)              general alt ajanına devretme
 ```
 
 **Yol belirteçleri** gitignore benzeri çalışır: `/` içermeyen desen (`.env`) her dizinde adıyla eşleşir; `/` içeren desen çalışma dizinine göredir; `~/` ev dizinidir; bir dizin adı içindeki her şeyi kapsar. Yollar **sembolik bağlantılar çözülerek** karşılaştırılır; yani `.env`'e işaret eden `masum.txt` de `Read(.env)` kuralına takılır.
@@ -88,13 +89,14 @@ Plan modu uyarısı istemin **sonuna** eklenir (önbellek önekini bozmamak içi
 
 Hook'lar yaşam döngüsünün belirli noktalarında çalışan kabuk komutlarıdır.
 
-| Olay               | Ne zaman                                              | Engelleyebilir mi           |
-| ------------------ | ----------------------------------------------------- | --------------------------- |
-| `PreToolUse`       | Araç çalışmadan önce (izin kuralları geçtikten sonra) | evet                        |
-| `PostToolUse`      | Araç çalıştıktan sonra                                | hayır (geri bildirim ekler) |
-| `UserPromptSubmit` | Kullanıcı istem gönderince                            | evet                        |
-| `SessionStart`     | Oturumun ilk isteminde                                | hayır (bağlam ekler)        |
-| `Stop`             | Model turu bitirince                                  | hayır                       |
+| Olay               | Ne zaman                                                            | Engelleyebilir mi           |
+| ------------------ | ------------------------------------------------------------------- | --------------------------- |
+| `PreToolUse`       | Araç çalışmadan önce (izin kuralları geçtikten sonra)               | evet                        |
+| `PostToolUse`      | Araç çalıştıktan sonra                                              | hayır (geri bildirim ekler) |
+| `UserPromptSubmit` | Kullanıcı istem gönderince                                          | evet                        |
+| `SessionStart`     | Oturumun ilk isteminde                                              | hayır (bağlam ekler)        |
+| `Stop`             | Model turu bitirince                                                | hayır                       |
+| `SubagentStop`     | Bir alt ajan bitince (`agent`, `description`, `result` alanlarıyla) | hayır                       |
 
 **Protokol.** Komuta stdin'den tek satır JSON gelir, ortamda `USTA_PROJECT_DIR` bulunur:
 
@@ -129,6 +131,10 @@ if [[ "$cmd" == *"git push"*"--force"* ]]; then
   exit 2
 fi
 ```
+
+## Alt ajanlar
+
+Alt ajanlar **aynı kapıdan** geçer: mod (plan modu dahil), kurallar, hook'lar ve checkpoint'ler onların her aracı için de geçerlidir; hangi ajanın kullanılabileceğini `Task(ajan)` kurallarıyla sınırlayabilirsiniz. Birçok alt ajan aynı anda sorsa bile tek seferde tek onay kutusu açılır; arka plan görevleri soramaz, onay gerektiren çağrı reddedilir. Ayrıntı: [Alt ajanlar](subagents.md#izinler-ve-onay).
 
 ## Checkpoint ve `/rewind`
 

@@ -1,8 +1,12 @@
+import { homedir } from "node:os";
+import { join } from "node:path";
 import {
+  type AgentDefinition,
   type AskAnswer,
   type AskRequest,
   appendCompaction,
   appendMessage,
+  BUILTIN_AGENTS,
   BulkEditNudge,
   bashTool,
   buildSystemPrompt,
@@ -14,8 +18,10 @@ import {
   createNudgeAfterTool,
   createReviewer,
   createSession,
+  createTaskTools,
   createToolGate,
   Economy,
+  formatReport,
   HookRunner,
   type Message,
   ModelRegistry,
@@ -25,6 +31,8 @@ import {
   type Provider,
   runAgent,
   type Session,
+  serializeAsk,
+  TaskManager,
   t,
   toolsForMode,
   toToolSpec,
@@ -55,6 +63,8 @@ export interface AppProps {
   economy?: Economy;
   /** Problems found while loading settings; shown once at startup. */
   warnings?: string[];
+  /** Subagents available this session (built-in + custom). Defaults to the built-in ones. */
+  agents?: AgentDefinition[];
   /** Existing transcript when resuming. */
   resume?: { session: Session; messages: Message[] };
   initialPrompt?: string;
@@ -198,13 +208,21 @@ export function App(props: AppProps) {
     });
   };
 
+  // One approval box at a time, whoever asks (the main agent or a subagent). After the user
+  // aborted the run, questions still waiting in the queue are denied instead of shown.
+  const [askUser] = useState(() =>
+    serializeAsk(
+      (request) => new Promise<AskAnswer>((resolve) => setPending({ request, resolve })),
+      { cancelled: () => abort.current?.signal.aborted ?? false },
+    ),
+  );
   const [gate] = useState(() =>
     createToolGate({
       engine,
       hooks,
       checkpoints: () => checkpoints.current,
       sessionId: () => session.current?.meta.id,
-      ask: (request) => new Promise<AskAnswer>((resolve) => setPending({ request, resolve })),
+      ask: askUser,
       onWarning: (text) => info(`⚠ ${text}`),
       onPreview: (id, diff) => previews.current.set(id, diff),
     }),
@@ -213,9 +231,75 @@ export function App(props: AppProps) {
     createReviewer({
       engine,
       checkpoints: () => checkpoints.current,
-      ask: (request) => new Promise<AskAnswer>((resolve) => setPending({ request, resolve })),
+      ask: askUser,
     }),
   );
+  const [agents] = useState(() => props.agents ?? BUILTIN_AGENTS);
+  const [manager] = useState(
+    () =>
+      new TaskManager({
+        agents: () => agents,
+        runtime: {
+          provider: props.provider,
+          cwd: props.cwd,
+          engine,
+          economy,
+          tools: () => tools,
+          hooks,
+          checkpoints: () => checkpoints.current,
+          sessionId: () => session.current?.meta.id,
+          ask: askUser,
+          onWarning: (text) => info(`⚠ ${text}`),
+          logDir: () =>
+            session.current
+              ? join(homedir(), ".usta", "subagents", session.current.meta.id)
+              : undefined,
+        },
+      }),
+  );
+  const [taskTools] = useState(() => createTaskTools(manager, agents));
+  const allTools = [...tools, ...taskTools];
+
+  const elapsed = (rec: { startedAt: number; endedAt?: number }) =>
+    `${Math.round(((rec.endedAt ?? Date.now()) - rec.startedAt) / 1000)}s`;
+  const taskLine = (rec: ReturnType<TaskManager["list"]>[number]) =>
+    t("tasks.line", {
+      id: rec.id,
+      status: t(`tasks.status.${rec.status}`),
+      agent: rec.agent,
+      description: rec.description,
+      elapsed: elapsed(rec),
+    });
+  const tasksReport = () => {
+    const list = manager.list();
+    return list.length ? list.map(taskLine).join("\n") : t("tasks.none");
+  };
+  const taskShow = (id: string) => {
+    const rec = manager.get(id);
+    if (!rec) return t("tasks.notFound", { id });
+    return `${taskLine(rec)}\n${rec.result ? formatReport(rec.result) : (rec.error ?? "")}`.trim();
+  };
+
+  // Tell the user when a background task ends (foreground ones show up as their tool result).
+  const notified = useRef(new Set<string>());
+  useEffect(
+    () =>
+      manager.onChange((rec) => {
+        bump();
+        if (!rec.background || notified.current.has(rec.id)) return;
+        if (rec.status === "done")
+          info(t("tasks.finished", { id: rec.id, description: rec.description }));
+        else if (rec.status === "failed")
+          info(t("tasks.failed", { id: rec.id, description: rec.description }));
+        else if (rec.status === "cancelled")
+          info(t("tasks.cancelled", { id: rec.id, description: rec.description }));
+        else return;
+        notified.current.add(rec.id);
+      }),
+    [manager],
+  );
+  useEffect(() => () => manager.stopAll(), [manager]);
+
   const [hookAfterTool] = useState(() =>
     createAfterTool(
       hooks,
@@ -272,7 +356,7 @@ export function App(props: AppProps) {
       const result = await runAgent([...messages.current], {
         provider: props.provider,
         model: economy.modelId,
-        tools: () => toolsForMode(tools, engine.mode),
+        tools: () => toolsForMode(allTools, engine.mode),
         cwd: props.cwd,
         system: systemPrompt,
         volatileTail: () => (engine.mode === "plan" ? PLAN_MODE_REMINDER : undefined),
@@ -282,6 +366,13 @@ export function App(props: AppProps) {
         approve: gate,
         review,
         afterTool: composeAfterTool(hookAfterTool, createNudgeAfterTool(new BulkEditNudge())),
+        pendingMessages: () => manager.drainNotices(),
+        onToolProgress: (call, text) =>
+          setRunning((r) =>
+            call.id in r
+              ? { ...r, [call.id]: `${summarizeCall(call.name, call.arguments)} · ${text}` }
+              : r,
+          ),
         beforeRequest: economy.beforeRequest,
         limitOutput: economy.limitOutput,
         state: economy.state,
@@ -431,7 +522,7 @@ export function App(props: AppProps) {
             await economy.report(
               systemPrompt,
               messages.current,
-              toolsForMode(tools, engine.mode).map(toToolSpec),
+              toolsForMode(allTools, engine.mode).map(toToolSpec),
             ),
             economy.modelId,
             economy.compactAt,
@@ -442,6 +533,7 @@ export function App(props: AppProps) {
           session.current = undefined;
           checkpoints.current = undefined;
           sessionStarted.current = false;
+          manager.stopAll();
           economy.reset();
           economy.setSession(undefined);
           bump();
@@ -450,6 +542,19 @@ export function App(props: AppProps) {
           ]);
         },
         listModels: async () => (await props.provider.listModels?.()) ?? [],
+        tasks: {
+          report: tasksReport,
+          show: taskShow,
+          stop: (id) =>
+            t(
+              manager.stop(id)
+                ? "tasks.stopped"
+                : manager.get(id)
+                  ? "tasks.notRunning"
+                  : "tasks.notFound",
+              { id },
+            ),
+        },
       });
     } catch (err) {
       addItem({ kind: "error", text: err instanceof Error ? err.message : String(err) });
@@ -563,6 +668,7 @@ export function App(props: AppProps) {
         remainingCr={tracker.quota?.remainingCr}
         free={economy.model.promptPrice === 0 && economy.model.completionPrice === 0}
         sessionId={session.current?.meta.id}
+        tasks={manager.running()}
       />
     </>
   );

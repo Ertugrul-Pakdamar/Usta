@@ -6,6 +6,14 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 
 ### Eklendi
 
+**M5: Alt ajanlar ve arka plan görevleri**
+- `Task` ve `TaskOutput` araçları: iş, kendi bağlamında çalışan bir alt ajana devredilir; ana ajana yalnızca son rapor ve maliyet notu döner. Salt okuma alt ajanlar aynı turda paralel çalışır (en fazla 3).
+- Dahili ajanlar `explore` (salt okuma, `models.fast`), `plan`, `general`; özel ajanlar `~/.usta/agents/*.md` ve `<proje>/.usta/agents/*.md` (proje ajanları güven kapısına tabi, içerik özetine bağlı onay).
+- Alt ajanlar ana oturumun **aynı izin kapısından** geçer (mod, kurallar, hook'lar, checkpoint); `Task(ajan)` kuralları; onay kutusu ajanı etiketler ve aynı anda tek kutu açılır (`serializeAsk`); arka plan görevleri soramaz; yazabilen ajanlar sırayla çalışır.
+- Arka plan görevleri: `Task {background: true}`, `/tasks`, `/tasks show|stop <id>`, durum çubuğunda sayaç, bitince bildirim ve raporun sonraki turda konuşmaya eklenmesi; başsız modda ön planda çalışır.
+- `SubagentStop` hook'u; alt ajan kayıtları `~/.usta/subagents/<oturum>/<görev>.jsonl` (0600, anahtar maskeli); alt ajan kullanımı oturum toplamına eklenir, bütçe alt ajan isteklerinde de işler; JSON çıktısında `session_usage`.
+- Belgeler: `docs/subagents.md` (TR/EN), ADR-0007; gerçek model ölçümleri (büyük dosyada ana bağlam −%60, tek küçük aramada daha pahalı).
+
 **M4.5: Lokalizasyon**
 - Türkçe ve İngilizce arayüz: `t()` ve katalog (`core/src/i18n`); `en.ts` kaynak, `tr.ts` derleme zamanında eksiksiz olmak zorunda.
 - Dil seçimi: `--lang` > `USTA_LANG` > ayar (`language`) > sistem yereli > `tr`; tanınan başka dil `en`'e düşer. `/lang` oturum sırasında dili değiştirir.
@@ -19,7 +27,7 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 - Model kaydı (`/v1/models`, diskte 1 saatlik önbellek); kalibre token tahmini ve gateway `count_tokens` ile tam sayım.
 - Maliyet ve kota takibi (`/v1/quota`), oturum bütçeleri (`--budget`, `--token-budget`, ayarlarda `budget`); aşımda sorar veya çıkış kodu 3 ile durur.
 - Önbellek dostu istem: sabit sistem istemi ve araç listesi; plan modu uyarısı isteğin sonuna; `ExitPlanMode` yalnızca plan modunda.
-- Sabit istem yükü 1190 → 1071 token (iki araç eklenmesine rağmen).
+- Sabit istem yükü 1190 → 989 token (M4 sonu, 7 araç; ilk ölçüm 1071'di, `ApplyChanges` kaldırılınca düştü).
 - Araç çıktısı sınırlayıcı (baş + son, tamamı `~/.usta/outputs`), `Read` için "değişmedi" önbelleği, `Bash` bellek koruması.
 - Otomatik bağlam özeti (`compactAt`, varsayılan %80) ve `/compact`; oturum dosyasına `compact` kaydı.
 - `/context` (gateway sayımıyla döküm) ve genişletilmiş `/cost`; durum çubuğunda bağlam %, önbellek %, kalan CR.
@@ -59,6 +67,8 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 - Gizli dosyalar (`.env`, `*.pem`, `*.key`) dosya araçlarında varsayılan olarak reddedilir.
 
 ### Düzeltildi
+
+- Belgelerdeki sabit istem yükü rakamı düzeltildi: M4 sonu **989** token (7 araç); önceki 1071, `ApplyChanges` kaldırılmadan önceki geçici tasarımın ölçümüydü. M5'te alt ajan araçlarıyla 1281.
 
 - CI: Markdown biçim hataları (Türkçe README/CONTRIBUTING, İngilizce SECURITY, kararsız biçimlenen bir mimari tablosu) `pnpm lint`'i kırıyordu; düzeltildi.
 

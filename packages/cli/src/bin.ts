@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
 import { createInterface } from "node:readline/promises";
 import {
   type AskRequest,
@@ -12,6 +14,7 @@ import {
   createAfterTool,
   createNudgeAfterTool,
   createReviewer,
+  createTaskTools,
   createToolGate,
   fetchTerms,
   findSession,
@@ -27,11 +30,20 @@ import {
   runAgent,
   runDoctor,
   type Session,
+  serializeAsk,
+  TaskManager,
   t,
   toolsForMode,
 } from "@usta/core";
 import { Command } from "commander";
-import { askYesNo, createEconomy, initLanguage, parseTokens, setupRuntime } from "./runtime.js";
+import {
+  askYesNo,
+  createEconomy,
+  initLanguage,
+  loadSessionAgents,
+  parseTokens,
+  setupRuntime,
+} from "./runtime.js";
 
 loadEnvFiles();
 pruneOldOutputs();
@@ -145,6 +157,7 @@ async function runInteractive(opts: InteractiveOptions, initialPrompt?: string):
   const provider = new OpenAICompatibleProvider(config);
   const model = opts.model ?? resume?.session.meta.model ?? settings.models.main ?? config.model;
   const economy = await createEconomy({ config, provider, settings, flags: opts, model });
+  const loadedAgents = await loadSessionAgents(cwd, opts, true);
   const { startTui } = await import("./tui/start.js");
   await startTui({
     provider,
@@ -156,7 +169,8 @@ async function runInteractive(opts: InteractiveOptions, initialPrompt?: string):
     engine,
     hooks,
     economy,
-    warnings,
+    agents: loadedAgents.agents,
+    warnings: [...warnings, ...loadedAgents.warnings],
     version: `v${pkg.version}`,
   });
 }
@@ -182,7 +196,8 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
   const provider = new OpenAICompatibleProvider(config);
   const model = opts.model ?? settings.models.main ?? config.model;
   const economy = await createEconomy({ config, provider, settings, flags: opts, model });
-  economy.setSession(`headless-${Date.now().toString(36)}`);
+  const headlessId = `headless-${Date.now().toString(36)}`;
+  economy.setSession(headlessId);
   economy.callbacks = {
     onWarning: warn,
     askBudget: interactive ? (m) => askYesNo(m) : undefined,
@@ -210,9 +225,31 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
             : t("cli.runPrompt", {
                 call: `${req.tool.name} ${JSON.stringify(req.input).slice(0, 200)}`,
               });
-        return { allow: await askYesNo(`${what}${req.reason ? ` (${req.reason})` : ""}`) };
+        const who = req.agent ? `[${req.agent}] ` : "";
+        return { allow: await askYesNo(`${who}${what}${req.reason ? ` (${req.reason})` : ""}`) };
       }
     : undefined;
+  // Subagents may ask too; their questions are answered one at a time.
+  const askSerial = ask ? serializeAsk(ask) : undefined;
+
+  const loadedAgents = await loadSessionAgents(cwd, opts, interactive);
+  for (const w of loadedAgents.warnings) warn(w);
+  const manager = new TaskManager({
+    agents: () => loadedAgents.agents,
+    allowBackground: false, // nobody is around to receive a notice: run in the foreground
+    runtime: {
+      provider,
+      cwd,
+      engine,
+      economy,
+      tools: () => builtinTools,
+      hooks,
+      ask: askSerial,
+      onWarning: warn,
+      logDir: () => join(homedir(), ".usta", "subagents", headlessId),
+    },
+  });
+  const allTools = [...builtinTools, ...createTaskTools(manager, loadedAgents.agents)];
 
   const start = await hooks.run("SessionStart");
   const submit = await hooks.run("UserPromptSubmit", { prompt: opts.print });
@@ -228,15 +265,15 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
   const result = await runAgent(prompt, {
     provider,
     model: economy.modelId,
-    tools: () => toolsForMode(builtinTools, engine.mode),
+    tools: () => toolsForMode(allTools, engine.mode),
     cwd,
     system: buildSystemPrompt(cwd),
     volatileTail: () => (engine.mode === "plan" ? PLAN_MODE_REMINDER : undefined),
     maxTokens: config.maxTokens,
     maxTurns: opts.maxTurns,
     signal: abort.signal,
-    approve: createToolGate({ engine, hooks, onWarning: warn, ask }),
-    review: createReviewer({ engine, ask }),
+    approve: createToolGate({ engine, hooks, onWarning: warn, ask: askSerial }),
+    review: createReviewer({ engine, ask: askSerial }),
     afterTool: composeAfterTool(
       createAfterTool(hooks, undefined, warn),
       createNudgeAfterTool(new BulkEditNudge()),
@@ -269,6 +306,12 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
           completion_tokens: result.usage.completionTokens,
           cached_tokens: result.usage.cachedTokens ?? 0,
           cache_ratio: Number(tracker.cacheRatio.toFixed(3)),
+        },
+        // Whole session, subagents included (`usage` above is the main conversation only).
+        session_usage: {
+          requests: tracker.requests,
+          prompt_tokens: tracker.promptTokens,
+          completion_tokens: tracker.completionTokens,
         },
         ...(tracker.spentCr !== undefined && { spent_cr: tracker.spentCr }),
         ...(tracker.quota?.remainingCr !== undefined && {
