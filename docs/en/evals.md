@@ -4,6 +4,7 @@ To show usta's "fewer tokens" claim by **measurement** rather than estimate, the
 
 ## Method
 
+> The same eval suite was also used to compare usta with **Claude Code on the same model**: [Comparison with Claude Code on the same model](vs-claude-code.md).
 - **Model:** `qwen3-vl-30b` (the gateway's only model); all runs on 2026-10-29.
 - **9 tasks**, each starting from a fresh project in a temp directory and **checked automatically** (file contents, a test run, the answer text). The tasks: 4 bulk edits (rename across 12 files, a header in 15 files, a version in 10 JSON files, CSV→JSON), a bug fix, a feature, writing a script from scratch, finding an answer in a codebase, and counting in a 700-line log.
 - **Two variants:** `baseline` (all tools) and `no-script` (`--disable-tools Script`; Script is also removed from the system prompt and the hints). Every task × variant ran **3 times** (54 runs), with `-y` (bypass) in an isolated temp directory.

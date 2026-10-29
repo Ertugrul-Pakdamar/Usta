@@ -66,6 +66,7 @@ Legend: ✅ present · 🟡 partial/different · ❌ absent.
 
 ## Where usta differs (what Claude Code does not have, or does differently)
 
+- **A measured advantage on the same model (on this eval set):** with `qwen3-vl-30b` usta had 91% success against Claude Code's 80% and used **13.5× fewer tokens**; method, raw data and limits: [Comparison with Claude Code on the same model](vs-claude-code.md). This does not make up for the gaps listed above.
 - **Token and credit economy at the center:** up-front cost estimate, credit budget (`--budget`), gateway quota, cache-hit display, `/cost` and `/context`. Measurements: [Token economy](token-economy.md).
 - **The `Script` tool:** makes a bulk change with one script and a diff approval; in the evals **−56% tokens** on bulk edits ([report](evals.md)).
 - **EVREN-specific:** only the user can accept the terms of use, the credit balance comes from `/v1/quota`, and the API key and address are entered inside the app (`usta login`).

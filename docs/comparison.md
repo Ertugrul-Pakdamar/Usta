@@ -66,6 +66,7 @@ Gösterim: ✅ var · 🟡 kısmen/farklı · ❌ yok.
 
 ## usta'nın farkları (Claude Code'da olmayan ya da farklı olanlar)
 
+- **Aynı modelde ölçülmüş üstünlük (bu eval setinde):** `qwen3-vl-30b` ile usta %91, Claude Code %80 başarı verdi ve **13,5× daha az token** harcadı; yöntem, ham veri ve sınırlar: [Claude Code ile aynı modelde karşılaştırma](vs-claude-code.md). Bu, aşağıdaki eksiklerin telafisi değildir.
 - **Token ve kredi ekonomisi merkezde:** ön maliyet tahmini, kredi bütçesi (`--budget`), gateway kotası, önbellek isabet gösterimi, `/cost` ve `/context`. Ölçümler: [Token ekonomisi](token-economy.md).
 - **`Script` aracı:** toplu değişikliği tek betikle, diff onayıyla yapar; eval'de toplu düzenlemede **−%56 token** ([rapor](evals.md)).
 - **EVREN'e özgü:** kullanım şartlarını yalnızca kullanıcı kabul eder, kredi bakiyesi `/v1/quota`'dan gelir, API anahtarı ve adres uygulama içinden girilir (`usta login`).

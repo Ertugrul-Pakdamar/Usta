@@ -6,6 +6,10 @@
 
 Planlama, kod analizi, dosya düzenleme ve terminal erişimini **en az token, en az emekle** yapın.
 
+#### 🏆 Aynı modelde Claude Code'dan daha yüksek başarı, ~13 kat az token
+
+`qwen3-vl-30b` ile kendi eval setimizde: **%91 ↔ %80 başarı** ve çalıştırma başına **13,5× daha az token** — [yöntem, ham veri ve sınırlar](docs/vs-claude-code.md)
+
 [![CI](https://github.com/Ertugrul-Pakdamar/Usta/actions/workflows/ci.yml/badge.svg)](https://github.com/Ertugrul-Pakdamar/Usta/actions/workflows/ci.yml)
 [![Lisans: Apache-2.0](https://img.shields.io/badge/lisans-Apache--2.0-blue.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%E2%89%A5%2022-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
@@ -27,7 +31,9 @@ Planlama, kod analizi, dosya düzenleme ve terminal erişimini **en az token, en
 
 Kod ajanları güçlüdür ama pahalı ve denetimsiz olabilir. **usta** üç şeyi birlikte çözmek için yazıldı:
 
-- **Token ekonomisi bir özellik, sonradan eklenen bir iyileştirme değil.** Sabit istem öneki sayesinde gateway önbelleği %50–95 isabet verir; büyük çıktılar bağlama sığdırılmaz, diske yazılır; bağlam dolunca otomatik özetlenir; aynı değişiklik çok dosyada gerekiyorsa model tek bir betik yazar.
+<p align="center"><img src="docs/assets/chart-vs-claude-code.svg" alt="Aynı modelde usta ve Claude Code: başarı %91 ↔ %80, 13,5 kat az token" width="720"></p>
+
+- **Token ekonomisi bir özellik, sonradan eklenen bir iyileştirme değil.** Aynı modelde Claude Code'a karşı **13,5× daha az token ve daha yüksek başarı** ölçüldü ([rapor](docs/vs-claude-code.md)). Sabit istem öneki sayesinde gateway önbelleği %50–95 isabet verir; büyük çıktılar bağlama sığdırılmaz, diske yazılır; bağlam dolunca otomatik özetlenir; aynı değişiklik çok dosyada gerekiyorsa model tek bir betik yazar.
 - **Güvenlik varsayılan.** Her araç çağrısı bir izin kapısından geçer: kurallar, plan modu, diff'li onay, korunan yollar, hook'lar. Repodan gelen ayarlar siz onaylamadan çalışmaz.
 - **Savunma sanayi bağlamına uygun.** Telemetri yok, veri yalnızca sizin EVREN gateway'inize gider, çalışmak için yalnızca gateway erişimi yeter, gizli dosyalar varsayılan olarak modelden saklanır.
 
