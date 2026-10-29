@@ -20,13 +20,14 @@ Bu dizin hem kullanıcılar hem katkıcılar içindir. Proje alfa aşamasındad�
 
 ## Katkıcılar için
 
-| Belge                              | İçerik                                                                |
-| ---------------------------------- | --------------------------------------------------------------------- |
-| [Mimari](architecture.md)          | Paketler, ajan döngüsü, araç kapısı, dosya biçimleri, test stratejisi |
-| [Genişletme](extending.md)         | Yeni araç ekleme (bugün), hook'lar, skill/plugin/MCP (planlı)         |
-| [Yol haritası](roadmap.md)         | Aşamalar, durumları ve gerekçeleri                                    |
-| [Mimari karar kayıtları](adr/)     | Neden böyle yaptık: kanıtlı kararlar                                  |
-| [CONTRIBUTING](../CONTRIBUTING.md) | Geliştirme ortamı, iş akışı, standartlar                              |
+| Belge                                             | İçerik                                                                 |
+| ------------------------------------------------- | ---------------------------------------------------------------------- |
+| [Mimari](architecture.md)                         | Paketler, ajan döngüsü, araç kapısı, dosya biçimleri, test stratejisi  |
+| [Genişletme](extending.md)                        | Yeni araç ekleme (bugün), hook'lar, skill/plugin/MCP (planlı)          |
+| [Yol haritası](roadmap.md)                        | Aşamalar, durumları ve gerekçeleri                                     |
+| [Karşılaştırma ve sonraki adımlar](comparison.md) | Claude Code ile özellik farkları, aday iş listesi (N1–N12), katkı yolu |
+| [Mimari karar kayıtları](adr/)                    | Neden böyle yaptık: kanıtlı kararlar                                   |
+| [CONTRIBUTING](../CONTRIBUTING.md)                | Geliştirme ortamı, iş akışı, standartlar                               |
 
 ## Dil
 

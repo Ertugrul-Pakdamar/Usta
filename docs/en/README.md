@@ -22,10 +22,11 @@ _Turkish documentation: [docs/README.md](../README.md)._
 
 ## For contributors
 
-| Document                              | Contents                                                                   |
-| ------------------------------------- | -------------------------------------------------------------------------- |
-| [Architecture](architecture.md)       | Packages, agent loop, tool gate, localization, file formats, test strategy |
-| [Extending](extending.md)             | Adding a tool (today), hooks, skills/plugins/MCP (planned)                 |
-| [Roadmap](roadmap.md)                 | Milestones, their status and the reasons for the order                     |
-| [Architecture decision records](adr/) | Why we did it this way: decisions backed by evidence                       |
-| [Contributing](contributing.md)       | Development environment, workflow, standards                               |
+| Document                                   | Contents                                                                           |
+| ------------------------------------------ | ---------------------------------------------------------------------------------- |
+| [Architecture](architecture.md)            | Packages, agent loop, tool gate, localization, file formats, test strategy         |
+| [Extending](extending.md)                  | Adding a tool (today), hooks, skills/plugins/MCP (planned)                         |
+| [Roadmap](roadmap.md)                      | Milestones, their status and the reasons for the order                             |
+| [Comparison and next steps](comparison.md) | Feature gaps versus Claude Code, a candidate work list (N1–N12), how to contribute |
+| [Architecture decision records](adr/)      | Why we did it this way: decisions backed by evidence                               |
+| [Contributing](contributing.md)            | Development environment, workflow, standards                                       |

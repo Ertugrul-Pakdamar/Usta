@@ -13,7 +13,7 @@ Plan, analyse code, edit files and run commands with **the fewest tokens and the
 [![Status: alpha](https://img.shields.io/badge/status-alpha-orange.svg)](docs/en/roadmap.md)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-[Türkçe](README.md) · **English**
+[Türkçe](README.md) · **English** · [Compared with Claude Code](docs/en/comparison.md)
 
 <img src="docs/assets/demo.en.svg" alt="A usta session: the model changes 8 files with one script, applied after the diff is approved" width="720">
 
@@ -110,7 +110,7 @@ Details and method: [Token economy](docs/en/token-economy.md). Real A/B results:
 
 <p align="center"><img src="docs/assets/roadmap.en.svg" alt="Roadmap: M0–M7 done" width="720"></p>
 
-All stages M0–M7 are done (skeleton, core, TUI, security, token economy, localization, subagents, auto mode, skills, MCP, plugins, `@file`, evals, single-file binary). `v0.1.0` is ready to be tagged. See [docs/en/roadmap.md](docs/en/roadmap.md).
+All stages M0–M7 are done (skeleton, core, TUI, security, token economy, localization, subagents, auto mode, skills, MCP, plugins, `@file`, evals, single-file binary). `v0.1.0` is released. See [docs/en/roadmap.md](docs/en/roadmap.md) and what is next in [docs/en/comparison.md](docs/en/comparison.md).
 
 ## Contributing and license
 
