@@ -12,6 +12,7 @@ _Turkish documentation: [docs/README.md](../README.md)._
 | [Configuration](configuration.md)          | Environment variables, settings files and their layers, every CLI flag, the language, the `~/.usta` directory |
 | [Permissions and security](permissions.md) | Modes, rule syntax, Bash safety, project trust gate, plan mode, hooks, rewind                                 |
 | [Token economy](token-economy.md)          | Cost visibility, caching, output limiting, summarization, budgets, Script-first                               |
+| [Plugins](plugins.md)                      | `usta-plugin.json`, install, consent and integrity, examples                                                  |
 | [MCP connectors](mcp.md)                   | `usta mcp`, configuration, token cost, security                                                               |
 | [Skills and commands](skills.md)           | `SKILL.md`, `commands/*.md`, on-demand loading, trust gate                                                    |
 | [Auto mode](auto-mode.md)                  | Classifier-backed permission mode, local layer, circuit breaker, audit, measured accuracy                     |

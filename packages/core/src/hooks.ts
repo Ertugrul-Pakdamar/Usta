@@ -1,4 +1,6 @@
 import { spawn } from "node:child_process";
+import { isAbsolute, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { t } from "./i18n/index.js";
 
 export const HOOK_EVENTS = [
@@ -14,7 +16,14 @@ export type HookEvent = (typeof HOOK_EVENTS)[number];
 export interface HookDef {
   /** Regex tested against the tool name (tool events only). Empty or "*" = all. */
   matcher?: string;
-  command: string;
+  /** Shell command; the event arrives as JSON on stdin. Exactly one of `command` / `module`. */
+  command?: string;
+  /**
+   * JavaScript module (relative to the working directory, or absolute) whose default export is
+   * `(event) => void | {decision?: "block", reason?, context?}`. Runs in-process, so it has
+   * the same power as a command hook; it comes from user settings or an installed plugin.
+   */
+  module?: string;
   /** Seconds. Default 30. */
   timeout?: number;
 }
@@ -32,6 +41,8 @@ export interface HookPayload {
   agent?: string;
   description?: string;
   result?: string;
+  /** Stop: true when the agent is already continuing because of an earlier Stop hook. */
+  stopHookActive?: boolean;
 }
 
 export interface HookResult {
@@ -52,10 +63,41 @@ function matches(def: HookDef, toolName: string | undefined): boolean {
   }
 }
 
+const hookLabel = (def: HookDef) => def.command ?? def.module ?? "?";
+
+/** Runs a module hook with a timeout; whatever it returns is handled like a command's JSON. */
+async function execModule(
+  def: HookDef,
+  cwd: string,
+  event: unknown,
+): Promise<{ value?: unknown; error?: string; timedOut: boolean }> {
+  const file = isAbsolute(def.module as string)
+    ? (def.module as string)
+    : resolve(cwd, def.module as string);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const mod = (await import(pathToFileURL(file).href)) as { default?: unknown };
+    if (typeof mod.default !== "function")
+      return { error: "no default export function", timedOut: false };
+    const timeout = new Promise<"timeout">((r) => {
+      timer = setTimeout(() => r("timeout"), (def.timeout ?? 30) * 1000);
+    });
+    const out = await Promise.race([
+      Promise.resolve((mod.default as (e: unknown) => unknown)(event)),
+      timeout,
+    ]);
+    return out === "timeout" ? { timedOut: true } : { value: out, timedOut: false };
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : String(err), timedOut: false };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function exec(def: HookDef, cwd: string, stdin: string) {
   return new Promise<{ code: number | null; stdout: string; stderr: string; timedOut: boolean }>(
     (resolve) => {
-      const child = spawn("bash", ["-c", def.command], {
+      const child = spawn("bash", ["-c", def.command as string], {
         cwd,
         detached: true,
         stdio: ["pipe", "pipe", "pipe"],
@@ -107,13 +149,34 @@ export class HookRunner {
 
   async run(event: HookEvent, payload: HookPayload = {}): Promise<HookResult> {
     const result: HookResult = { context: [], warnings: [] };
-    const stdin = JSON.stringify({ event, cwd: this.cwd, ...payload });
+    const full = { event, cwd: this.cwd, ...payload };
+    const stdin = JSON.stringify(full);
     for (const def of this.config[event] ?? []) {
       if (!matches(def, payload.toolName)) continue;
+      if (def.module) {
+        const m = await execModule(def, this.cwd, full);
+        if (m.timedOut) {
+          result.warnings.push(
+            t("hooks.timeout", { seconds: def.timeout ?? 30, command: hookLabel(def) }),
+          );
+        } else if (m.error) {
+          result.warnings.push(
+            t("hooks.failed", { code: "!", command: hookLabel(def), detail: ` — ${m.error}` }),
+          );
+        } else {
+          const v = m.value as { decision?: string; reason?: string; context?: string } | undefined;
+          if (v?.decision === "block") {
+            result.blocked = { reason: v.reason || "the hook blocked the call" };
+            return result;
+          }
+          if (typeof v?.context === "string") result.context.push(v.context);
+        }
+        continue;
+      }
       const r = await exec(def, this.cwd, stdin);
       if (r.timedOut) {
         result.warnings.push(
-          t("hooks.timeout", { seconds: def.timeout ?? 30, command: def.command }),
+          t("hooks.timeout", { seconds: def.timeout ?? 30, command: hookLabel(def) }),
         );
         continue;
       }
@@ -125,7 +188,7 @@ export class HookRunner {
         result.warnings.push(
           t("hooks.failed", {
             code: r.code ?? "?",
-            command: def.command,
+            command: hookLabel(def),
             detail: r.stderr ? ` — ${r.stderr.trim()}` : "",
           }),
         );

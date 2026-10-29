@@ -95,7 +95,7 @@ Hook'lar yaşam döngüsünün belirli noktalarında çalışan kabuk komutları
 | `PostToolUse`      | Araç çalıştıktan sonra                                              | hayır (geri bildirim ekler) |
 | `UserPromptSubmit` | Kullanıcı istem gönderince                                          | evet                        |
 | `SessionStart`     | Oturumun ilk isteminde                                              | hayır (bağlam ekler)        |
-| `Stop`             | Model turu bitirince                                                | hayır                       |
+| `Stop`             | Model turu bitirince                                                | evet: ajan **devam eder**   |
 | `SubagentStop`     | Bir alt ajan bitince (`agent`, `description`, `result` alanlarıyla) | hayır                       |
 
 **Protokol.** Komuta stdin'den tek satır JSON gelir, ortamda `USTA_PROJECT_DIR` bulunur:
@@ -119,6 +119,10 @@ Hook'lar yaşam döngüsünün belirli noktalarında çalışan kabuk komutları
 | diğer | Uyarı: gösterilir, akış devam eder                                                                                                                                          |
 
 `matcher`, araç adına karşı **tam eşleşen** bir düzenli ifadedir (`"Write|Edit"`); boş veya `*` hepsi demektir. Zaman aşımı varsayılan 30 sn'dir ve süreç ağacı öldürülür.
+
+**`Stop` ile devam ettirme.** Bir `Stop` hook'u engellerse (çıkış 2 ya da `{"decision":"block","reason":"…"}`) ajan durmaz; sebep `[Stop hook] …` kullanıcı mesajı olarak eklenir ve model işe devam eder (örneğin "testler hâlâ kırık"). Olay `stopHookActive: true` taşıyorsa ajan zaten bir hook yüzünden devam ediyordur; hook sonsuz döngüye girmemek için bunu kontrol etmelidir. Güvenlik ağı olarak bir çalıştırmada en çok **3** devam edilir.
+
+**Modül hook'ları.** Kabuk komutu yerine `{"module": "/yol/hook.mjs"}` yazılabilir; modülün varsayılan dışa aktarımı `(olay) => void | {decision?, reason?, context?}` işlevidir (async olabilir; olay nesnesi yukarıdaki JSON'dur). Süreç içinde çalışır, aynı zaman aşımı ve aynı sınırlar geçerlidir; hata veya zaman aşımı yalnızca uyarıdır. Modül kodu çalışma dizinindeki depoda değişebileceği için **yalnızca kendi ayarlarınızdan (`~/.usta/settings.json`) ve kurduğunuz [plugin](plugins.md)'lerden** okunur; proje ayarındaki `module` hook'ları uyarıyla yok sayılır.
 
 **Hook'lar yalnızca kısıtlayabilir.** Bir hook'un `allow` demesi `deny`/`ask` kurallarını aşamaz; hook izin kuralları geçtikten **sonra** çalışır.
 

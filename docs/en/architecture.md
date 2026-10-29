@@ -123,6 +123,10 @@ Under `core/src/agents`: `definitions.ts` (built-in and custom `agents/*.md` age
 
 Reasoning and measurements: [ADR-0007](adr/0007-subagents.md).
 
+## Plugins and hooks
+
+`core/src/plugins.ts`: `installPlugin` (folder/git → consent → a copy in `~/.usta/plugins/<name>` + a file digest), `loadPlugins` (skips those whose digest changed), `mergePluginHooks`. Plugins join the skill/command/agent/MCP loaders as an **extra root**; their hooks are put before the settings hooks in `setupRuntime`. `hooks.ts` runs both shell commands and `module` hooks (`import()`, raced against a timeout); `agent/loop.ts` lets a `Stop` hook continue the agent via `onStop` (`createOnStop`, at most 3 continuations). Rationale: [ADR-0010](adr/0010-plugins-and-stop-hooks.md).
+
 ## MCP
 
 `packages/mcp`: `config.ts` (`~/.usta/mcp.json` plus the project file behind the trust gate, `${VAR}` expansion) and `manager.ts` (`McpManager`: connects with the SDK client and turns each remote tool into a `Tool` via `adaptTool`). Tools carry the server's schema in `Tool.jsonSchema`; `mutating` defaults to true and `readOnlyHint` only affects whether the user is asked. The CLI connects at session start (`loadSessionMcp`), adds the tools to `tools` and closes on exit. Rationale: [ADR-0009](adr/0009-mcp.md).

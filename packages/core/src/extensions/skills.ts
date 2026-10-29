@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { defineTool, ToolError, z } from "@usta/sdk";
 import { splitFrontmatter } from "../agents/definitions.js";
 import { t } from "../i18n/index.js";
+import { loadPlugins } from "../plugins.js";
 import { isDigestTrusted } from "../settings.js";
 
 const NAME = /^[a-z][a-z0-9-]{0,39}$/;
@@ -111,6 +112,8 @@ export function loadExtensions(
       else commands.set(res.command.name, res.command);
     }
   };
+  // Installed, still-approved plugins come first, so the user's and the project's own files win.
+  for (const p of loadPlugins(homeDir).plugins) add(readRaw(p.root, `plugin:${p.name}`), "user");
   add(readRaw(join(homeDir, ".usta"), "~/.usta"), "user");
 
   const projectRoot = join(cwd, ".usta");

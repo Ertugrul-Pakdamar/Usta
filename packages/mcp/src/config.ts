@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
-import { isDigestTrusted } from "@usta/core";
+import { isDigestTrusted, loadPlugins } from "@usta/core";
 import { z } from "@usta/sdk";
 
 const NAME = /^[a-zA-Z][a-zA-Z0-9-]{0,29}$/;
@@ -98,6 +98,13 @@ export function loadMcpConfig(
 ): LoadedMcpConfig {
   const warnings: string[] = [];
   const out: LoadedMcpConfig = { servers: {}, warnings };
+  for (const p of loadPlugins(home).plugins) {
+    for (const [name, value] of Object.entries(p.mcpServers)) {
+      const parsed = serverSchema.safeParse(value);
+      if (parsed.success && NAME.test(name)) out.servers[name] = parsed.data;
+      else warnings.push(`plugin ${p.name}: invalid MCP server "${name}"`);
+    }
+  }
   const user = readMcpFile(userMcpFile(home), warnings);
   Object.assign(out.servers, user?.servers);
   const project = readMcpFile(projectMcpFile(cwd), warnings);

@@ -6,6 +6,13 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 
 ### Eklendi
 
+**M6c: Plugin'ler, modül hook'ları, Stop ile devam**
+- Plugin: `usta-plugin.json` + `skills/`, `commands/`, `agents/`; manifestte hook'lar ve MCP sunucuları (`${PLUGIN_ROOT}`). `usta plugin install|list|enable|disable|remove`, `/plugins`. Kaynak: klasör veya git (npm ertelendi). Kurulum içeriği gösterip etkileşimli onay ister (atlanamaz); kurulumdan sonra değişen plugin uyarıyla atlanır.
+- Modül hook'ları: `{"module": "…"}` (süreç içi, block/context döner); yalnızca kullanıcı ayarlarından ve plugin'lerden okunur, proje ayarındaki yok sayılır. Ayar şeması: `command` ile `module`'den tam biri.
+- `Stop` hook'u artık engelleyebilir: sebep `[Stop hook] …` mesajı olarak eklenir ve ajan devam eder (`stopHookActive`, çalıştırma başına en çok 3 devam).
+- Örnek plugin'ler `plugins/` altında: `commit-helper`, `guard-rails` (gerçek modelle doğrulandı).
+- Belgeler: `docs/plugins.md` (TR/EN), ADR-0010, izinler sayfasında hook bölümü.
+
 **M6b: MCP connector'ları**
 - `@usta/mcp`: stdio ve HTTP (streamable) MCP sunucularına bağlanır; araçlar `mcp__<sunucu>__<araç>` adıyla, sunucunun kendi JSON Şemasıyla (`Tool.jsonSchema`) modele sunulur ve aynı izin kapısından geçer. `mcp__sunucu` kuralı sunucunun tüm araçlarını kapsar.
 - `usta mcp add|list|remove`, oturumda `/mcp`; yapılandırma `~/.usta/mcp.json` (0600, Claude Code ile aynı `mcpServers` biçimi), `${VAR}` ile gizliler dosyaya yazılmaz, `tools` ile daraltma.

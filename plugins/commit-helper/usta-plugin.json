@@ -1,0 +1,5 @@
+{
+  "name": "commit-helper",
+  "version": "0.1.0",
+  "description": "A /commit command and the team's commit message style"
+}

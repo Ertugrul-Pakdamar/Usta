@@ -33,6 +33,8 @@ export interface SlashContext {
   extensionsReport(): string;
   /** Connected MCP servers and their tools. */
   mcpReport(): string;
+  /** Installed plugins. */
+  pluginsReport(): string;
   /** Recent turns that /rewind can undo, newest first. */
   rewindList(): string;
   rewind(turns: number): void;
@@ -128,6 +130,11 @@ export const slashCommands: SlashCommand[] = [
       ctx.setMode(args as PermissionMode);
       ctx.info(t("slash.modeSet", { mode: args }));
     },
+  },
+  {
+    name: "plugins",
+    description: "slash.desc.plugins",
+    run: (_, ctx) => ctx.info(ctx.pluginsReport()),
   },
   {
     name: "mcp",
