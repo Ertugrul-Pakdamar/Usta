@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { t } from "./i18n/index.js";
 
 export const HOOK_EVENTS = [
   "PreToolUse",
@@ -73,7 +74,7 @@ function exec(def: HookDef, cwd: string, stdin: string) {
       child.stderr.on("data", (b: Buffer) => {
         stderr = (stderr + b.toString("utf8")).slice(0, MAX_OUTPUT);
       });
-      child.on("error", () => resolve({ code: null, stdout, stderr: "başlatılamadı", timedOut }));
+      child.on("error", () => resolve({ code: null, stdout, stderr: "failed to start", timedOut }));
       child.on("close", (code) => {
         clearTimeout(timer);
         resolve({ code, stdout, stderr, timedOut });
@@ -106,16 +107,22 @@ export class HookRunner {
       if (!matches(def, payload.toolName)) continue;
       const r = await exec(def, this.cwd, stdin);
       if (r.timedOut) {
-        result.warnings.push(`Hook zaman aşımına uğradı (${def.timeout ?? 30}s): ${def.command}`);
+        result.warnings.push(
+          t("hooks.timeout", { seconds: def.timeout ?? 30, command: def.command }),
+        );
         continue;
       }
       if (r.code === 2) {
-        result.blocked = { reason: (r.stderr || r.stdout).trim() || "hook engelledi" };
+        result.blocked = { reason: (r.stderr || r.stdout).trim() || "the hook blocked the call" };
         return result;
       }
       if (r.code !== 0) {
         result.warnings.push(
-          `Hook hata verdi (çıkış ${r.code}): ${def.command}${r.stderr ? ` — ${r.stderr.trim()}` : ""}`,
+          t("hooks.failed", {
+            code: r.code ?? "?",
+            command: def.command,
+            detail: r.stderr ? ` — ${r.stderr.trim()}` : "",
+          }),
         );
         continue;
       }
@@ -124,7 +131,7 @@ export class HookRunner {
       try {
         const json = JSON.parse(out) as { decision?: string; reason?: string; context?: string };
         if (json.decision === "block") {
-          result.blocked = { reason: json.reason || "hook engelledi" };
+          result.blocked = { reason: json.reason || "the hook blocked the call" };
           return result;
         }
         if (typeof json.context === "string") result.context.push(json.context);

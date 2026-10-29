@@ -1,4 +1,4 @@
-import type { PermissionMode } from "@usta/core";
+import { type PermissionMode, t } from "@usta/core";
 import { Text } from "ink";
 import { formatTokens } from "./format.js";
 
@@ -15,27 +15,30 @@ interface Props {
   sessionId: string | undefined;
 }
 
-const MODE: Record<PermissionMode, { label: string; color?: string }> = {
-  default: { label: "izin sor" },
-  acceptEdits: { label: "düzenlemeleri kabul", color: "green" },
-  plan: { label: "PLAN MODU", color: "yellow" },
-  bypass: { label: "TÜMÜNE İZİN", color: "red" },
+const MODE_COLOR: Record<PermissionMode, string | undefined> = {
+  default: undefined,
+  acceptEdits: "green",
+  plan: "yellow",
+  bypass: "red",
 };
 
 export function StatusBar(p: Props) {
-  const m = MODE[p.mode];
-  const ctxPct = Math.round(p.contextRatio * 100);
+  const label = t(`tui.mode.${p.mode}`);
   return (
     <Text dimColor>
       {p.model} ·{" "}
-      <Text color={m.color} bold={p.mode !== "default"} dimColor={p.mode === "default"}>
-        {m.label}
+      <Text color={MODE_COLOR[p.mode]} bold={p.mode !== "default"} dimColor={p.mode === "default"}>
+        {label}
       </Text>{" "}
       (⇧Tab)
-      {p.contextRatio > 0 ? ` · bağlam %${ctxPct}` : ""} · ↑{formatTokens(p.promptTokens)} ↓
-      {formatTokens(p.completionTokens)}
-      {p.cacheRatio > 0 ? ` · önb. %${Math.round(p.cacheRatio * 100)}` : ""}
-      {p.free ? " · ücretsiz" : ""}
+      {p.contextRatio > 0
+        ? ` · ${t("tui.status.context", { percent: Math.round(p.contextRatio * 100) })}`
+        : ""}{" "}
+      · ↑{formatTokens(p.promptTokens)} ↓{formatTokens(p.completionTokens)}
+      {p.cacheRatio > 0
+        ? ` · ${t("tui.status.cache", { percent: Math.round(p.cacheRatio * 100) })}`
+        : ""}
+      {p.free ? ` · ${t("tui.status.free")}` : ""}
       {p.remainingCr !== undefined ? ` · ${p.remainingCr} CR` : ""}
       {p.sessionId ? ` · ${p.sessionId}` : ""} · /help
     </Text>

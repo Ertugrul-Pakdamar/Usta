@@ -12,6 +12,7 @@ usta üç kaynaktan yapılandırılır: **ortam değişkenleri** (gateway erişi
 | `EVREN_DEFAULT_MAX_TOKENS` | hayır   | Tek bir model cevabının üst sınırı; boşsa gateway varsayılanı                            |
 | `EVREN_FAST_MODEL`         | hayır   | Bağlam özetleri için ucuz model; boşsa ana model (`models.fast` ayarı önceliklidir)      |
 | `USTA_NO_RG`               | hayır   | Doluysa `rg` kullanılmaz, saf JS arama çalışır                                           |
+| `USTA_LANG`                | hayır   | Arayüz dili: `tr` veya `en` ([Dil](#dil))                                                |
 
 Arama sırası (ilk bulunan kazanır): gerçek ortam değişkenleri → `./.env` → `~/.usta/credentials`. Dosyalar `ANAHTAR=değer` biçimindedir.
 
@@ -40,7 +41,8 @@ Katmanlar birleştirilir: listeler (`allow`, `deny`, `ask`, hook'lar) birbirine 
   },
   "models": { "main": "qwen3-vl-30b", "fast": "qwen3-vl-30b" },
   "budget": { "tokens": 500000, "cr": 5 },
-  "compactAt": 0.8
+  "compactAt": 0.8,
+  "language": "tr"
 }
 ```
 
@@ -53,6 +55,7 @@ Katmanlar birleştirilir: listeler (`allow`, `deny`, `ask`, hook'lar) birbirine 
 | `budget.tokens`                      | `int`                                            | Oturum boyunca işlenen toplam token üst sınırı (girdi + çıktı)              |
 | `budget.cr`                          | `number`                                         | Oturum kredi (CR) üst sınırı                                                |
 | `compactAt`                          | `0.3 – 0.95`                                     | Bağlam penceresinin bu oranına varınca otomatik özet (varsayılan 0.8)       |
+| `language`                           | `tr` \| `en`                                     | Arayüz dili ([Dil](#dil)). Zararsız olduğu için her katmandan uygulanır     |
 
 ### Proje güven kapısı
 
@@ -92,10 +95,27 @@ usta models                        gateway'deki modelleri listele
 | `--allow <kural...>`          | İzin kuralı ekle (tekrarlanabilir)                                    |
 | `--deny <kural...>`           | Yasak kuralı ekle (tekrarlanabilir)                                   |
 | `--trust-project`             | Repodaki `.usta/settings.json` dosyasına sormadan güven               |
+| `--lang <dil>`                | Arayüz dili: `tr` veya `en`                                           |
 | `--budget <cr>`               | Oturum kredi bütçesi                                                  |
 | `--token-budget <n>`          | Oturum token bütçesi; `200k`, `1.5m` biçimleri geçerli                |
 | `-y, --yes`                   | `bypass` modu: **deny kuralları dışında her şeye izin verir**         |
 | `-V, --version`, `-h, --help` | Sürüm, yardım                                                         |
+
+## Dil
+
+Arayüz (menüler, hata iletileri, `doctor`, `terms`, komut satırı yardımı, raporlar) Türkçe ve İngilizce desteklenir. Dil şu sırayla seçilir; **açık seçim sistem yerelinden güçlüdür**:
+
+1. `--lang tr|en` bayrağı
+2. `USTA_LANG` ortam değişkeni
+3. Ayar dosyasında `"language"`
+4. Sistem yereli (`LC_ALL`, `LC_MESSAGES`, `LANG`, `LANGUAGE`): `tr*` → Türkçe, `en*` → İngilizce, **başka bir dil → İngilizce** (uluslararası yedek)
+5. Yerel yoksa veya `C`/`POSIX` ise: Türkçe
+
+Oturum içinde `/lang en` veya `/lang tr` dili anında değiştirir (o oturum için; kalıcı yapmak için `USTA_LANG` veya `language` ayarını kullanın). Sayılar ve tarihler dile göre biçimlenir (`1.010 CR` / `1,010 CR`, `1 Aralık 2026` / `December 1, 2026`).
+
+**Modele giden metinler dilden bağımsızdır.** Sistem istemi, araç açıklamaları, araç sonuçları ve hata iletileri, izin/hook ret sebepleri her zaman İngilizcedir; böylece davranış tutarlı kalır, daha az token harcanır ve önbellek öneki bozulmaz. Arayüz dili yalnızca _sizin_ gördüğünüz metni değiştirir. Örneğin reddedilen bir çağrıyı siz kendi dilinizde okursunuz, model ise İngilizce nedeni alır.
+
+> **Sınır:** Komut satırı yardımındaki bölüm başlıkları (`Usage:`, `Options:`, `Commands:`) kullanılan `commander` kütüphanesinden gelir ve İngilizce kalır; açıklamalar çevrilir.
 
 ## `~/.usta` dizini
 

@@ -1,3 +1,4 @@
+import { t } from "./i18n/index.js";
 import type { Message, Provider } from "./types.js";
 
 const SUMMARY_TAG = "<conversation-summary>";
@@ -91,7 +92,7 @@ export async function compactMessages(opts: CompactOptions): Promise<CompactResu
     if (ev.type === "text") summary += ev.delta;
   }
   summary = summary.trim();
-  if (!summary) throw new Error("Özet boş döndü.");
+  if (!summary) throw new Error(t("compaction.empty"));
   return {
     summary,
     keepFrom,

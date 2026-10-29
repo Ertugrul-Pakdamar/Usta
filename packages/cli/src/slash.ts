@@ -1,4 +1,14 @@
-import { PERMISSION_MODES, type PermissionMode } from "@usta/core";
+import {
+  getLanguage,
+  LANGUAGES,
+  type Lang,
+  type MessageKey,
+  PERMISSION_MODES,
+  type PermissionMode,
+  parseLanguage,
+  setLanguage,
+  t,
+} from "@usta/core";
 
 export interface SlashContext {
   model: string;
@@ -24,7 +34,9 @@ export interface SlashContext {
 
 export interface SlashCommand {
   name: string;
-  description: string;
+  /** Message key of the description; it is looked up when shown, so `/lang` takes effect at once. */
+  description: MessageKey;
+  descriptionParams?: () => Record<string, string>;
   run(args: string, ctx: SlashContext): void | Promise<void>;
 }
 
@@ -33,100 +45,113 @@ export function parseSlash(input: string): { name: string; args: string } | unde
   return m ? { name: m[1] as string, args: (m[2] ?? "").trim() } : undefined;
 }
 
+const settableModes = () => PERMISSION_MODES.filter((m) => m !== "bypass").join("|");
+const languages = () => LANGUAGES.join("|");
+
+/** The description of a command in the current language. */
+export const describeCommand = (c: SlashCommand): string =>
+  t(c.description, c.descriptionParams?.());
+
 export const slashCommands: SlashCommand[] = [
   {
     name: "help",
-    description: "Komutları ve kısayolları listeler",
+    description: "slash.desc.help",
     run: (_, ctx) =>
       ctx.info(
         [
-          ...slashCommands.map((c) => `/${c.name.padEnd(8)} ${c.description}`),
+          ...slashCommands.map((c) => `/${c.name.padEnd(11)} ${describeCommand(c)}`),
           "",
-          "!komut     Doğrudan shell komutu çalıştırır (modele gitmez)",
-          "Enter gönder · satır sonuna \\ koyup Enter = yeni satır · ↑/↓ geçmiş",
-          "Esc çalışan işi iptal eder · Ctrl+C iptal / çıkış",
+          t("slash.help.shell"),
+          t("slash.help.keys1"),
+          t("slash.help.keys2"),
         ].join("\n"),
       ),
   },
-  {
-    name: "clear",
-    description: "Yeni bir konuşma (ve yeni oturum) başlatır",
-    run: (_, ctx) => ctx.clear(),
-  },
+  { name: "clear", description: "slash.desc.clear", run: (_, ctx) => ctx.clear() },
   {
     name: "model",
-    description: "Modeli gösterir veya değiştirir: /model <ad>",
+    description: "slash.desc.model",
     run(args, ctx) {
-      if (!args) return ctx.info(`Model: ${ctx.model}`);
+      if (!args) return ctx.info(t("slash.modelCurrent", { model: ctx.model }));
       ctx.setModel(args);
-      ctx.info(`Model değişti: ${args}`);
+      ctx.info(t("slash.modelChanged", { model: args }));
     },
   },
   {
     name: "models",
-    description: "Gateway'deki modelleri listeler",
+    description: "slash.desc.models",
     async run(_, ctx) {
       const models = await ctx.listModels();
-      ctx.info(models.map((m) => `${m === ctx.model ? "●" : " "} ${m}`).join("\n") || "Model yok.");
+      ctx.info(
+        models.map((m) => `${m === ctx.model ? "●" : " "} ${m}`).join("\n") || t("slash.noModels"),
+      );
     },
   },
-  {
-    name: "cost",
-    description: "Token kullanımı, önbellek, kalan kredi ve bütçe",
-    run: (_, ctx) => ctx.info(ctx.costReport()),
-  },
+  { name: "cost", description: "slash.desc.cost", run: (_, ctx) => ctx.info(ctx.costReport()) },
   {
     name: "context",
-    description: "Bağlam penceresinin neye gittiğini gösterir",
+    description: "slash.desc.context",
     run: async (_, ctx) => ctx.info(await ctx.contextReport()),
   },
   {
     name: "compact",
-    description: "Eski turları özetleyip bağlamı küçültür: /compact [neye odaklanılsın]",
+    description: "slash.desc.compact",
     run: (args, ctx) => ctx.compact(args || undefined),
   },
   {
     name: "session",
-    description: "Oturum kimliğini gösterir (devam: usta --resume <id>)",
-    run: (_, ctx) => ctx.info(ctx.sessionId ? `Oturum: ${ctx.sessionId}` : "Henüz oturum yok."),
+    description: "slash.desc.session",
+    run: (_, ctx) =>
+      ctx.info(ctx.sessionId ? t("slash.session", { id: ctx.sessionId }) : t("slash.noSession")),
   },
   {
     name: "mode",
-    description: `İzin modunu gösterir/değiştirir: /mode <${PERMISSION_MODES.filter((m) => m !== "bypass").join("|")}>`,
+    description: "slash.desc.mode",
+    descriptionParams: () => ({ modes: settableModes() }),
     run(args, ctx) {
-      if (!args) return ctx.info(`İzin modu: ${ctx.mode} (değiştirmek için ⇧Tab veya /mode <ad>)`);
-      if (args === "bypass" || !(PERMISSION_MODES as readonly string[]).includes(args)) {
-        return ctx.info(
-          args === "bypass"
-            ? "bypass yalnızca --yes / --permission-mode bypass ile başlatılırken açılabilir."
-            : `Bilinmeyen mod: ${args}`,
-        );
+      if (!args) return ctx.info(t("slash.modeCurrent", { mode: ctx.mode }));
+      if (args === "bypass") return ctx.info(t("slash.modeBypassOnly"));
+      if (!(PERMISSION_MODES as readonly string[]).includes(args)) {
+        return ctx.info(t("slash.modeUnknown", { mode: args }));
       }
       ctx.setMode(args as PermissionMode);
-      ctx.info(`İzin modu: ${args}`);
+      ctx.info(t("slash.modeSet", { mode: args }));
     },
   },
   {
     name: "plan",
-    description: "Plan moduna geçer (salt okuma; plan onayına kadar değişiklik yok)",
+    description: "slash.desc.plan",
     run(_, ctx) {
       ctx.setMode("plan");
-      ctx.info("Plan modu açık. Hedefinizi yazın; model araştırıp bir plan sunacak.");
+      ctx.info(t("slash.planOn"));
     },
   },
   {
     name: "permissions",
-    description: "Geçerli izin kurallarını, hook'ları ve ayar dosyalarını gösterir",
+    description: "slash.desc.permissions",
     run: (_, ctx) => ctx.info(ctx.describePermissions()),
   },
   {
     name: "rewind",
-    description: "Son turların dosya değişikliklerini ve konuşmayı geri alır: /rewind <tur sayısı>",
+    description: "slash.desc.rewind",
     run(args, ctx) {
       const n = Number.parseInt(args, 10);
       if (Number.isInteger(n) && n > 0) return ctx.rewind(n);
       ctx.info(ctx.rewindList());
     },
   },
-  { name: "exit", description: "Çıkar", run: (_, ctx) => ctx.exit() },
+  {
+    name: "lang",
+    description: "slash.desc.lang",
+    descriptionParams: () => ({ languages: languages() }),
+    run(args, ctx) {
+      if (!args)
+        return ctx.info(t("slash.langCurrent", { lang: getLanguage(), languages: languages() }));
+      const lang: Lang | undefined = parseLanguage(args);
+      if (!lang) return ctx.info(t("slash.langUnknown", { value: args, languages: languages() }));
+      setLanguage(lang);
+      ctx.info(t("slash.langSet", { lang }));
+    },
+  },
+  { name: "exit", description: "slash.desc.exit", run: (_, ctx) => ctx.exit() },
 ];

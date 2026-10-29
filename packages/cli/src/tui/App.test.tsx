@@ -204,7 +204,7 @@ describe("App", () => {
     expect(await readFile(join(cwd, "a.txt"), "utf8")).toBe("2");
     expect(engine.mode).toBe("acceptEdits");
     expect(JSON.stringify(provider.requests[1]?.messages)).toContain(
-      "Plan modunda değişiklik yapılamaz",
+      "Plan mode: changes are not allowed",
     );
     // The system prompt (the cacheable prefix) never changes; plan mode rides on a trailing message.
     const systems = new Set(provider.requests.map((r) => JSON.stringify(r.messages[0])));
@@ -350,7 +350,7 @@ describe("App", () => {
       />,
     );
     await type(ui, "merhaba dunya");
-    await waitFor(ui, "Bütçe aşılacak");
+    await waitFor(ui, "bütçesi (5) aşılacak");
     ui.stdin.write("n");
     await waitFor(ui, "Durduruldu");
     expect(provider.requests).toHaveLength(0);

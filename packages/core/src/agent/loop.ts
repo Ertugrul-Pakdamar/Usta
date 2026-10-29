@@ -1,5 +1,6 @@
 import { type ReviewRequest, type ReviewVerdict, type Tool, ToolError, z } from "@usta/sdk";
 import { BudgetExceededError } from "../cost.js";
+import { type Localized, t, tl } from "../i18n/index.js";
 import { extractTextToolCalls } from "../provider/text-tool-calls.js";
 import type { Message, Provider, ToolCall, ToolSpec, Usage } from "../types.js";
 import { buildSystemPrompt } from "./prompt.js";
@@ -9,10 +10,11 @@ export type AgentEvent =
   /** `sentMessages` = length of the history (system included) the request was built from, excluding the volatile tail. */
   | { type: "usage"; usage: Usage; sentMessages: number }
   | { type: "tool_start"; call: ToolCall }
-  | { type: "tool_result"; call: ToolCall; output: string; isError: boolean };
+  /** `output` is what the model sees; `display` (when set) is the same message translated for the user. */
+  | { type: "tool_result"; call: ToolCall; output: string; isError: boolean; display?: string };
 
 /** `false`/`{allow:false}` blocks the call; `reason` is shown to the model. */
-export type ApprovalVerdict = boolean | { allow: boolean; reason?: string };
+export type ApprovalVerdict = boolean | { allow: boolean; reason?: string; reasonKey?: Localized };
 
 export type AfterToolFn = (
   tool: Tool<any>,
@@ -112,32 +114,37 @@ async function execute(
   call: ToolCall,
   tools: Tool<any>[],
   opts: AgentOptions,
-): Promise<{ output: string; isError: boolean }> {
-  const tool = tools.find((t) => t.name === call.name);
+): Promise<{ output: string; isError: boolean; display?: string }> {
+  const tool = tools.find((x) => x.name === call.name);
   if (!tool) {
-    const known = tools.map((t) => t.name).join(", ");
-    return { output: `Bilinmeyen tool: ${call.name}. Mevcut tool'lar: ${known}`, isError: true };
+    const known = tools.map((x) => x.name).join(", ");
+    return { output: `Unknown tool: ${call.name}. Available tools: ${known}`, isError: true };
   }
   let raw: unknown;
   try {
     raw = JSON.parse(call.arguments || "{}");
   } catch {
-    return { output: "Argümanlar geçerli JSON değil; düzeltip tekrar çağırın.", isError: true };
+    return { output: "The arguments are not valid JSON; fix them and call again.", isError: true };
   }
   const parsed = tool.input.safeParse(raw);
   if (!parsed.success) {
-    return { output: `Geçersiz argümanlar: ${z.prettifyError(parsed.error)}`, isError: true };
+    return { output: `Invalid arguments: ${z.prettifyError(parsed.error)}`, isError: true };
   }
   const verdict = opts.approve ? await opts.approve(tool, parsed.data, call) : !tool.mutating;
   const allowed = typeof verdict === "boolean" ? verdict : verdict.allow;
   if (!allowed) {
     const reason = typeof verdict === "object" ? verdict.reason : undefined;
+    const reasonKey = typeof verdict === "object" ? verdict.reasonKey : undefined;
+    const shownReason = reasonKey ? tl(reasonKey) : reason;
     return {
-      output: `${tool.name} çağrısına izin verilmedi${reason ? `: ${reason}` : "."} Aynı çağrıyı tekrar denemeyin; kullanıcıya neye ihtiyacınız olduğunu söyleyin.`,
+      output: `${tool.name} was not allowed${reason ? `: ${reason}` : "."} Do not retry the same call; tell the user what you need.`,
       isError: true,
+      display: shownReason
+        ? t("perm.denied", { tool: tool.name, reason: shownReason })
+        : t("perm.deniedNoReason", { tool: tool.name }),
     };
   }
-  let result: { output: string; isError: boolean };
+  let result: { output: string; isError: boolean; display?: string };
   try {
     result = {
       output: await tool.run(parsed.data, {
@@ -154,7 +161,7 @@ async function execute(
     result =
       err instanceof ToolError
         ? { output: err.message, isError: true }
-        : { output: `Beklenmeyen hata: ${(err as Error).message}`, isError: true };
+        : { output: `Unexpected error: ${(err as Error).message}`, isError: true };
   }
   if (opts.limitOutput) result.output = await opts.limitOutput(tool, call, result.output);
   const extra = await opts.afterTool?.(tool, parsed.data, call, result);

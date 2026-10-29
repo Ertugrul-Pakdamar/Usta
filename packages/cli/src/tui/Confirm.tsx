@@ -1,3 +1,4 @@
+import { t } from "@usta/core";
 import { Box, Text } from "ink";
 
 export function Confirm({ message }: { message: string }) {
@@ -7,8 +8,8 @@ export function Confirm({ message }: { message: string }) {
         {message}
       </Text>
       <Text>
-        Devam edilsin mi? <Text color="green">[y]</Text> evet <Text color="red">[n]</Text> hayır
-        (Esc)
+        {t("tui.confirm.continue")} <Text color="green">[y]</Text> {t("tui.yes")}{" "}
+        <Text color="red">[n]</Text> {t("tui.no")}
       </Text>
     </Box>
   );

@@ -8,7 +8,7 @@ export function resolvePath(cwd: string, path: string): string {
   const abs = resolve(cwd, path);
   const name = basename(abs);
   if (PROTECTED.some((re) => re.test(name)) && name !== ".env.example") {
-    throw new ToolError(`Erişim engellendi: ${name} gizli bilgi içerebilir.`);
+    throw new ToolError(`Access denied: ${name} may contain secrets.`);
   }
   return abs;
 }

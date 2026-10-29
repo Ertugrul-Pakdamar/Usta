@@ -15,7 +15,7 @@ Plan, analyse code, edit files and run commands with **the fewest tokens and the
 
 [Türkçe](README.md) · **English**
 
-<img src="docs/assets/demo.svg" alt="A usta session: the model changes 8 files with one script, applied after the diff is approved" width="720">
+<img src="docs/assets/demo.en.svg" alt="A usta session: the model changes 8 files with one script, applied after the diff is approved" width="720">
 
 </div>
 
@@ -40,6 +40,7 @@ Coding agents are powerful but can be expensive and unsupervised. **usta** tackl
 - **Hooks:** `PreToolUse` `PostToolUse` `UserPromptSubmit` `SessionStart` `Stop`.
 - **Token economy:** `/cost` `/context` `/compact`, budgets (`--budget`, `--token-budget`), cache-friendly prompts, output limiter, read cache.
 - **Sessions:** private JSONL files, resume with `usta -c` / `usta -r <id>`.
+- **Localization:** Turkish and English interface (`--lang`, `USTA_LANG`, `/lang`); everything sent to the model stays English regardless of the interface language.
 - **Headless:** `usta -p "..." --output-format json` for CI and scripts, with meaningful exit codes (`0` ok, `1` error, `2` unfinished, `3` budget).
 - **Extensibility:** tools via `@usta/sdk` today; skills, plugins and MCP connectors in [M6](docs/roadmap.md).
 
@@ -48,7 +49,7 @@ Coding agents are powerful but can be expensive and unsupervised. **usta** tackl
 **Requirements:** Node.js ≥ 22, [pnpm](https://pnpm.io) 12, an EVREN LLM Gateway account. Optional: `python3` (Script tool), `rg` (fast search).
 
 ```sh
-git clone git@github.com:Ertugrul-Pakdamar/Usta.git
+git clone https://github.com/Ertugrul-Pakdamar/Usta.git
 cd Usta
 pnpm install && pnpm build
 
@@ -67,6 +68,7 @@ usta                                   # interactive
 usta "fix the login test"              # start with a prompt
 usta -c                                # resume the latest session of this directory
 usta --plan                            # start in plan mode
+usta --lang en                         # English interface (or USTA_LANG=en)
 usta -p "list the TODOs" --output-format json
 usta --budget 5 --token-budget 200k
 ```
@@ -91,7 +93,7 @@ Measured with `qwen3-vl-30b` on 2026-10-29 using the gateway's own `count_tokens
 
 ## Roadmap
 
-M0–M4 are done (skeleton, core, TUI, security, token economy). Next: M4.5 localization, M5 subagents, M5.5 auto mode, M6 skills/plugins/MCP, M7 single-file binary and v0.1.0. See [docs/roadmap.md](docs/roadmap.md).
+M0–M4 are done (skeleton, core, TUI, security, token economy). M4.5 (localization) is in progress: the interface is done, English documentation is next. Then M5 subagents, M5.5 auto mode, M6 skills/plugins/MCP, M7 single-file binary and v0.1.0. See [docs/roadmap.md](docs/roadmap.md).
 
 ## Contributing and license
 

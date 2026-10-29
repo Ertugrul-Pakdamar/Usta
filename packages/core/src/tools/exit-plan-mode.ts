@@ -11,6 +11,6 @@ export const exitPlanModeTool = defineTool({
   mutating: false,
   input: z.object({ plan: z.string().min(1) }),
   async run() {
-    return "Plan onaylandı. Şimdi planı uygulamaya başlayın.";
+    return "Plan approved. Start implementing it now.";
   },
 });

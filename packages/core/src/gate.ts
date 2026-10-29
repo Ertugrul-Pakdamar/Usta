@@ -3,6 +3,7 @@ import type { ReviewRequest, ReviewVerdict, Tool } from "@usta/sdk";
 import type { AfterToolFn, ApprovalVerdict } from "./agent/loop.js";
 import type { CheckpointStore } from "./checkpoint.js";
 import type { HookRunner } from "./hooks.js";
+import { t, tl } from "./i18n/index.js";
 import { type PermissionEngine, type PermissionMode, resolveTarget } from "./permissions.js";
 import type { ToolCall } from "./types.js";
 
@@ -45,7 +46,7 @@ function remember(tool: Tool<any>, input: unknown, engine: PermissionEngine) {
   const target = tool.permission?.target(input as never);
   if (tool.permission?.kind === "command" && target) {
     return {
-      label: `bu komutu bu oturumda hep (${target.slice(0, 40)})`,
+      label: t("gate.rememberCommand", { command: target.slice(0, 40) }),
       apply: () => engine.addRule("allow", `${tool.name}(${target})`),
     };
   }
@@ -53,18 +54,18 @@ function remember(tool: Tool<any>, input: unknown, engine: PermissionEngine) {
     const { insideCwd, candidates } = resolveTarget(target, engine.cwd);
     if (tool.mutating && insideCwd) {
       return {
-        label: "çalışma dizinindeki düzenlemeleri otomatik kabul et",
+        label: t("gate.rememberEdits"),
         apply: () => engine.setMode("acceptEdits"),
       };
     }
     const dir = dirname(candidates[0] as string);
     return {
-      label: `${dir}/** için bu oturumda hep`,
+      label: t("gate.rememberDir", { dir }),
       apply: () => engine.addRule("allow", `${tool.name}(${dir}/**)`),
     };
   }
   return {
-    label: `${tool.name} için bu oturumda hep`,
+    label: t("gate.rememberTool", { tool: tool.name }),
     apply: () => engine.addRule("allow", tool.name),
   };
 }
@@ -78,7 +79,9 @@ export function createToolGate(opts: GateOptions) {
   const { engine } = opts;
   return async (tool: Tool<any>, input: unknown, call: ToolCall): Promise<ApprovalVerdict> => {
     const verdict = engine.decide(tool, input);
-    if (verdict.decision === "deny") return { allow: false, reason: verdict.reason };
+    if (verdict.decision === "deny") {
+      return { allow: false, reason: verdict.reason, reasonKey: verdict.reasonKey };
+    }
 
     if (opts.hooks?.has("PreToolUse")) {
       const hook = await opts.hooks.run("PreToolUse", {
@@ -87,7 +90,13 @@ export function createToolGate(opts: GateOptions) {
         toolInput: input,
       });
       for (const w of hook.warnings) opts.onWarning?.(w);
-      if (hook.blocked) return { allow: false, reason: `Hook engelledi: ${hook.blocked.reason}` };
+      if (hook.blocked) {
+        return {
+          allow: false,
+          reason: `Blocked by a hook: ${hook.blocked.reason}`,
+          reasonKey: { key: "perm.hookBlocked", params: { reason: hook.blocked.reason } },
+        };
+      }
     }
 
     const diff = tool.mutating
@@ -101,7 +110,8 @@ export function createToolGate(opts: GateOptions) {
         return {
           allow: false,
           reason:
-            "onay gerekiyor ama etkileşimli onay yok (--allow kuralı veya --permission-mode ile izin verilebilir)",
+            "approval is needed but nobody can be asked (it can be allowed with an --allow rule or --permission-mode)",
+          reasonKey: { key: "perm.noApproval" },
         };
       }
       const isPlan = tool.name === "ExitPlanMode";
@@ -111,7 +121,7 @@ export function createToolGate(opts: GateOptions) {
         tool,
         input,
         call,
-        reason: verdict.reason,
+        reason: verdict.reasonKey ? tl(verdict.reasonKey) : verdict.reason,
         diff,
         plan: isPlan ? String((input as { plan?: string }).plan ?? "") : undefined,
         rememberLabel: mem.label,
@@ -119,7 +129,8 @@ export function createToolGate(opts: GateOptions) {
       if (!answer.allow) {
         return {
           allow: false,
-          reason: isPlan ? "kullanıcı planı onaylamadı; planı revize edin" : "kullanıcı reddetti",
+          reason: isPlan ? "the user did not approve the plan; revise it" : "the user declined",
+          reasonKey: { key: isPlan ? "perm.planDeclined" : "perm.userDeclined" },
         };
       }
       if (answer.mode) engine.setMode(answer.mode);
@@ -155,7 +166,7 @@ export function createReviewer(opts: Pick<GateOptions, "engine" | "ask" | "check
         tool,
         input: undefined,
         call,
-        reason: verdict.reason ?? req.summary,
+        reason: verdict.reasonKey ? tl(verdict.reasonKey) : (verdict.reason ?? req.summary),
         diff: req.diff,
       });
       if (!answer.allow) return { ok: false, reason: "the user declined" };

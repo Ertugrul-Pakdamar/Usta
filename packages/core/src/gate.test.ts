@@ -71,7 +71,7 @@ describe("createToolGate", () => {
       s,
     );
     expect(s.asked).toHaveLength(0);
-    expect(toolOutputs(provider)).toContain("Kural engelledi: Read(.env)");
+    expect(toolOutputs(provider)).toContain("Denied by rule: Read(.env)");
   });
 
   it("without an interactive asker, 'ask' becomes a denial", async () => {
@@ -80,7 +80,7 @@ describe("createToolGate", () => {
       [{ toolCalls: [{ name: "Write", args: { path: "a", content: "1" } }] }, { text: "ok" }],
       s,
     );
-    expect(toolOutputs(provider)).toContain("onay gerekiyor");
+    expect(toolOutputs(provider)).toContain("approval is needed");
     await expect(readFile(join(cwd, "a"))).rejects.toThrow();
   });
 
@@ -91,7 +91,7 @@ describe("createToolGate", () => {
       [{ toolCalls: [{ name: "Write", args: { path: "a", content: "1" } }] }, { text: "ok" }],
       s1,
     );
-    expect(toolOutputs(provider)).toContain("Hook engelledi: hayır");
+    expect(toolOutputs(provider)).toContain("Blocked by a hook: hayır");
 
     const allowing = { PreToolUse: [{ command: `echo '{"decision":"allow"}'` }] };
     const s2 = setup({ hooks: allowing, deny: ["Bash(rm:*)"], answer: { allow: true } });
@@ -99,7 +99,7 @@ describe("createToolGate", () => {
       [{ toolCalls: [{ name: "Bash", args: { command: "rm -rf x" } }] }, { text: "ok" }],
       s2,
     );
-    expect(toolOutputs(p2)).toContain("Kural engelledi");
+    expect(toolOutputs(p2)).toContain("Denied by rule");
   });
 
   it("remember on a file edit switches to acceptEdits so the next edit does not ask", async () => {
@@ -160,7 +160,7 @@ describe("plan mode through the agent loop", () => {
     expect(s.engine.mode).toBe("acceptEdits");
     expect(await readFile(join(cwd, "a"), "utf8")).toBe("2");
     expect(JSON.stringify(provider.requests[1]?.messages)).toContain(
-      "Plan modunda değişiklik yapılamaz",
+      "Plan mode: changes are not allowed",
     );
   });
 
@@ -175,7 +175,7 @@ describe("plan mode through the agent loop", () => {
     const s = setup({ mode: "plan", answer: { allow: false } });
     const { provider } = await run([{ toolCalls: plan }, { text: "revize" }], s);
     expect(s.engine.mode).toBe("plan");
-    expect(toolOutputs(provider)).toContain("revize");
+    expect(toolOutputs(provider)).toContain("revise");
   });
 });
 

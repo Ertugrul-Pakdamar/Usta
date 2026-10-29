@@ -4,6 +4,7 @@ import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { z } from "zod";
 import { HOOK_EVENTS, type HookConfig } from "./hooks.js";
+import { LANGUAGES, type Lang, t } from "./i18n/index.js";
 import { PERMISSION_MODES, type PermissionMode } from "./permissions.js";
 
 const HookDefSchema = z.object({
@@ -30,6 +31,8 @@ const SettingsSchema = z.object({
     })
     .optional(),
   compactAt: z.number().min(0.3).max(0.95).optional(),
+  /** Interface language. Harmless, so it applies from every layer. */
+  language: z.enum(LANGUAGES).optional(),
 });
 type RawSettings = z.infer<typeof SettingsSchema>;
 
@@ -53,6 +56,7 @@ export interface LoadedSettings {
   /** Applied from every layer: a limit can only make a session safer. */
   budget?: { cr?: number; tokens?: number };
   compactAt?: number;
+  language?: Lang;
   /** Settings files that were read. */
   files: string[];
   warnings: string[];
@@ -85,10 +89,11 @@ function readLayer(path: string): { settings: RawSettings; hash: string } | unde
   try {
     json = JSON.parse(text);
   } catch (err) {
-    throw new Error(`${path} geçerli JSON değil: ${(err as Error).message}`);
+    throw new Error(t("settings.invalidJson", { path, message: (err as Error).message }));
   }
   const parsed = SettingsSchema.safeParse(json);
-  if (!parsed.success) throw new Error(`${path} geçersiz:\n${z.prettifyError(parsed.error)}`);
+  if (!parsed.success)
+    throw new Error(t("settings.invalid", { path, details: z.prettifyError(parsed.error) }));
   return { settings: parsed.data, hash: createHash("sha256").update(text).digest("hex") };
 }
 
@@ -127,6 +132,7 @@ export function loadSettings(
     out.deny.push(...s.permissions.deny);
     out.ask.push(...s.permissions.ask);
     if (s.budget) out.budget = { ...out.budget, ...s.budget };
+    if (s.language) out.language = s.language;
     if (!full) return;
     Object.assign(out.models, s.models);
     if (s.compactAt !== undefined) out.compactAt = s.compactAt;
@@ -134,9 +140,7 @@ export function loadSettings(
     mergeHooks(s.hooks as HookConfig);
     const mode = s.permissions.defaultMode;
     if (mode === "bypass" && !allowBypass) {
-      out.warnings.push(
-        `${path}: defaultMode "bypass" yalnızca kullanıcı ayarlarında geçerli; yok sayıldı.`,
-      );
+      out.warnings.push(t("settings.bypassIgnored", { path }));
     } else if (mode) {
       out.defaultMode = mode;
     }
@@ -169,9 +173,7 @@ export function loadSettings(
     ];
     out.project = { path: projectPath, hash: project.hash, sensitive, trusted, summary };
     if (!trusted) {
-      out.warnings.push(
-        `${projectPath}: allow kuralları ve hook'lar güvenilmediği için uygulanmadı (deny/ask uygulandı).`,
-      );
+      out.warnings.push(t("settings.untrusted", { path: projectPath }));
     }
     apply(s, projectPath, { full: trusted, allowBypass: false });
   }
@@ -180,4 +182,23 @@ export function loadSettings(
   const local = readLayer(localPath);
   if (local) apply(local.settings, localPath, { full: true, allowBypass: false });
   return out;
+}
+
+/**
+ * The `language` setting, read leniently (a broken file must not stop the language from being
+ * chosen before settings are loaded and validated). Local overrides project overrides user.
+ */
+export function readLanguageSetting(cwd: string, home = homedir()): string | undefined {
+  let language: string | undefined;
+  for (const path of [
+    join(home, ".usta", "settings.json"),
+    join(cwd, ".usta", "settings.json"),
+    join(cwd, ".usta", "settings.local.json"),
+  ]) {
+    try {
+      const value = (JSON.parse(readFileSync(path, "utf8")) as { language?: unknown }).language;
+      if (typeof value === "string") language = value;
+    } catch {}
+  }
+  return language;
 }

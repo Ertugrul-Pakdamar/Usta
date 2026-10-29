@@ -53,6 +53,8 @@ mkdir -p ~/.usta && cp .env ~/.usta/credentials && chmod 600 ~/.usta/credentials
 
 `.env` dosyası `.gitignore` ile dışarıda tutulur; **asla commit etmeyin**.
 
+Arayüz dili sistem yerelinizden seçilir (Türkçe veya İngilizce). Değiştirmek için `usta --lang en`, `export USTA_LANG=en` veya oturum içinde `/lang en` kullanın ([ayrıntı](configuration.md#dil)).
+
 ## Kullanım şartlarını kabul etme
 
 Gateway, hesap şartları kabul edilmeden hiçbir isteğe cevap vermez. usta bu kabulü **sizin yerinize yapmaz**:

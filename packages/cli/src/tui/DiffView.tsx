@@ -1,3 +1,4 @@
+import { t } from "@usta/core";
 import { Box, Text } from "ink";
 
 const MAX_LINES = 30;
@@ -32,7 +33,9 @@ export function DiffView({ diff }: { diff: string }) {
           </Text>
         );
       })}
-      {lines.length > MAX_LINES && <Text dimColor>… +{lines.length - MAX_LINES} satır</Text>}
+      {lines.length > MAX_LINES && (
+        <Text dimColor>{t("tui.moreLines", { count: lines.length - MAX_LINES })}</Text>
+      )}
     </Box>
   );
 }

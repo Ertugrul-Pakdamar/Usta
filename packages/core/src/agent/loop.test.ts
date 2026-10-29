@@ -39,7 +39,7 @@ describe("runAgent", () => {
     ]);
     await runAgent("write", { ...base(), provider });
     await expect(readFile(join(cwd, "x.txt"))).rejects.toThrow();
-    expect(JSON.stringify(provider.requests[1]?.messages.at(-1))).toContain("izin verilmedi");
+    expect(JSON.stringify(provider.requests[1]?.messages.at(-1))).toContain("was not allowed");
   });
 
   it("runs mutating tools when approved", async () => {
@@ -65,9 +65,9 @@ describe("runAgent", () => {
     await runAgent("x", { ...base(), provider });
     const tools = provider.requests[1]?.messages.filter((m) => m.role === "tool") ?? [];
     expect(tools).toHaveLength(3);
-    expect(JSON.stringify(tools)).toContain("geçerli JSON");
-    expect(JSON.stringify(tools)).toContain("Geçersiz argümanlar");
-    expect(JSON.stringify(tools)).toContain("Bilinmeyen tool");
+    expect(JSON.stringify(tools)).toContain("not valid JSON");
+    expect(JSON.stringify(tools)).toContain("Invalid arguments");
+    expect(JSON.stringify(tools)).toContain("Unknown tool");
   });
 
   it("runs read-only calls in parallel and keeps result order", async () => {

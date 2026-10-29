@@ -10,6 +10,7 @@ import {
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { summaryMessage } from "./compaction.js";
+import { t } from "./i18n/index.js";
 import type { Message } from "./types.js";
 
 export interface SessionMeta {
@@ -111,7 +112,7 @@ export function loadSession(path: string): { session: Session; messages: Message
       } else messages.push(line.message);
     } catch {} // a torn last line from a crash is ignored
   }
-  if (!meta) throw new Error(`Geçersiz oturum dosyası: ${path}`);
+  if (!meta) throw new Error(t("error.invalidSession", { path }));
   return { session: { meta, path }, messages: repair(messages) };
 }
 

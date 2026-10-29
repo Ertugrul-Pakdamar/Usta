@@ -14,10 +14,10 @@ export const globTool = defineTool({
   async run({ pattern, path }, ctx) {
     const cwd = path ? resolvePath(ctx.cwd, path) : ctx.cwd;
     const files = (await fg(pattern, { cwd, ignore: IGNORE, dot: true })).sort();
-    if (!files.length) return "Eşleşen dosya yok.";
+    if (!files.length) return "No matching files.";
     const shown = files.slice(0, MAX_RESULTS).join("\n");
     return files.length > MAX_RESULTS
-      ? `${shown}\n… ${files.length - MAX_RESULTS} sonuç daha`
+      ? `${shown}\n… ${files.length - MAX_RESULTS} more results`
       : shown;
   },
 });

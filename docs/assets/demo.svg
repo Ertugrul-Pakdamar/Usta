@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="789" height="764" viewBox="0 0 789 764" role="img" aria-label="usta terminal oturumu: toplu değişiklik betikle yapılır, diff onaylanınca uygulanır">
-  <title>usta terminal oturumu</title>
+  <title>usta terminal</title>
   <rect width="789" height="764" rx="12" fill="#0d1117" stroke="#30363d"/>
   <path d="M0 12a12 12 0 0 1 12-12h765a12 12 0 0 1 12 12v24H0z" fill="#161b22"/>
   <circle cx="22" cy="18" r="6" fill="#ff5f56"/><circle cx="42" cy="18" r="6" fill="#ffbd2e"/><circle cx="62" cy="18" r="6" fill="#27c93f"/>

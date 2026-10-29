@@ -34,8 +34,8 @@ export const bashTool = defineTool({
           if (child.pid) process.kill(-child.pid, "SIGKILL");
         } catch {}
       };
-      const timer = setTimeout(() => kill(`zaman aşımı (${timeout_ms} ms)`), timeout_ms);
-      const onAbort = () => kill("iptal edildi");
+      const timer = setTimeout(() => kill(`timed out after ${timeout_ms} ms`), timeout_ms);
+      const onAbort = () => kill("cancelled");
       ctx.signal?.addEventListener("abort", onAbort, { once: true });
       const collect = (b: Buffer) => {
         const chunk = b.toString("utf8");
@@ -58,7 +58,7 @@ export const bashTool = defineTool({
       child.on("close", (code) => {
         clearTimeout(timer);
         ctx.signal?.removeEventListener("abort", onAbort);
-        const status = reason ? `[${reason}]` : `[çıkış kodu ${code}]`;
+        const status = reason ? `[${reason}]` : `[exit code ${code}]`;
         const output = `${head}${dropped ? `\n… [${dropped} characters dropped] …\n` : ""}${tail}`;
         resolve(`${output.trimEnd()}\n${status}`.trim());
       });

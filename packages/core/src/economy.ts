@@ -10,6 +10,7 @@ import {
   fetchQuota,
   type Quota,
 } from "./cost.js";
+import { formatNumber, t } from "./i18n/index.js";
 import type { ModelInfo, ModelRegistry } from "./models.js";
 import { createOutputLimiter } from "./output-limit.js";
 import { GatewayTokenCounter, messageChars, TokenEstimator } from "./tokens.js";
@@ -158,21 +159,26 @@ export class Economy {
         }
       } catch (err) {
         this.compactFailedAt = messages.length;
-        this.callbacks.onWarning?.(`Bağlam özetlenemedi: ${(err as Error).message}`);
+        this.callbacks.onWarning?.(t("economy.compactFailed", { message: (err as Error).message }));
       }
     }
 
     if (this.opts.budget) {
       const check = checkBudget(this.opts.budget, this.tracker, projected, this.model);
       if (check.level === "exceeded" && !this.budgetAllowed) {
-        const what = check.kind === "cr" ? `${check.limit} CR` : `${check.limit} token`;
-        const message = `Bütçe aşılacak (${what}); sıradaki istek yaklaşık ${projected} token taşıyor.`;
+        const message = t(
+          check.kind === "cr" ? "economy.budgetExceededCr" : "economy.budgetExceededTokens",
+          {
+            limit: formatNumber(check.limit ?? 0),
+            projected: formatNumber(projected, 0),
+          },
+        );
         if (!(await this.callbacks.askBudget?.(message))) throw new BudgetExceededError(message);
         this.budgetAllowed = true;
       } else if (check.level === "warn" && !this.budgetWarned) {
         this.budgetWarned = true;
         this.callbacks.onWarning?.(
-          `Bütçenin %80'ine ulaşıldı (${check.kind === "cr" ? "CR" : "token"}).`,
+          t(check.kind === "cr" ? "economy.budgetWarnCr" : "economy.budgetWarnTokens"),
         );
       }
     }
@@ -235,7 +241,7 @@ export class Economy {
     if (!this.quotaWarned && left !== undefined && cap && left / cap < 0.1) {
       this.quotaWarned = true;
       this.callbacks.onWarning?.(
-        `Günlük token kotasının %${Math.round((left / cap) * 100)}'i kaldı.`,
+        t("economy.quotaLow", { percent: Math.round((left / cap) * 100) }),
       );
     }
     return quota;
