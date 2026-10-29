@@ -6,6 +6,12 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 
 ### Eklendi
 
+**M6a: Skill'ler ve özel komutlar**
+- Skill: `skills/<ad>/SKILL.md` (`name`, `description`); yalnızca ad+açıklama `Skill` aracının açıklamasında gider, gövde model çağırınca yüklenir. Skill yoksa araç eklenmez (sabit yük artmaz).
+- Özel komut: `commands/<ad>.md`, `/ad argümanlar`, `$ARGUMENTS`; başsız modda `-p "/ad …"` de çalışır. `/skills` yükleneni listeler; öneri listesi özel komutları da gösterir.
+- Konum: `~/.usta` ve `<proje>/.usta` (proje kazanır). Proje dosyaları **güven kapısına tabi** (tam içeriğe bağlı onay, `~/.usta/trust.json`).
+- Belgeler: `docs/skills.md` (TR/EN). Gerçek modelle doğrulandı: model skill'i kendisi yükledi ve biçimi uyguladı.
+
 **M5.5: Auto modu (deneysel)**
 - Yeni izin modu `auto` (`--permission-mode auto`, `/mode auto`, ⇧Tab döngüsünde `acceptEdits`'ten sonra): değişiklik yapan çağrıları (`Bash`, `Script`, proje dışı yollar, eklenti araçları) `models.fast` ile "güvenli / riskli / belirsiz" diye sınıflar; `safe` izin alır, diğerleri kullanıcıya sorulur (soracak kimse yoksa reddedilir).
 - Sınıflandırıcı kuralları gevşetemez: `deny`, korunan yollar ve `ask` kuralları onun önünde biter. Yalnızca kullanıcı mesajlarını ve ajanın araç çağrılarını görür; araç çıktısı, alt ajan raporu, özet ve hook metni görmez (prompt injection direnci). Hata/zaman aşımı = `unsure`.

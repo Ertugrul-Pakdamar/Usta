@@ -29,6 +29,8 @@ export interface SlashContext {
   describePermissions(): string;
   /** The latest auto-mode decisions and counts. */
   autoReport(): string;
+  /** Loaded skills and custom commands. */
+  extensionsReport(): string;
   /** Recent turns that /rewind can undo, newest first. */
   rewindList(): string;
   rewind(turns: number): void;
@@ -124,6 +126,11 @@ export const slashCommands: SlashCommand[] = [
       ctx.setMode(args as PermissionMode);
       ctx.info(t("slash.modeSet", { mode: args }));
     },
+  },
+  {
+    name: "skills",
+    description: "slash.desc.skills",
+    run: (_, ctx) => ctx.info(ctx.extensionsReport()),
   },
   {
     name: "auto",

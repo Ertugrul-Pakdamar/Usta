@@ -62,7 +62,7 @@ ${SHARED}`,
 ];
 
 /** `---` frontmatter (`key: value` lines) and the body after it. */
-function splitFrontmatter(
+export function splitFrontmatter(
   text: string,
 ): { meta: Record<string, string>; body: string } | undefined {
   const m = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/.exec(text);

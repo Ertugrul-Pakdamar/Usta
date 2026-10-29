@@ -262,6 +262,21 @@ export const en = {
   "trust.agentsWarning":
     "Their instructions steer the model and they can use tools (within your permission rules).",
   "trust.agentsQuestion": "Do you trust these project agents?",
+  "ext.invalidName": '{label}: invalid name "{name}" (lowercase letters, digits and dashes)',
+  "ext.emptyBody": "{label}: the file has no content",
+  "ext.noDescription": "{label}: a skill needs a description",
+  "ext.untrusted":
+    "{dir}: {count} project skill/command file(s) were not loaded because the project is not trusted.",
+  "trust.extHeader": "This project defines skills or commands in {dir}:",
+  "trust.extWarning":
+    "Skills steer the model and commands become prompts you send; read them before you agree.",
+  "trust.extQuestion": "Do you trust these project skills and commands?",
+  "slash.desc.skills": "List the skills and custom commands that are loaded",
+  "ext.none":
+    "No skills or custom commands. Add skills/<name>/SKILL.md or commands/<name>.md under ~/.usta or .usta.",
+  "ext.skillsHeader": "Skills:",
+  "ext.commandsHeader": "Commands:",
+  "ext.unknownCommand": "Unknown command: {command}",
   "slash.desc.tasks": "Subagent tasks: /tasks, /tasks show <id>, /tasks stop <id>",
   "tasks.none": "No tasks.",
   "tasks.line": "{id}  {status}  {agent}: {description} · {elapsed}",

@@ -45,7 +45,7 @@ Kod ajanları güçlüdür ama pahalı ve denetimsiz olabilir. **usta** üç şe
 | **Alt ajanlar**         | `Task` ile geniş keşfi ayrı bağlamda yürüt (paralel, arka plan, `/tasks`); dahili `explore`/`plan`/`general` ve kendi `agents/*.md` ajanların; aynı izin kapısı                                |
 | **Dil**                 | Türkçe ve İngilizce arayüz ve belgeler (`--lang`, `USTA_LANG`, `/lang`); modele giden metin dilden bağımsız, sabit İngilizce                                                                   |
 | **Headless**            | `usta -p "..." --output-format json` — CI ve betikler için; çıkış kodları anlamlı                                                                                                              |
-| **Genişletilebilirlik** | `@usta/sdk` ile araç tanımlama bugün; skill, plugin ve MCP connector'ları [M6](docs/roadmap.md)                                                                                                |
+| **Genişletilebilirlik** | `@usta/sdk` ile araç tanımlama, Markdown **skill'leri** ve **özel komutlar** ([docs](docs/skills.md)) bugün; plugin ve MCP connector'ları [M6](docs/roadmap.md)                                |
 
 ## Hızlı başlangıç
 
@@ -84,6 +84,7 @@ Oturum içinde `/help` tüm komutları listeler:
 | -------------------------------------------------- | ---------------------------------------------------------------------- |
 | `/plan`, `/mode`                                   | Plan moduna geçer, izin modunu gösterir/değiştirir (⇧Tab ile de döner) |
 | `/auto`                                            | Auto modunun son kararlarını ve sayılarını gösterir                    |
+| `/skills`                                          | Yüklü skill'leri ve özel komutları listeler                            |
 | `/context`                                         | Bağlam penceresinin neye gittiğini gateway'in tam sayımıyla gösterir   |
 | `/cost`                                            | Token, önbellek isabeti, kalan kredi, günlük kota ve bütçe             |
 | `/compact [odak]`                                  | Eski turları özetleyip bağlamı küçültür                                |

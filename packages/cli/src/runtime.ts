@@ -4,6 +4,7 @@ import {
   builtinTools,
   detectLanguage,
   Economy,
+  extensionsTrustKey,
   GatewayError,
   gatewayError,
   HookRunner,
@@ -11,6 +12,7 @@ import {
   type Lang,
   type LoadedSettings,
   loadAgents,
+  loadExtensions,
   loadSettings,
   ModelRegistry,
   PERMISSION_MODES,
@@ -171,6 +173,26 @@ export async function loadSessionAgents(
     if (await askYesNo(t("trust.agentsQuestion"))) {
       trustDigest(agentsTrustKey(cwd), info.hash);
       loaded = loadAgents(cwd, undefined, { knownTools: KNOWN_TOOL_NAMES });
+    }
+  }
+  return loaded;
+}
+
+/** Skills and custom commands; project ones need the user's approval of their exact content first. */
+export async function loadSessionExtensions(
+  cwd: string,
+  flags: Pick<RuntimeFlags, "trustProject">,
+  canPrompt: boolean,
+) {
+  let loaded = loadExtensions(cwd, undefined, { trustProject: flags.trustProject });
+  const info = loaded.project;
+  if (info && !info.trusted && canPrompt) {
+    console.error(`\n${t("trust.extHeader", { dir: info.dir })}`);
+    for (const line of info.summary) console.error(`  - ${line}`);
+    console.error(t("trust.extWarning"));
+    if (await askYesNo(t("trust.extQuestion"))) {
+      trustDigest(extensionsTrustKey(cwd), info.hash);
+      loaded = loadExtensions(cwd, undefined);
     }
   }
   return loaded;
