@@ -13,12 +13,12 @@ flowchart LR
   CORE -->|"OpenAI-compatible HTTP"| GW[("EVREN LLM Gateway")]
 ```
 
-| Package | Responsibility | May depend on |
-|---|---|---|
-| `@usta/sdk` | **Public API**: `Tool`, `defineTool`, `ToolError`, `ToolContext`, `ReviewRequest`. Plugin/tool authors see only this | `zod` only |
-| `@usta/core` | Everything independent of the UI: agent loop, provider, tools, permission engine, gate, hooks, settings, sessions, checkpoints, token economy, localization | `sdk` |
-| `@usta/cli` | Ink interface, slash commands, headless mode, the `bin` entry | `core`, `sdk`, `mcp` |
-| `@usta/mcp` | MCP connector client *(M6; empty for now)* | `core`, `sdk` |
+| Package      | Responsibility                                                                                                                                              | May depend on        |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| `@usta/sdk`  | **Public API**: `Tool`, `defineTool`, `ToolError`, `ToolContext`, `ReviewRequest`. Plugin/tool authors see only this                                        | `zod` only           |
+| `@usta/core` | Everything independent of the UI: agent loop, provider, tools, permission engine, gate, hooks, settings, sessions, checkpoints, token economy, localization | `sdk`                |
+| `@usta/cli`  | Ink interface, slash commands, headless mode, the `bin` entry                                                                                               | `core`, `sdk`, `mcp` |
+| `@usta/mcp`  | MCP connector client _(M6; empty for now)_                                                                                                                  | `core`, `sdk`        |
 
 **Rule:** `core` knows nothing about the UI (Ink/React). That way the same core feeds the TUI, headless mode and, later, an IDE extension. Everything `core` exposes goes through `index.ts`; `sdk` is the only stable (semver) surface.
 
@@ -51,7 +51,7 @@ sequenceDiagram
 
 Important contracts of the loop:
 
-- **Errors go back to the model, they do not crash.** Invalid JSON, an unknown tool, arguments that do not match the schema, a denied permission: all are returned as the tool's *result* so the model can correct itself.
+- **Errors go back to the model, they do not crash.** Invalid JSON, an unknown tool, arguments that do not match the schema, a denied permission: all are returned as the tool's _result_ so the model can correct itself.
 - **Cancellation is safe.** If the stream is cancelled the half reply is not written to the history; the history is always valid (every tool call has a result).
 - **Tool calls arriving as text** (`<tool_call>{…}</tool_call>`) are turned into calls by a fallback parser; some models/servers produce this instead of native `tool_calls`.
 - **Read-only calls run in parallel**, changing ones sequentially.
@@ -61,14 +61,14 @@ Key options: `tools` (an array **or** a function evaluated every turn), `approve
 
 ## The tool contract (`@usta/sdk`)
 
-| Field | Meaning |
-|---|---|
-| `name`, `description` | Goes to the model. Must be **short English**: every tool costs ~110 tokens on every request |
-| `input` (zod) | Both validation and the JSON Schema for the model; a single source |
-| `mutating` | Does it change state? Forbidden in plan mode, needs approval |
-| `permission` | `{ kind: "path" \| "command", target(input) }`: what permission rules match against |
-| `preview?` | The diff/preview shown in the approval box |
-| `run(input, ctx)` | `ctx.cwd`, `ctx.signal`, `ctx.state`, `ctx.review`. Throws `ToolError` for an expected failure |
+| Field                 | Meaning                                                                                        |
+| --------------------- | ---------------------------------------------------------------------------------------------- |
+| `name`, `description` | Goes to the model. Must be **short English**: every tool costs ~110 tokens on every request    |
+| `input` (zod)         | Both validation and the JSON Schema for the model; a single source                             |
+| `mutating`            | Does it change state? Forbidden in plan mode, needs approval                                   |
+| `permission`          | `{ kind: "path" \| "command", target(input) }`: what permission rules match against            |
+| `preview?`            | The diff/preview shown in the approval box                                                     |
+| `run(input, ctx)`     | `ctx.cwd`, `ctx.signal`, `ctx.state`, `ctx.review`. Throws `ToolError` for an expected failure |
 
 ## The tool gate
 
@@ -100,14 +100,14 @@ The permission engine (`permissions.ts`) behaves like a pure function: the same 
 
 `Economy` (`core/src/economy.ts`) gathers a conversation's token management in one place:
 
-| Part | File | Job |
-|---|---|---|
-| `ModelRegistry` | `models.ts` | Window, price, capabilities from `/v1/models`; cached on disk |
-| `TokenEstimator`, `GatewayTokenCounter` | `tokens.ts` | Calibrated estimate, exact count via `count_tokens` |
-| `CostTracker`, `checkBudget`, `fetchQuota` | `cost.ts` | Usage, cache ratio, budget, `/v1/quota` |
-| `compactMessages` | `compaction.ts` | Summarizing older turns |
-| `createOutputLimiter` | `output-limit.ts` | Shorten big output and write it to disk |
-| `BulkEditNudge` | `nudge.ts` | Bulk-edit heuristic |
+| Part                                       | File              | Job                                                           |
+| ------------------------------------------ | ----------------- | ------------------------------------------------------------- |
+| `ModelRegistry`                            | `models.ts`       | Window, price, capabilities from `/v1/models`; cached on disk |
+| `TokenEstimator`, `GatewayTokenCounter`    | `tokens.ts`       | Calibrated estimate, exact count via `count_tokens`           |
+| `CostTracker`, `checkBudget`, `fetchQuota` | `cost.ts`         | Usage, cache ratio, budget, `/v1/quota`                       |
+| `compactMessages`                          | `compaction.ts`   | Summarizing older turns                                       |
+| `createOutputLimiter`                      | `output-limit.ts` | Shorten big output and write it to disk                       |
+| `BulkEditNudge`                            | `nudge.ts`        | Bulk-edit heuristic                                           |
 
 The UI (`cli`) builds `Economy` and wires its callbacks (`callbacks`) to its own needs (show a warning, ask about the budget, save a summary). The accounting logic is in the core, not in the UI.
 
@@ -115,10 +115,10 @@ The UI (`cli`) builds `Economy` and wires its callbacks (`callbacks`) to its own
 
 Every piece of text in usta falls into **one of two classes**, and this split is the foundation of the design:
 
-| Class | Examples | Language | Where it lives |
-|---|---|---|---|
-| **User-facing** | UI text, approval boxes, `doctor`/`terms` output, slash command descriptions, reports (`/cost`, `/context`), warnings, command-line help | The user's language (`tr`/`en`) | The catalog: `core/src/i18n` |
-| **Model-facing** | System prompt, tool descriptions, **tool results and error messages**, permission/hook denial reasons, summarizer prompt, hints | **English, fixed** | Plain strings in the code |
+| Class            | Examples                                                                                                                                 | Language                        | Where it lives               |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | ---------------------------- |
+| **User-facing**  | UI text, approval boxes, `doctor`/`terms` output, slash command descriptions, reports (`/cost`, `/context`), warnings, command-line help | The user's language (`tr`/`en`) | The catalog: `core/src/i18n` |
+| **Model-facing** | System prompt, tool descriptions, **tool results and error messages**, permission/hook denial reasons, summarizer prompt, hints          | **English, fixed**              | Plain strings in the code    |
 
 Model-facing text is not tied to the language because (1) the model must behave the same in every language, (2) Turkish costs more tokens, (3) the prompt prefix has to stay byte-for-byte identical for the cache ([ADR-0005](adr/0005-stable-prompt-prefix.md)). Reasoning and alternatives: [ADR-0006](adr/0006-localization.md).
 
@@ -134,12 +134,12 @@ Model-facing text is not tied to the language because (1) the model must behave 
 
 **Session** (`~/.usta/sessions/<id>.jsonl`): each line is a JSON object, append-only.
 
-| `type` | Meaning |
-|---|---|
-| `meta` | First line: `id`, `cwd`, `createdAt`, `model` |
-| `message` | A conversation message (`user`/`assistant`/`tool`) |
-| `truncate` | `/rewind`: keep the first `length` messages |
-| `compact` | Automatic/manual summary: the first `keepFrom` messages were replaced by `summary` |
+| `type`     | Meaning                                                                            |
+| ---------- | ---------------------------------------------------------------------------------- |
+| `meta`     | First line: `id`, `cwd`, `createdAt`, `model`                                      |
+| `message`  | A conversation message (`user`/`assistant`/`tool`)                                 |
+| `truncate` | `/rewind`: keep the first `length` messages                                        |
+| `compact`  | Automatic/manual summary: the first `keepFrom` messages were replaced by `summary` |
 
 The loader replays the lines in order; it ignores a half-written last line and drops a trailing tool-call turn that has no results. The system prompt is not stored (it is generated fresh when continuing). The API key is masked before writing.
 
@@ -150,16 +150,16 @@ The loader replays the lines in order; it ignores a half-written last line and d
 - **`<Static>`** prints finished items (user/assistant/tool) once; only the streaming text, the approval box and the input are redrawn (prevents flicker).
 - Streaming text is updated every 50 ms; the last 20 lines are shown, and it is rendered as markdown when finished.
 - Approval (`pending`) and the budget question (`confirm`) are separate states; while one is open the input is disabled and keys go to the box.
-- Pasted text arrives as one chunk and newlines inside it are *not a submit*.
+- Pasted text arrives as one chunk and newlines inside it are _not a submit_.
 - On long lines the prefix icons (`›`, `●`) are protected with `flexShrink={0}` (otherwise Yoga truncated them).
 
 ## Test strategy
 
-| Layer | How |
-|---|---|
-| Unit | Vitest. Pure modules (permission engine, parsers, economy) directly; temporary directories for the file system |
-| Agent loop | **Scenario** tests with `MockProvider`: model replies are written in advance, requests are recorded and checked (which message, which tool list, which prefix) |
-| Interface | `ink-testing-library`: keystrokes are sent, screen text is awaited. Text and Enter are written separately (because of paste handling) |
+| Layer            | How                                                                                                                                                                                              |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Unit             | Vitest. Pure modules (permission engine, parsers, economy) directly; temporary directories for the file system                                                                                   |
+| Agent loop       | **Scenario** tests with `MockProvider`: model replies are written in advance, requests are recorded and checked (which message, which tool list, which prefix)                                   |
+| Interface        | `ink-testing-library`: keystrokes are sent, screen text is awaited. Text and Enter are written separately (because of paste handling)                                                            |
 | Real environment | Unit tests cannot catch layout bugs, so interface changes are also verified by hand in a **pty** against the real gateway (example: the banner truncation on a long path was only seen that way) |
 
 No test needs a real API key or the network; gateway calls are tested with a fake `fetch`.

@@ -73,7 +73,7 @@ Helpful details: the affected version/commit, steps to reproduce (a small exampl
 **Out of scope:**
 
 - The model giving wrong/made-up answers (hallucination).
-- Known limits explicitly listed as *not guaranteed* on the [permissions page](docs/en/permissions.md#what-is-and-is-not-guaranteed) (for example prefix rules not seeing indirect calls such as `xargs rm`, `Bash` changes not being undoable). Ideas to improve them can be opened as normal issues.
+- Known limits explicitly listed as _not guaranteed_ on the [permissions page](docs/en/permissions.md#what-is-and-is-not-guaranteed) (for example prefix rules not seeing indirect calls such as `xargs rm`, `Bash` changes not being undoable). Ideas to improve them can be opened as normal issues.
 - Vulnerabilities on the gateway side (report those to the gateway operator).
 - The consequences of a user deliberately enabling `bypass` mode.
 

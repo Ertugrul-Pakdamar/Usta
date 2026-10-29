@@ -4,12 +4,12 @@ usta's security idea is simple: **whatever the model asks for, every tool call p
 
 ## Permission modes
 
-| Mode | Reads | Write/Edit in the working directory | Bash / Script | When |
-|---|---|---|---|---|
-| `default` | free | asks | asks | Default |
-| `acceptEdits` | free | automatic | asks | When you trust the edits |
-| `plan` | free | **forbidden** | **forbidden** | Research and a plan first |
-| `bypass` | free | automatic | automatic | Isolated environments only; `-y` or user setting |
+| Mode          | Reads | Write/Edit in the working directory | Bash / Script | When                                             |
+| ------------- | ----- | ----------------------------------- | ------------- | ------------------------------------------------ |
+| `default`     | free  | asks                                | asks          | Default                                          |
+| `acceptEdits` | free  | automatic                           | asks          | When you trust the edits                         |
+| `plan`        | free  | **forbidden**                       | **forbidden** | Research and a plan first                        |
+| `bypass`      | free  | automatic                           | automatic     | Isolated environments only; `-y` or user setting |
 
 ⇧Tab cycles `default → acceptEdits → plan` (you cannot reach `bypass` from there). Paths **outside** the working directory ask in every mode (except bypass).
 
@@ -60,13 +60,13 @@ A shell command can look like one command and run several. So:
 
 ### "Always allow" inside a session
 
-The `a` key in the approval box adds a **session-only** rule, not a permanent one: for `Bash` just that exact command, for edits in the working directory `acceptEdits`, for paths outside the working directory that directory. For `Script` the target is the script language, so `a` allows *every* python (or node) script for that session; keep that in mind. For a permanent rule write it into a settings file.
+The `a` key in the approval box adds a **session-only** rule, not a permanent one: for `Bash` just that exact command, for edits in the working directory `acceptEdits`, for paths outside the working directory that directory. For `Script` the target is the script language, so `a` allows _every_ python (or node) script for that session; keep that in mind. For a permanent rule write it into a settings file.
 
 ## Secret file protection
 
 `Read`/`Write`/`Edit` refuse `.env`, `.env.*` (except `.env.example`), `*.pem`, `*.key`, `*.p12`, `*.pfx` by default; `Grep` does not scan them; `Script` never copies them into its working copy.
 
-> **Limit:** This protection is *in the file tools*. The model can run `cat .env` with `Bash`; to block that too, add rules such as `deny: ["Bash(cat .env:*)"]` or do not allow Bash at all.
+> **Limit:** This protection is _in the file tools_. The model can run `cat .env` with `Bash`; to block that too, add rules such as `deny: ["Bash(cat .env:*)"]` or do not allow Bash at all.
 
 ## Project trust gate
 
@@ -88,28 +88,33 @@ The plan-mode reminder is added to the **end** of the prompt (so the cacheable p
 
 Hooks are shell commands run at certain points of the lifecycle.
 
-| Event | When | Can block |
-|---|---|---|
-| `PreToolUse` | Before a tool runs (after the permission rules passed) | yes |
-| `PostToolUse` | After a tool ran | no (adds feedback) |
-| `UserPromptSubmit` | When the user submits a prompt | yes |
-| `SessionStart` | At the first prompt of a session | no (adds context) |
-| `Stop` | When the model finishes a turn | no |
+| Event              | When                                                   | Can block          |
+| ------------------ | ------------------------------------------------------ | ------------------ |
+| `PreToolUse`       | Before a tool runs (after the permission rules passed) | yes                |
+| `PostToolUse`      | After a tool ran                                       | no (adds feedback) |
+| `UserPromptSubmit` | When the user submits a prompt                         | yes                |
+| `SessionStart`     | At the first prompt of a session                       | no (adds context)  |
+| `Stop`             | When the model finishes a turn                         | no                 |
 
 **Protocol.** The command gets one line of JSON on stdin and `USTA_PROJECT_DIR` in its environment:
 
 ```json
-{ "event": "PreToolUse", "cwd": "/…/project", "sessionId": "2026-10-29-ab12cd",
-  "toolName": "Bash", "toolInput": { "command": "rm -rf build" } }
+{
+  "event": "PreToolUse",
+  "cwd": "/…/project",
+  "sessionId": "2026-10-29-ab12cd",
+  "toolName": "Bash",
+  "toolInput": { "command": "rm -rf build" }
+}
 ```
 
 `PostToolUse` also carries `toolOutput` (first 5000 characters) and `isError`; `UserPromptSubmit` carries `prompt`.
 
-| Exit | Meaning |
-|---|---|
-| `0` | Fine. If stdout is `{"decision":"block","reason":"…"}` it blocks; `{"context":"…"}` adds context for the model. For `UserPromptSubmit`/`SessionStart` plain stdout becomes context too |
-| `2` | Block: stderr (or stdout) is returned to the model as the reason |
-| other | Warning: shown, the flow continues |
+| Exit  | Meaning                                                                                                                                                                                |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `0`   | Fine. If stdout is `{"decision":"block","reason":"…"}` it blocks; `{"context":"…"}` adds context for the model. For `UserPromptSubmit`/`SessionStart` plain stdout becomes context too |
+| `2`   | Block: stderr (or stdout) is returned to the model as the reason                                                                                                                       |
+| other | Warning: shown, the flow continues                                                                                                                                                     |
 
 `matcher` is a regular expression that must match the **whole** tool name (`"Write|Edit"`); empty or `*` means all. The timeout is 30 s by default and the process tree is killed.
 
@@ -127,7 +132,7 @@ fi
 
 ## Checkpoints and `/rewind`
 
-Every user prompt is a *turn*. Right before Write/Edit/Script changes a file, its previous content (or the fact that it did not exist) is copied to `~/.usta/checkpoints/<session>/`.
+Every user prompt is a _turn_. Right before Write/Edit/Script changes a file, its previous content (or the fact that it did not exist) is copied to `~/.usta/checkpoints/<session>/`.
 
 ```
 /rewind          lists the recent turns
@@ -140,11 +145,11 @@ The conversation cut is written to the session file, so it also holds when you c
 
 ## What is and is not guaranteed
 
-| Guaranteed | **Not** guaranteed |
-|---|---|
-| Every tool call passes the gate and `deny` always wins | Prefix rules catching indirect commands (`xargs`, `bash -c`) |
-| Repository settings do not run without approval | Blocking secret access through `Bash` (extra rules needed) |
+| Guaranteed                                                        | **Not** guaranteed                                                                                                               |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Every tool call passes the gate and `deny` always wins            | Prefix rules catching indirect commands (`xargs`, `bash -c`)                                                                     |
+| Repository settings do not run without approval                   | Blocking secret access through `Bash` (extra rules needed)                                                                       |
 | In the file tools, symlinks and `..` are resolved before checking | A `Script` program being unable to reach the network or home directory (it only runs on a copy; its code is approved beforehand) |
-| Session/output/checkpoint files have private permissions | `Bash` changes being undoable |
+| Session/output/checkpoint files have private permissions          | `Bash` changes being undoable                                                                                                    |
 
 To report a vulnerability see [SECURITY.md](../../SECURITY.md).

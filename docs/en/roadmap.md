@@ -2,18 +2,18 @@
 
 usta is in **alpha**. Milestones go in order; each one aims for a working product and measured results at its end. This page is updated together with the code.
 
-| Milestone | Status | Scope |
-|---|---|---|
-| **M0** Skeleton | ✅ | Monorepo, Biome, Vitest, CI, `doctor`, ADRs |
-| **M1** Core | ✅ | Provider, agent loop, 6 file/shell tools, headless `-p`, `.env` loading, terms-of-use flow |
-| **M2** Interface | ✅ | Ink TUI, streaming, markdown, diff-based approval, slash commands, session records and resume |
-| **M3** Security | ✅ | Permission engine and modes, layered settings, project trust gate, plan mode, checkpoints/`/rewind`, hooks |
-| **M4** Token economy | ✅ | Model registry, token estimation/counting, cost and quota, budgets, cache-friendly prompt, output limiter, read cache, automatic summary, `/context` `/cost` `/compact`, `rg`, `Script`, heuristics |
-| **M4.5** Localization | ✅ | `t()` + TR/EN catalogs (complete at compile time), language selection (`--lang`/`USTA_LANG`/setting/locale), `/lang`, all user-facing text, `Intl` number/date formats, model-facing text fixed English, English documentation |
-| **M5** Subagents | 🔜 | `Task` tool (separate context, only a summary returns), background tasks and `/tasks`, custom agents (`agents/*.md`), real routing with `models.fast` |
-| **M5.5** Auto mode | 🔜 | A classifier-backed permission mode: a fast model classifies each changing call with its context as "safe / risky / unsure"; deny rules and protected paths stay above it; circuit breaker; audit log |
-| **M6** Extensibility | 🔜 | Skills, slash commands, plugin manifest and `usta plugin`, MCP connectors, TS-module hooks, continuing from a `Stop` hook, example plugins |
-| **M7** Release | 🔜 | Single-file binary (`bun build --compile`), a real A/B **evaluation report** (success, tokens, CR), `@file` completion, syntax-highlighted diff, `v0.1.0` |
+| Milestone             | Status | Scope                                                                                                                                                                                                                          |
+| --------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **M0** Skeleton       | ✅     | Monorepo, Biome, Vitest, CI, `doctor`, ADRs                                                                                                                                                                                    |
+| **M1** Core           | ✅     | Provider, agent loop, 6 file/shell tools, headless `-p`, `.env` loading, terms-of-use flow                                                                                                                                     |
+| **M2** Interface      | ✅     | Ink TUI, streaming, markdown, diff-based approval, slash commands, session records and resume                                                                                                                                  |
+| **M3** Security       | ✅     | Permission engine and modes, layered settings, project trust gate, plan mode, checkpoints/`/rewind`, hooks                                                                                                                     |
+| **M4** Token economy  | ✅     | Model registry, token estimation/counting, cost and quota, budgets, cache-friendly prompt, output limiter, read cache, automatic summary, `/context` `/cost` `/compact`, `rg`, `Script`, heuristics                            |
+| **M4.5** Localization | ✅     | `t()` + TR/EN catalogs (complete at compile time), language selection (`--lang`/`USTA_LANG`/setting/locale), `/lang`, all user-facing text, `Intl` number/date formats, model-facing text fixed English, English documentation |
+| **M5** Subagents      | 🔜     | `Task` tool (separate context, only a summary returns), background tasks and `/tasks`, custom agents (`agents/*.md`), real routing with `models.fast`                                                                          |
+| **M5.5** Auto mode    | 🔜     | A classifier-backed permission mode: a fast model classifies each changing call with its context as "safe / risky / unsure"; deny rules and protected paths stay above it; circuit breaker; audit log                          |
+| **M6** Extensibility  | 🔜     | Skills, slash commands, plugin manifest and `usta plugin`, MCP connectors, TS-module hooks, continuing from a `Stop` hook, example plugins                                                                                     |
+| **M7** Release        | 🔜     | Single-file binary (`bun build --compile`), a real A/B **evaluation report** (success, tokens, CR), `@file` completion, syntax-highlighted diff, `v0.1.0`                                                                      |
 
 ## Why this order
 

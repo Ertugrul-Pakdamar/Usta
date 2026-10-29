@@ -138,10 +138,8 @@ Yükleyici satırları sırayla oynatır; yarım yazılmış son satırı yok sa
 
 usta'daki her metin **iki sınıftan birine** girer ve bu ayrım tasarımın temelidir:
 
-| Sınıf                 | Örnekler                                                                                                                                             | Dil                            | Nerede yaşar             |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ------------------------ |
-| **Kullanıcıya dönük** | Arayüz metinleri, onay kutuları, `doctor`/`terms` çıktısı, slash komutu açıklamaları, raporlar (`/cost`, `/context`), uyarılar, komut satırı yardımı | Kullanıcının dili (`tr`/`en`)  | Katalog: `core/src/i18n` |
-| **Modele dönük**      | Sistem istemi, araç açıklamaları, **araç sonuçları ve hata iletileri**, izin/hook ret sebepleri, özet istemi, ipuçları                               | **İngilizce, sabit**           | Kodda düz metin          |
+- **Kullanıcıya dönük** (kullanıcının dilinde, `tr`/`en`): arayüz metinleri, onay kutuları, `doctor`/`terms` çıktısı, slash komutu açıklamaları, raporlar (`/cost`, `/context`), uyarılar, komut satırı yardımı. Katalogda yaşar: `core/src/i18n`.
+- **Modele dönük** (**sabit İngilizce**): sistem istemi, araç açıklamaları, **araç sonuçları ve hata iletileri**, izin/hook ret sebepleri, özet istemi, ipuçları. Kodda düz metin olarak yaşar.
 
 Modele dönük metin dile bağlanmaz çünkü (1) model her dilde aynı davranmalı, (2) Türkçe daha çok token tüketir, (3) istem önekinin bayt bayt aynı kalması önbellek için şarttır ([ADR-0005](adr/0005-stable-prompt-prefix.md)). Gerekçe ve alternatifler: [ADR-0006](adr/0006-localization.md).
 
