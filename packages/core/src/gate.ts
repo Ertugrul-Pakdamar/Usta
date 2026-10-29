@@ -255,6 +255,29 @@ export function createAfterTool(
   };
 }
 
+/**
+ * The `Stop` hook as a loop `onStop` callback: a hook that blocks makes the agent continue,
+ * with the hook's reason as the next user message.
+ */
+export function createOnStop(
+  hooks: HookRunner,
+  sessionId?: () => string | undefined,
+  onWarning?: (text: string) => void,
+  onContinue?: (reason: string) => void,
+) {
+  return async (info: { stopHookActive: boolean }): Promise<string | undefined> => {
+    if (!hooks.has("Stop")) return undefined;
+    const r = await hooks.run("Stop", {
+      sessionId: sessionId?.(),
+      stopHookActive: info.stopHookActive,
+    });
+    for (const w of r.warnings) onWarning?.(w);
+    if (!r.blocked) return undefined;
+    onContinue?.(r.blocked.reason);
+    return `[Stop hook] ${r.blocked.reason}`;
+  };
+}
+
 /** Runs several afterTool callbacks and joins whatever each one wants to append. */
 export function composeAfterTool(...fns: (AfterToolFn | undefined)[]): AfterToolFn {
   return async (tool, input, call, result) => {

@@ -1,4 +1,4 @@
-import { mkdtemp, readFile } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -73,5 +73,61 @@ describe("HookRunner", () => {
       toolInput: "x".repeat(1_000_000),
     });
     expect(r.blocked).toBeUndefined();
+  });
+});
+
+describe("module hooks", () => {
+  const mod = async (body: string, name = "hook.mjs") => {
+    await writeFile(join(cwd, name), body);
+    return name;
+  };
+
+  it("get the event object, can add context, and resolve relative to the working directory", async () => {
+    const file = await mod(
+      "export default (e) => ({ context: `saw ${e.toolName} in ${e.event}` });",
+    );
+    const r = await runner({ module: file }).run("PreToolUse", { toolName: "Bash" });
+    expect(r.context).toEqual(["saw Bash in PreToolUse"]);
+    expect(r.blocked).toBeUndefined();
+  });
+
+  it("can block (sync or async)", async () => {
+    const file = await mod(
+      'export default async (e) => (e.toolInput.command.includes("--no-verify") ? { decision: "block", reason: "no skipping hooks" } : undefined);',
+    );
+    const r = runner({ module: file });
+    expect(
+      (
+        await r.run("PreToolUse", {
+          toolName: "Bash",
+          toolInput: { command: "git commit --no-verify" },
+        })
+      ).blocked?.reason,
+    ).toBe("no skipping hooks");
+    expect(
+      (await r.run("PreToolUse", { toolName: "Bash", toolInput: { command: "git commit" } }))
+        .blocked,
+    ).toBeUndefined();
+  });
+
+  it("a throwing, missing, export-less or hanging module is a warning, never a crash", async () => {
+    const bad = await mod('export default () => { throw new Error("kaboom"); };', "bad.mjs");
+    const none = await mod("export const x = 1;", "none.mjs");
+    const hang = await mod("export default () => new Promise(() => {});", "hang.mjs");
+    expect((await runner({ module: bad }).run("PreToolUse", {})).warnings[0]).toContain("kaboom");
+    expect((await runner({ module: none }).run("PreToolUse", {})).warnings[0]).toContain(
+      "default export",
+    );
+    expect((await runner({ module: "missing.mjs" }).run("PreToolUse", {})).warnings).toHaveLength(
+      1,
+    );
+    const t = await runner({ module: hang, timeout: 0.05 }).run("PreToolUse", {});
+    expect(t.warnings).toHaveLength(1);
+  });
+
+  it("the Stop event carries stopHookActive", async () => {
+    const file = await mod("export default (e) => ({ context: String(e.stopHookActive) });");
+    const r = await runner({ module: file }, "Stop").run("Stop", { stopHookActive: true });
+    expect(r.context).toEqual(["true"]);
   });
 });

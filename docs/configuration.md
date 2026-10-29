@@ -120,19 +120,20 @@ Oturum içinde `/lang en` veya `/lang tr` dili anında değiştirir (o oturum i�
 
 ## `~/.usta` dizini
 
-| Yol                    | İçerik                                 | Notlar                                             |
-| ---------------------- | -------------------------------------- | -------------------------------------------------- |
-| `credentials`          | `EVREN_*` değişkenleri                 | `chmod 600` önerilir                               |
-| `settings.json`        | Kullanıcı ayarları                     |                                                    |
-| `trust.json`           | Güvenilen proje ayarlarının özetleri   |                                                    |
-| `sessions/<id>.jsonl`  | Konuşma kayıtları                      | 0600; `-c`/`-r` ile devam                          |
-| `checkpoints/<id>/`    | `/rewind` için dosya yedekleri         | 0600                                               |
-| `outputs/<id>/`        | Bağlama sığmayan tam araç çıktıları    | 7 günden eskiler açılışta silinir                  |
-| `cache/models.json`    | Gateway model bilgisi önbelleği        | 1 saat geçerli                                     |
-| `agents/*.md`          | Kullanıcının özel alt ajanları         | [Alt ajanlar](subagents.md#özel-ajanlar)           |
-| `subagents/<oturum>/`  | Alt ajan konuşma kayıtları             | 0600; denetim için                                 |
-| `mcp.json`             | MCP sunucuları (0600)                  | [MCP](mcp.md)                                      |
-| `skills/`, `commands/` | Kullanıcı skill'leri ve özel komutları | [Skill'ler](skills.md)                             |
-| `audit/<oturum>.jsonl` | Auto modu kararları                    | 0600; [Auto modu](auto-mode.md#denetim-ve-maliyet) |
+| Yol                                   | İçerik                                 | Notlar                                             |
+| ------------------------------------- | -------------------------------------- | -------------------------------------------------- |
+| `credentials`                         | `EVREN_*` değişkenleri                 | `chmod 600` önerilir                               |
+| `settings.json`                       | Kullanıcı ayarları                     |                                                    |
+| `trust.json`                          | Güvenilen proje ayarlarının özetleri   |                                                    |
+| `sessions/<id>.jsonl`                 | Konuşma kayıtları                      | 0600; `-c`/`-r` ile devam                          |
+| `checkpoints/<id>/`                   | `/rewind` için dosya yedekleri         | 0600                                               |
+| `outputs/<id>/`                       | Bağlama sığmayan tam araç çıktıları    | 7 günden eskiler açılışta silinir                  |
+| `cache/models.json`                   | Gateway model bilgisi önbelleği        | 1 saat geçerli                                     |
+| `agents/*.md`                         | Kullanıcının özel alt ajanları         | [Alt ajanlar](subagents.md#özel-ajanlar)           |
+| `subagents/<oturum>/`                 | Alt ajan konuşma kayıtları             | 0600; denetim için                                 |
+| `plugins/<ad>/`, `plugins/state.json` | Kurulu plugin'ler ve durumları         | [Plugin'ler](plugins.md)                           |
+| `mcp.json`                            | MCP sunucuları (0600)                  | [MCP](mcp.md)                                      |
+| `skills/`, `commands/`                | Kullanıcı skill'leri ve özel komutları | [Skill'ler](skills.md)                             |
+| `audit/<oturum>.jsonl`                | Auto modu kararları                    | 0600; [Auto modu](auto-mode.md#denetim-ve-maliyet) |
 
 Oturum dosyaları araç çıktılarını içerebilir; paylaşmadan önce gözden geçirin.

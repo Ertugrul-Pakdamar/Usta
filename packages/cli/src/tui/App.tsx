@@ -17,6 +17,7 @@ import {
   createAfterTool,
   createAutoClassifier,
   createNudgeAfterTool,
+  createOnStop,
   createReviewer,
   createSession,
   createSkillTool,
@@ -49,6 +50,7 @@ import type { Tool } from "@usta/sdk";
 import { Box, Static, Text, useApp, useInput, useStdout } from "ink";
 import { useEffect, useRef, useState } from "react";
 import { formatMcpStatus } from "../mcp-cmd.js";
+import { formatPlugins } from "../plugin-cmd.js";
 import { describeCommand, parseSlash, slashCommands } from "../slash.js";
 import { Approval } from "./Approval.js";
 import { Confirm } from "./Confirm.js";
@@ -395,6 +397,12 @@ export function App(props: AppProps) {
         review,
         afterTool: composeAfterTool(hookAfterTool, createNudgeAfterTool(new BulkEditNudge())),
         pendingMessages: () => manager.drainNotices(),
+        onStop: createOnStop(
+          hooks,
+          () => session.current?.meta.id,
+          (text) => info(`⚠ ${text}`),
+          (reason) => info(t("hooks.stopContinue", { reason })),
+        ),
         onToolProgress: (call, text) =>
           setRunning((r) =>
             call.id in r
@@ -440,10 +448,6 @@ export function App(props: AppProps) {
       if (result.stopReason === "max_turns") info(t("tui.maxTurns"));
       if (result.stopReason === "budget")
         info(t("tui.stopped", { detail: result.stopDetail ?? "" }));
-      if (result.stopReason === "end_turn") {
-        const stop = await hooks.run("Stop", { sessionId: sess.meta.id });
-        for (const w of stop.warnings) info(`⚠ ${w}`);
-      }
     } catch (err) {
       flushStream(true);
       addItem({ kind: "error", text: err instanceof Error ? err.message : String(err) });
@@ -545,6 +549,7 @@ export function App(props: AppProps) {
         setMode: (m) => engine.setMode(m),
         describePermissions: () => describe(engine, hooks),
         autoReport: () => formatAutoReport(auto),
+        pluginsReport: formatPlugins,
         extensionsReport: () => formatExtensions(props.extensions),
         mcpReport: () =>
           props.mcp?.status.length ? formatMcpStatus(props.mcp).join("\n") : t("mcp.none"),

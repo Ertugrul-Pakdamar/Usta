@@ -90,14 +90,14 @@ The plan-mode reminder is added to the **end** of the prompt (so the cacheable p
 
 Hooks are shell commands run at certain points of the lifecycle.
 
-| Event              | When                                                                    | Can block          |
-| ------------------ | ----------------------------------------------------------------------- | ------------------ |
-| `PreToolUse`       | Before a tool runs (after the permission rules passed)                  | yes                |
-| `PostToolUse`      | After a tool ran                                                        | no (adds feedback) |
-| `UserPromptSubmit` | When the user submits a prompt                                          | yes                |
-| `SessionStart`     | At the first prompt of a session                                        | no (adds context)  |
-| `Stop`             | When the model finishes a turn                                          | no                 |
-| `SubagentStop`     | When a subagent finishes (with `agent`, `description`, `result` fields) | no                 |
+| Event              | When                                                                    | Can block                    |
+| ------------------ | ----------------------------------------------------------------------- | ---------------------------- |
+| `PreToolUse`       | Before a tool runs (after the permission rules passed)                  | yes                          |
+| `PostToolUse`      | After a tool ran                                                        | no (adds feedback)           |
+| `UserPromptSubmit` | When the user submits a prompt                                          | yes                          |
+| `SessionStart`     | At the first prompt of a session                                        | no (adds context)            |
+| `Stop`             | When the model finishes a turn                                          | yes: the agent **continues** |
+| `SubagentStop`     | When a subagent finishes (with `agent`, `description`, `result` fields) | no                           |
 
 **Protocol.** The command gets one line of JSON on stdin and `USTA_PROJECT_DIR` in its environment:
 
@@ -120,6 +120,10 @@ Hooks are shell commands run at certain points of the lifecycle.
 | other | Warning: shown, the flow continues                                                                                                                                                     |
 
 `matcher` is a regular expression that must match the **whole** tool name (`"Write|Edit"`); empty or `*` means all. The timeout is 30 s by default and the process tree is killed.
+
+**Continuing with `Stop`.** If a `Stop` hook blocks (exit 2 or `{"decision":"block","reason":"…"}`) the agent does not stop; the reason is added as a `[Stop hook] …` user message and the model carries on (for example "the tests are still failing"). If the event carries `stopHookActive: true` the agent is already continuing because of a hook; a hook should check it to avoid looping. As a safety net a run continues at most **3** times.
+
+**Module hooks.** Instead of a shell command you can write `{"module": "/path/hook.mjs"}`; the module's default export is a function `(event) => void | {decision?, reason?, context?}` (may be async; the event object is the JSON above). It runs in-process with the same timeout and limits; an error or timeout is only a warning. Because module code in a repository can change under you, modules are read **only from your own settings (`~/.usta/settings.json`) and from [plugins](plugins.md) you installed**; `module` hooks in project settings are ignored with a warning.
 
 **Hooks can only restrict.** A hook saying `allow` cannot override `deny`/`ask` rules; hooks run **after** the permission rules.
 

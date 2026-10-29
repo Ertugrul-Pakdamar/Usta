@@ -1,0 +1,9 @@
+{
+  "name": "guard-rails",
+  "version": "0.1.0",
+  "description": "Blocks git commits that skip hooks, and keeps the agent working while TODO(usta) markers remain",
+  "hooks": {
+    "PreToolUse": [{ "matcher": "Bash", "module": "hooks/no-skip-hooks.mjs" }],
+    "Stop": [{ "module": "hooks/no-open-todos.mjs", "timeout": 20 }]
+  }
+}

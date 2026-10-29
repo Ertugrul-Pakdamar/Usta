@@ -1,6 +1,6 @@
 # Extending
 
-You can extend usta in six ways today; plugins arrive with the last part of [M6](roadmap.md).
+You can extend usta in seven ways today.
 
 | Way                        | Status   | Use                                                                 |
 | -------------------------- | -------- | ------------------------------------------------------------------- |
@@ -10,7 +10,7 @@ You can extend usta in six ways today; plugins arrive with the last part of [M6]
 | Permission rules           | ✅ today | In a settings file: [Permissions](permissions.md)                   |
 | Skills and custom commands | ✅ today | A Markdown file: [Skills and commands](skills.md)                   |
 | MCP connector              | ✅ today | `usta mcp add`: [MCP](mcp.md)                                       |
-| Plugin                     | 🔜 M6    | Draft below                                                         |
+| Plugin                     | ✅ today | `usta plugin install`: [Plugins](plugins.md)                        |
 
 ## Adding a new tool
 
@@ -61,12 +61,8 @@ Rules for writing tools:
 
 The easiest way to add behavior without writing code is a hook: blocking commands, auto-formatting, adding context, audit logs. Protocol and example: [Permissions → Hooks](permissions.md#hooks).
 
-## Planned: plugins (M6)
+## Plugins
 
-> **Draft:** The formats below are design goals; they may change until implemented. They will be kept close to existing Claude Code skill/plugin formats so that migration is easy.
+To bundle skills, commands, agents, hooks and MCP servers in one folder and hand it to a team: [Plugins](plugins.md).
 
-| Concept    | Format                                                 | Note                                                      |
-| ---------- | ------------------------------------------------------ | --------------------------------------------------------- |
-| **Plugin** | `usta-plugin.json` manifest: packages all of the above | `usta plugin install` from a local folder, git URL or npm |
-
-If you have an idea or a need, open a [feature request](https://github.com/Ertugrul-Pakdamar/Usta/issues/new?template=feature_request.yml); you can shape the M6 design.
+If you have an idea or a need, open a [feature request](https://github.com/Ertugrul-Pakdamar/Usta/issues/new?template=feature_request.yml).

@@ -7,14 +7,18 @@ import {
   extensionsTrustKey,
   GatewayError,
   gatewayError,
+  HOOK_EVENTS,
+  type HookConfig,
   HookRunner,
   LANGUAGES,
   type Lang,
   type LoadedSettings,
   loadAgents,
   loadExtensions,
+  loadPlugins,
   loadSettings,
   ModelRegistry,
+  mergePluginHooks,
   PERMISSION_MODES,
   PermissionEngine,
   type PermissionMode,
@@ -85,13 +89,21 @@ export async function setupRuntime(cwd: string, flags: RuntimeFlags, canPrompt: 
 
   const allow = [...settings.allow, ...(flags.allow ?? [])];
   const deny = [...settings.deny, ...(flags.deny ?? [])];
-  const warnings = [...settings.warnings];
+  const plugins = loadPlugins();
+  const mergeHooks = (own: HookConfig) => {
+    const merged = mergePluginHooks(plugins.plugins);
+    for (const event of HOOK_EVENTS) {
+      if (own[event]?.length) merged[event] = [...(merged[event] ?? []), ...(own[event] ?? [])];
+    }
+    return merged;
+  };
+  const warnings = [...settings.warnings, ...plugins.warnings];
   for (const rule of [...allow, ...deny, ...settings.ask]) {
     if (!parseRule(rule)) warnings.push(t("warn.invalidRule", { rule }));
   }
   return {
     engine: new PermissionEngine({ cwd, mode, allow, deny, ask: settings.ask }),
-    hooks: new HookRunner(settings.hooks, cwd),
+    hooks: new HookRunner(mergeHooks(settings.hooks), cwd),
     warnings,
     settings,
   };

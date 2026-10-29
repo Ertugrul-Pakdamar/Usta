@@ -97,3 +97,20 @@ describe("loadSettings", () => {
     expect(() => loadSettings(cwd, home)).toThrow("geçersiz");
   });
 });
+
+describe("module hooks in settings", () => {
+  it("are read from the user's settings but ignored (with a warning) from a repository", async () => {
+    await write(home, "settings.json", { hooks: { Stop: [{ module: "/abs/user-hook.mjs" }] } });
+    await write(cwd, "settings.json", {
+      hooks: { Stop: [{ module: "./evil.mjs" }, { command: "echo ok" }] },
+    });
+    const r = loadSettings(cwd, home, { trustProject: true });
+    expect(r.hooks.Stop).toEqual([{ module: "/abs/user-hook.mjs" }, { command: "echo ok" }]);
+    expect(r.warnings.some((w) => w.includes("settings.json"))).toBe(true);
+  });
+
+  it("a hook needs exactly one of command / module", async () => {
+    await write(home, "settings.json", { hooks: { Stop: [{ command: "a", module: "b" }] } });
+    expect(() => loadSettings(cwd, home)).toThrow("exactly one");
+  });
+});

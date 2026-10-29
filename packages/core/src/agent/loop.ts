@@ -68,9 +68,16 @@ export interface AgentOptions {
    * finished". They are stored like any other message (and reported through `onMessage`).
    */
   pendingMessages?: () => Message[];
+  /**
+   * Called when the model is done. Returning text keeps the run going: the text is added as a
+   * user message (a Stop hook asking for more work). At most `MAX_STOP_CONTINUATIONS` times.
+   */
+  onStop?: (info: { stopHookActive: boolean }) => Promise<string | undefined>;
   /** Receives `ctx.progress` reports of long-running tools. */
   onToolProgress?: (call: ToolCall, text: string) => void;
 }
+
+export const MAX_STOP_CONTINUATIONS = 3;
 
 export interface AgentResult {
   messages: Message[];
@@ -203,6 +210,7 @@ export async function runAgent(
   const usage: Usage = { promptTokens: 0, completionTokens: 0 };
   const maxTurns = opts.maxTurns ?? 25;
   let text = "";
+  let continuations = 0;
 
   for (let turn = 1; turn <= maxTurns; turn++) {
     if (opts.signal?.aborted)
@@ -273,7 +281,18 @@ export async function runAgent(
 
     push({ role: "assistant", content, ...(toolCalls.length && { toolCalls }) });
     text = content;
-    if (!toolCalls.length) return { messages, text, turns: turn, usage, stopReason: "end_turn" };
+    if (!toolCalls.length) {
+      const more =
+        continuations < MAX_STOP_CONTINUATIONS
+          ? await opts.onStop?.({ stopHookActive: continuations > 0 })
+          : undefined;
+      if (more) {
+        continuations++;
+        push({ role: "user", content: more });
+        continue;
+      }
+      return { messages, text, turns: turn, usage, stopReason: "end_turn" };
+    }
 
     const run = async (call: ToolCall) => {
       opts.onEvent?.({ type: "tool_start", call });

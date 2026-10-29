@@ -120,19 +120,20 @@ Inside a session, `/lang en` or `/lang tr` switches the language immediately (fo
 
 ## The `~/.usta` directory
 
-| Path                    | Contents                                       | Notes                                          |
-| ----------------------- | ---------------------------------------------- | ---------------------------------------------- |
-| `credentials`           | `EVREN_*` variables                            | `chmod 600` recommended                        |
-| `settings.json`         | User settings                                  |                                                |
-| `trust.json`            | Digests of trusted project settings            |                                                |
-| `sessions/<id>.jsonl`   | Conversation records                           | 0600; continue with `-c`/`-r`                  |
-| `checkpoints/<id>/`     | File backups for `/rewind`                     | 0600                                           |
-| `outputs/<id>/`         | Full tool outputs that did not fit the context | Older than 7 days are deleted at startup       |
-| `cache/models.json`     | Cache of gateway model info                    | Valid for 1 hour                               |
-| `agents/*.md`           | The user's custom subagents                    | [Subagents](subagents.md#custom-agents)        |
-| `subagents/<session>/`  | Subagent conversation records                  | 0600; for auditing                             |
-| `mcp.json`              | MCP servers (0600)                             | [MCP](mcp.md)                                  |
-| `skills/`, `commands/`  | User skills and custom commands                | [Skills](skills.md)                            |
-| `audit/<session>.jsonl` | Auto mode decisions                            | 0600; [Auto mode](auto-mode.md#audit-and-cost) |
+| Path                                    | Contents                                       | Notes                                          |
+| --------------------------------------- | ---------------------------------------------- | ---------------------------------------------- |
+| `credentials`                           | `EVREN_*` variables                            | `chmod 600` recommended                        |
+| `settings.json`                         | User settings                                  |                                                |
+| `trust.json`                            | Digests of trusted project settings            |                                                |
+| `sessions/<id>.jsonl`                   | Conversation records                           | 0600; continue with `-c`/`-r`                  |
+| `checkpoints/<id>/`                     | File backups for `/rewind`                     | 0600                                           |
+| `outputs/<id>/`                         | Full tool outputs that did not fit the context | Older than 7 days are deleted at startup       |
+| `cache/models.json`                     | Cache of gateway model info                    | Valid for 1 hour                               |
+| `agents/*.md`                           | The user's custom subagents                    | [Subagents](subagents.md#custom-agents)        |
+| `subagents/<session>/`                  | Subagent conversation records                  | 0600; for auditing                             |
+| `plugins/<name>/`, `plugins/state.json` | Installed plugins and their state              | [Plugins](plugins.md)                          |
+| `mcp.json`                              | MCP servers (0600)                             | [MCP](mcp.md)                                  |
+| `skills/`, `commands/`                  | User skills and custom commands                | [Skills](skills.md)                            |
+| `audit/<session>.jsonl`                 | Auto mode decisions                            | 0600; [Auto mode](auto-mode.md#audit-and-cost) |
 
 Session files may contain tool output; review them before sharing.

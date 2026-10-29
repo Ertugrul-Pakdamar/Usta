@@ -17,6 +17,7 @@ export * from "./models.js";
 export * from "./nudge.js";
 export * from "./output-limit.js";
 export * from "./permissions.js";
+export * from "./plugins.js";
 export * from "./provider/mock.js";
 export * from "./provider/openai-compatible.js";
 export * from "./provider/text-tool-calls.js";

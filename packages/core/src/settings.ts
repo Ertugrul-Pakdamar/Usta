@@ -7,11 +7,16 @@ import { HOOK_EVENTS, type HookConfig } from "./hooks.js";
 import { LANGUAGES, type Lang, t } from "./i18n/index.js";
 import { PERMISSION_MODES, type PermissionMode } from "./permissions.js";
 
-const HookDefSchema = z.object({
-  matcher: z.string().optional(),
-  command: z.string().min(1),
-  timeout: z.number().positive().optional(),
-});
+const HookDefSchema = z
+  .object({
+    matcher: z.string().optional(),
+    command: z.string().min(1).optional(),
+    module: z.string().min(1).optional(),
+    timeout: z.number().positive().optional(),
+  })
+  .refine((d) => (d.command === undefined) !== (d.module === undefined), {
+    message: 'a hook needs exactly one of "command" or "module"',
+  });
 
 const SettingsSchema = z.object({
   permissions: z
@@ -147,7 +152,19 @@ export function loadSettings(
     Object.assign(out.models, s.models);
     if (s.compactAt !== undefined) out.compactAt = s.compactAt;
     out.allow.push(...s.permissions.allow);
-    mergeHooks(s.hooks as HookConfig);
+    // A module is code that lives in the repository and can change after the user approved the
+    // settings file, so module hooks are only taken from the user's own settings (or plugins).
+    const hooks = s.hooks as HookConfig;
+    if (!allowBypass) {
+      for (const event of HOOK_EVENTS) {
+        const defs = hooks[event];
+        if (defs?.some((d) => d.module)) {
+          out.warnings.push(t("settings.moduleIgnored", { path }));
+          hooks[event] = defs.filter((d) => !d.module);
+        }
+      }
+    }
+    mergeHooks(hooks);
     const mode = s.permissions.defaultMode;
     if (mode === "bypass" && !allowBypass) {
       out.warnings.push(t("settings.bypassIgnored", { path }));
@@ -178,7 +195,7 @@ export function loadSettings(
       ...Object.entries(s.models).flatMap(([k, v]) => (v ? [`models.${k}: ${v}`] : [])),
       ...(s.compactAt !== undefined ? [`compactAt: ${s.compactAt}`] : []),
       ...Object.entries(s.hooks).flatMap(([event, defs]) =>
-        (defs ?? []).map((d) => `hook ${event}: ${d.command}`),
+        (defs ?? []).map((d) => `hook ${event}: ${d.command ?? d.module}`),
       ),
     ];
     out.project = { path: projectPath, hash: project.hash, sensitive, trusted, summary };

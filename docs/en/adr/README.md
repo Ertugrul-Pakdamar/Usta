@@ -4,14 +4,15 @@ Important decisions that are expensive to reverse are kept here **with their rea
 
 _Turkish originals: [docs/adr](../../adr/README.md)._
 
-| No                                    | Title                                                 | Status   |
-| ------------------------------------- | ----------------------------------------------------- | -------- |
-| [0001](0001-tech-stack.md)            | Technology choices                                    | Accepted |
-| [0002](0002-token-counting.md)        | Token counting: calibrated estimate + gateway count   | Accepted |
-| [0003](0003-script-review-in-tool.md) | Script: approval and apply in one tool call           | Accepted |
-| [0004](0004-project-trust-gate.md)    | A trust gate for settings that come from a repository | Accepted |
-| [0005](0005-stable-prompt-prefix.md)  | Stable prompt prefix and a trailing temporary message | Accepted |
-| [0006](0006-localization.md)          | Localization: user-facing versus model-facing text    | Accepted |
-| [0007](0007-subagents.md)             | Subagents: isolated context, shared permission gate   | Accepted |
-| [0008](0008-auto-mode.md)             | Auto mode: the classifier sits below the rules        | Accepted |
-| [0009](0009-mcp.md)                   | MCP: same gate, configuration behind the trust gate   | Accepted |
+| No                                     | Title                                                 | Status   |
+| -------------------------------------- | ----------------------------------------------------- | -------- |
+| [0001](0001-tech-stack.md)             | Technology choices                                    | Accepted |
+| [0002](0002-token-counting.md)         | Token counting: calibrated estimate + gateway count   | Accepted |
+| [0003](0003-script-review-in-tool.md)  | Script: approval and apply in one tool call           | Accepted |
+| [0004](0004-project-trust-gate.md)     | A trust gate for settings that come from a repository | Accepted |
+| [0005](0005-stable-prompt-prefix.md)   | Stable prompt prefix and a trailing temporary message | Accepted |
+| [0006](0006-localization.md)           | Localization: user-facing versus model-facing text    | Accepted |
+| [0007](0007-subagents.md)              | Subagents: isolated context, shared permission gate   | Accepted |
+| [0008](0008-auto-mode.md)              | Auto mode: the classifier sits below the rules        | Accepted |
+| [0010](0010-plugins-and-stop-hooks.md) | Plugins, module hooks, continuing on Stop             | Accepted |
+| [0009](0009-mcp.md)                    | MCP: same gate, configuration behind the trust gate   | Accepted |

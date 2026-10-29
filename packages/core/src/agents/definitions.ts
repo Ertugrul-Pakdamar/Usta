@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { t } from "../i18n/index.js";
+import { loadPlugins } from "../plugins.js";
 import { isDigestTrusted } from "../settings.js";
 
 /** A subagent: its own instructions, tool allowlist and model. */
@@ -187,6 +188,9 @@ export function loadAgents(
     }
   };
 
+  for (const p of loadPlugins(homeDir).plugins) {
+    add(readAgentFiles(join(p.root, "agents")), "user", `plugin:${p.name}/agents`);
+  }
   add(readAgentFiles(join(homeDir, ".usta", "agents")), "user", "~/.usta/agents");
 
   const projectDir = join(cwd, ".usta", "agents");

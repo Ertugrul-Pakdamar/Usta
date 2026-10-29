@@ -14,6 +14,7 @@ import {
   createAfterTool,
   createAutoClassifier,
   createNudgeAfterTool,
+  createOnStop,
   createReviewer,
   createSkillTool,
   createTaskTools,
@@ -40,6 +41,7 @@ import {
 } from "@usta/core";
 import { Command } from "commander";
 import { registerMcpCommands } from "./mcp-cmd.js";
+import { registerPluginCommands } from "./plugin-cmd.js";
 import {
   askYesNo,
   createEconomy,
@@ -129,6 +131,7 @@ terms
   });
 
 registerMcpCommands(program);
+registerPluginCommands(program);
 
 program
   .command("models")
@@ -320,6 +323,9 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
     limitOutput: economy.limitOutput,
     state: economy.state,
     onMessage: (m) => conversation.push(m),
+    onStop: createOnStop(hooks, undefined, warn, (reason) =>
+      warn(t("hooks.stopContinue", { reason })),
+    ),
     onEvent: (ev) => {
       if (ev.type === "text" && !json) process.stdout.write(ev.delta);
       if (ev.type === "usage") economy.recordUsage(ev.usage, ev.sentMessages);
@@ -330,7 +336,6 @@ async function runHeadless(opts: HeadlessOptions): Promise<void> {
     },
   });
   await mcp.manager.close();
-  if (result.stopReason === "end_turn") for (const w of (await hooks.run("Stop")).warnings) warn(w);
   await economy.refreshQuota();
 
   const tracker = economy.tracker;

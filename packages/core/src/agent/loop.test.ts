@@ -7,7 +7,7 @@ import { BudgetExceededError } from "../cost.js";
 import { MockProvider } from "../provider/mock.js";
 import { builtinTools } from "../tools/index.js";
 import type { Message } from "../types.js";
-import { runAgent } from "./loop.js";
+import { MAX_STOP_CONTINUATIONS, runAgent } from "./loop.js";
 
 let cwd: string;
 beforeEach(async () => {
@@ -286,5 +286,45 @@ describe("runAgent", () => {
     ]);
     await runAgent("x", { ...base(), tools: [batch], provider });
     expect(provider.requests[1]?.messages.at(-1)).toMatchObject({ content: "undefined" });
+  });
+});
+
+describe("onStop (Stop hook continuation)", () => {
+  const base = { model: "m", tools: [], cwd: "/" };
+
+  it("keeps going with the hook's text as a user message, then stops when the hook is satisfied", async () => {
+    const provider = new MockProvider([{ text: "first" }, { text: "second" }]);
+    const seen: boolean[] = [];
+    const r = await runAgent("go", {
+      ...base,
+      provider,
+      onStop: async ({ stopHookActive }) => {
+        seen.push(stopHookActive);
+        return seen.length === 1 ? "[Stop hook] run the tests" : undefined;
+      },
+    });
+    expect(r.stopReason).toBe("end_turn");
+    expect(r.text).toBe("second");
+    expect(seen).toEqual([false, true]);
+    expect(provider.requests[1]?.messages.at(-1)).toEqual({
+      role: "user",
+      content: "[Stop hook] run the tests",
+    });
+  });
+
+  it("cannot loop forever: continuations are capped", async () => {
+    const provider = new MockProvider(Array.from({ length: 10 }, (_, i) => ({ text: `t${i}` })));
+    let calls = 0;
+    const r = await runAgent("go", {
+      ...base,
+      provider,
+      onStop: async () => {
+        calls++;
+        return "again";
+      },
+    });
+    expect(calls).toBe(MAX_STOP_CONTINUATIONS);
+    expect(provider.requests).toHaveLength(MAX_STOP_CONTINUATIONS + 1);
+    expect(r.stopReason).toBe("end_turn");
   });
 });

@@ -146,6 +146,10 @@ Yükleyici satırları sırayla oynatır; yarım yazılmış son satırı yok sa
 
 Gerekçe ve ölçümler: [ADR-0007](adr/0007-subagents.md).
 
+## Plugin'ler ve hook'lar
+
+`core/src/plugins.ts`: `installPlugin` (klasör/git → onay → `~/.usta/plugins/<ad>` kopyası + dosya özeti), `loadPlugins` (özeti değişenleri atlar), `mergePluginHooks`. Plugin'ler skill/komut/ajan/MCP yükleyicilerine **ek kök** olarak girer; hook'lar `setupRuntime`'da ayar hook'larının önüne eklenir. `hooks.ts` hem kabuk komutunu hem `module` hook'unu (`import()`, zaman aşımı yarışı) çalıştırır; `agent/loop.ts` `onStop` ile `Stop` hook'unun ajanı devam ettirmesini sağlar (`createOnStop`, en çok 3 devam). Gerekçe: [ADR-0010](adr/0010-plugins-and-stop-hooks.md).
+
 ## MCP
 
 `packages/mcp`: `config.ts` (`~/.usta/mcp.json` + güven kapısındaki proje dosyası, `${VAR}` açma) ve `manager.ts` (`McpManager`: SDK istemcisiyle bağlanır, her uzak aracı `adaptTool` ile `Tool`'a çevirir). Araçlar `Tool.jsonSchema` ile sunucunun şemasını taşır; `mutating` varsayılan doğrudur, `readOnlyHint` yalnızca sorma davranışını etkiler. CLI oturum başında bağlanır (`loadSessionMcp`), araçları `tools`'a ekler ve çıkışta kapatır. Gerekçe: [ADR-0009](adr/0009-mcp.md).
