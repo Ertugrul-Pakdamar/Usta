@@ -1,0 +1,43 @@
+{
+  "name": "@usta/cli",
+  "version": "0.0.0",
+  "description": "usta: a token-aware, permission-gated terminal coding agent for the EVREN LLM Gateway.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "bin": {
+    "usta": "dist/bin.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "@usta/core": "workspace:*",
+    "@usta/mcp": "workspace:*",
+    "@usta/sdk": "workspace:*",
+    "commander": "^15.0.0",
+    "ink": "^8.0.0",
+    "marked": "^18.1.2",
+    "marked-terminal": "^7.3.0",
+    "react": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/marked-terminal": "^6.1.1",
+    "@types/react": "^19.3.0",
+    "ink-testing-library": "^4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ertugrul-Pakdamar/Usta.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/Ertugrul-Pakdamar/Usta#readme",
+  "bugs": {
+    "url": "https://github.com/Ertugrul-Pakdamar/Usta/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

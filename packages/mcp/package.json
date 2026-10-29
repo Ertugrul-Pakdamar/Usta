@@ -1,0 +1,31 @@
+{
+  "name": "@usta/mcp",
+  "version": "0.0.0",
+  "description": "MCP connector client for usta (work in progress).",
+  "type": "module",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "@usta/sdk": "workspace:*",
+    "@usta/core": "workspace:*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ertugrul-Pakdamar/Usta.git",
+    "directory": "packages/mcp"
+  },
+  "homepage": "https://github.com/Ertugrul-Pakdamar/Usta#readme",
+  "bugs": {
+    "url": "https://github.com/Ertugrul-Pakdamar/Usta/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
