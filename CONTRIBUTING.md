@@ -2,6 +2,8 @@
 
 usta'ya ilgi gösterdiğiniz için teşekkürler! Bu rehber, bir fikri birleştirilmiş bir değişikliğe dönüştürmenin en kısa yolunu anlatır. Katılımınız [Davranış Kuralları](CODE_OF_CONDUCT.md)'na tabidir.
 
+*English version: [docs/en/contributing.md](docs/en/contributing.md).*
+
 ## İçindekiler
 
 1. [Başlamadan önce](#başlamadan-önce)
@@ -117,6 +119,7 @@ Hata düzelten her PR, o hatayı yeniden üretip düzeltmeyi kanıtlayan bir tes
 
 - Kullanıcıya görünen her davranış değişikliği ilgili [belgeyi](docs/README.md) ve [CHANGELOG.md](CHANGELOG.md)'yi güncellemelidir.
 - **Mimariyi veya geri dönmesi pahalı bir kararı** değiştiriyorsanız [docs/adr](docs/adr/README.md) altına kısa bir ADR ekleyin: _Bağlam, Karar, Sonuçlar_ ve mümkünse **ölçüm/kanıt**. usta'da kararlar tahmine değil ölçüme dayanır.
+- **İki dili birlikte güncelleyin.** Bir Türkçe belgedeki değişiklik `docs/en` altındaki İngilizce karşılığına da yansımalı (ya da PR'da çevirinin ardından geleceğini belirtin).
 - Yeni bir araç mı ekliyorsunuz? Önce [Genişletme](docs/extending.md) rehberini okuyun; her araç her istekte ~110 token tutar, gereklilik gerekçesi PR'da yer almalı.
 
 ## Pull request kontrol listesi

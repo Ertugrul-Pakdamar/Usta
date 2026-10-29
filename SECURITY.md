@@ -40,3 +40,48 @@ Bildirimde şunlar yardımcı olur: etkilenen sürüm/commit, yeniden üretme ad
 - Kullanıcı verisi (oturumlar, çıktılar, checkpoint'ler) `0600`/`0700` izinleriyle tutulur ve API anahtarı yazılmadan önce maskelenir.
 
 Ayrıntılar: [docs/permissions.md](docs/permissions.md), [ADR-0004](docs/adr/0004-project-trust-gate.md).
+
+---
+
+# Security policy (English)
+
+usta is a tool that runs commands and changes files on the user's machine; security is at the center of this project. We take vulnerability reports seriously.
+
+## Supported versions
+
+The project is in alpha; only the latest state of the `main` branch is supported. This table will be updated for stable releases (after `v0.1.0`).
+
+## Reporting a vulnerability
+
+**Do not open a public issue, PR or discussion.** Use GitHub's private reporting channel instead:
+
+1. Go to the **Security** tab of the repository.
+2. Create a [private report](https://github.com/Ertugrul-Pakdamar/Usta/security/advisories/new) with **Report a vulnerability**.
+
+Helpful details: the affected version/commit, steps to reproduce (a small example if possible), expected and actual behavior, and your impact assessment. We try to answer reports in a reasonable time and to keep you informed until a fix is released. After the fix is released your contribution is credited publicly, if you wish.
+
+## Scope
+
+**In scope (examples):**
+
+- Bypassing the permission engine: overriding a `deny` rule, defeating an `allow` rule with a compound Bash command, defeating a path rule with a symlink or `..`.
+- Bypassing the project trust gate: repository `allow`/hook/settings running without approval.
+- Leaking secrets (API key, `.env`, key files) to the model, logs, session files or the network.
+- Running commands without approval through hooks or the `Script` tool.
+- Loose permissions on session, checkpoint and output files; path traversal.
+
+**Out of scope:**
+
+- The model giving wrong/made-up answers (hallucination).
+- Known limits explicitly listed as *not guaranteed* on the [permissions page](docs/en/permissions.md#what-is-and-is-not-guaranteed) (for example prefix rules not seeing indirect calls such as `xargs rm`, `Bash` changes not being undoable). Ideas to improve them can be opened as normal issues.
+- Vulnerabilities on the gateway side (report those to the gateway operator).
+- The consequences of a user deliberately enabling `bypass` mode.
+
+## Security design summary
+
+- Every tool call passes through a single permission gate; **`deny` always wins**.
+- Fail closed: when unsure, ask or deny.
+- No telemetry; data only goes to the user's gateway.
+- User data (sessions, outputs, checkpoints) is kept with `0600`/`0700` permissions and the API key is masked before writing.
+
+Details: [docs/en/permissions.md](docs/en/permissions.md), [ADR-0004](docs/en/adr/0004-project-trust-gate.md).

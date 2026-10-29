@@ -13,6 +13,7 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 - Sayı ve tarih biçimleri dile göre (`Intl`): `1.010 CR` / `1,010 CR`, `1 Aralık 2026` / `December 1, 2026`; çoğul biçimleri.
 - Reddedilen araç çağrıları kullanıcıya kendi dilinde gösterilir (`display`), modele İngilizce nedeni gider (`reasonKey`).
 - İngilizce terminal görüntüsü (`docs/assets/demo.en.svg`), ADR-0006.
+- **İngilizce belgeler:** `docs/en/` altında tüm kullanıcı ve katkıcı belgeleri, ADR'ler ve katkı rehberi; `SECURITY.md` ve `CODE_OF_CONDUCT.md` iki dilli.
 
 **M4: Token ekonomisi**
 - Model kaydı (`/v1/models`, diskte 1 saatlik önbellek); kalibre token tahmini ve gateway `count_tokens` ile tam sayım.

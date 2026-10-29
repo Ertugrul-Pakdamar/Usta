@@ -10,7 +10,7 @@ Plan, analyse code, edit files and run commands with **the fewest tokens and the
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%E2%89%A5%2022-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-7-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
-[![Status: alpha](https://img.shields.io/badge/status-alpha-orange.svg)](docs/roadmap.md)
+[![Status: alpha](https://img.shields.io/badge/status-alpha-orange.svg)](docs/en/roadmap.md)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 [Türkçe](README.md) · **English**
@@ -21,7 +21,7 @@ Plan, analyse code, edit files and run commands with **the fewest tokens and the
 
 ---
 
-> The full documentation under [`docs/`](docs/README.md) is currently in Turkish; English documentation arrives with milestone M4.5 (localization). This page summarizes the project.
+> Full documentation: [docs/en](docs/en/README.md) (English) · [docs](docs/README.md) (Turkish). This page summarizes the project.
 
 ## Why usta?
 
@@ -42,7 +42,7 @@ Coding agents are powerful but can be expensive and unsupervised. **usta** tackl
 - **Sessions:** private JSONL files, resume with `usta -c` / `usta -r <id>`.
 - **Localization:** Turkish and English interface (`--lang`, `USTA_LANG`, `/lang`); everything sent to the model stays English regardless of the interface language.
 - **Headless:** `usta -p "..." --output-format json` for CI and scripts, with meaningful exit codes (`0` ok, `1` error, `2` unfinished, `3` budget).
-- **Extensibility:** tools via `@usta/sdk` today; skills, plugins and MCP connectors in [M6](docs/roadmap.md).
+- **Extensibility:** tools via `@usta/sdk` today; skills, plugins and MCP connectors in [M6](docs/en/roadmap.md).
 
 ## Quick start
 
@@ -93,8 +93,8 @@ Measured with `qwen3-vl-30b` on 2026-10-29 using the gateway's own `count_tokens
 
 ## Roadmap
 
-M0–M4 are done (skeleton, core, TUI, security, token economy). M4.5 (localization) is in progress: the interface is done, English documentation is next. Then M5 subagents, M5.5 auto mode, M6 skills/plugins/MCP, M7 single-file binary and v0.1.0. See [docs/roadmap.md](docs/roadmap.md).
+M0–M4 are done (skeleton, core, TUI, security, token economy). M4.5 (localization, incl. English documentation) is done. Next: M5 subagents, M5.5 auto mode, M6 skills/plugins/MCP, M7 single-file binary and v0.1.0. See [docs/roadmap.md](docs/en/roadmap.md).
 
 ## Contributing and license
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Licensed under [Apache-2.0](LICENSE).
+See [CONTRIBUTING](docs/en/contributing.md) ([Turkish](CONTRIBUTING.md)) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Licensed under [Apache-2.0](LICENSE).
