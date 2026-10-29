@@ -30,6 +30,9 @@ Before a request is sent, its size is computed with a **calibrated estimate**: t
 
 ## A cache-friendly prompt
 
+<p align="center"><img src="../assets/chart-payload.en.svg" alt="Fixed payload per request: M1–M3 1,190, end of M4 989, M5 1,281 tokens" width="760"></p>
+
+
 The gateway caches the **prefix** of the prompt (`usage.prompt_tokens_details.cached_tokens`). So the start of the prompt stays **byte-for-byte identical** for the whole session:
 
 - The system prompt is built once per session (date included, at session start).
@@ -80,6 +83,9 @@ or `"budget": {"tokens": 500000, "cr": 5}` in settings. It is checked before eve
 
 ## Script-first: make the same change with one script
 
+<p align="center"><img src="../assets/chart-script-ab.en.svg" alt="Tokens for bulk edits with Script on and off" width="760"></p>
+
+
 When the model would make the same edit in 8 files, it writes one script instead of 8 separate `Edit` calls (each a model turn).
 
 ```mermaid
@@ -111,6 +117,9 @@ Details:
 > **Observation:** A two-tool design (first `Script`, then `ApplyChanges`) was tried with the real model; it did not call the second tool. So approval and applying were merged into one call: [ADR-0003](adr/0003-script-review-in-tool.md).
 
 ## Subagents: protect the main context
+
+<p align="center"><img src="../assets/chart-subagents.en.svg" alt="Main-context and session tokens with subagents" width="760"></p>
+
 
 A wide or multi-step exploration fills the main context with intermediate output, and that output is **billed again on every later request**. The `Task` tool gives such work to a subagent running in its own context; only its report returns to the main context.
 

@@ -99,6 +99,9 @@ Dosyalar şuralardan okunur; **adı aynı olan sonraki, öncekini ezer** (dahili
 
 ## Maliyet: ne zaman kullanmalı?
 
+<p align="center"><img src="assets/chart-subagents.svg" alt="Alt ajanlar iki kenarlı" width="760"></p>
+
+
 Alt ajan bedava değildir: her istekte `Task` ve `TaskOutput` şemaları gider (sabit yük **0.99k → 1.28k token**, ilk istekten sonra önbellekten gelir) ve alt ajanın kendi model turları vardır. Gerçek model (`qwen3-vl-30b`) ile ölçüm, 2026-10-29:
 
 | Senaryo                                        | Ana bağlam (girdi / çıktı) | Oturum toplamı | İstek      |

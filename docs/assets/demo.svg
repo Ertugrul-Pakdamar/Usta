@@ -5,7 +5,7 @@
   <circle cx="22" cy="18" r="6" fill="#ff5f56"/><circle cx="42" cy="18" r="6" fill="#ffbd2e"/><circle cx="62" cy="18" r="6" fill="#27c93f"/>
   <text x="394" y="23" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="12" fill="#6e7681">usta</text>
   <g font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="13" fill="#c9d1d9">
-  <text x="24" y="56" xml:space="preserve"><tspan fill="#56d4dd" font-weight="700">usta</tspan><tspan fill="#6e7681"> v0.0.0 · qwen3-vl-30b · ~/proje</tspan></text>
+  <text x="24" y="56" xml:space="preserve"><tspan fill="#56d4dd" font-weight="700">usta</tspan><tspan fill="#6e7681"> v0.1.0 · qwen3-vl-30b · ~/proje</tspan></text>
   <text x="24" y="96" xml:space="preserve"><tspan fill="#56d4dd">› </tspan><tspan fill="#c9d1d9">page*.txt dosyalarında foo yerine bar yaz</tspan></text>
   <text x="24" y="136" xml:space="preserve"><tspan fill="#3fb950">⏺ </tspan><tspan fill="#c9d1d9" font-weight="700">Glob(page*.txt)</tspan></text>
   <text x="24" y="156" xml:space="preserve"><tspan fill="#6e7681">  ⎿ page1.txt</tspan></text>

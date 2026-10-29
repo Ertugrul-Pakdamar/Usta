@@ -43,24 +43,32 @@ Coding agents are powerful but can be expensive and unsupervised. **usta** tackl
 - **Subagents:** delegate wide exploration to a separate context with `Task` (parallel, background, `/tasks`); built-in `explore`/`plan`/`general` plus your own `agents/*.md`; the same permission gate. Measured: reading a big file through a subagent cut the main context by 60%, but one small search is cheaper inline ([details](docs/en/subagents.md)).
 - **Localization:** Turkish and English interface (`--lang`, `USTA_LANG`, `/lang`); everything sent to the model stays English regardless of the interface language.
 - **Headless:** `usta -p "..." --output-format json` for CI and scripts, with meaningful exit codes (`0` ok, `1` error, `2` unfinished, `3` budget).
+- **Install and sign-in:** a single-file binary (no Node needed); `usta login` takes the gateway address and API key hidden and stores them in `~/.usta/credentials` with 0600.
 - **Extensibility:** tools via `@usta/sdk`, Markdown **skills** and **custom commands** ([docs](docs/en/skills.md)) today; **MCP connectors** ([docs](docs/en/mcp.md)), module **hooks** and **plugins** ([docs](docs/en/plugins.md)) today.
 
 ## Quick start
 
-**Requirements:** Node.js ≥ 22, [pnpm](https://pnpm.io) 12, an EVREN LLM Gateway account. Optional: `python3` (Script tool), `rg` (fast search).
+**One file (recommended):** download the `usta` archive for your platform from the [Releases](https://github.com/Ertugrul-Pakdamar/Usta/releases) page; **no Node.js needed**.
 
 ```sh
-git clone https://github.com/Ertugrul-Pakdamar/Usta.git
-cd Usta
-pnpm install && pnpm build
-
-cp .env.example .env        # fill in EVREN_API_KEY and EVREN_BASE_URL
-pnpm usta doctor            # connectivity, key, terms status, quota
-pnpm usta terms accept      # read and accept the gateway terms yourself (never automatic)
-pnpm usta                   # interactive session
+tar -xzf usta-linux-x64.tar.gz && sudo mv usta /usr/local/bin/
+usta login        # gateway address and API key (the key is not echoed); asked automatically on first run
+usta doctor       # connectivity, key, terms status, quota
+usta terms        # read the gateway terms
+usta terms accept # ... and accept them yourself (never automatic)
+usta              # interactive session
 ```
 
-Run `usta` from anywhere with `cd packages/cli && npm link`.
+**From source** (development): with Node.js ≥ 22 and [pnpm](https://pnpm.io) 12:
+
+```sh
+git clone https://github.com/Ertugrul-Pakdamar/Usta.git && cd Usta
+pnpm install && pnpm build
+pnpm usta login   # or: cp .env.example .env and fill it in
+pnpm usta
+```
+
+Optional: `python3` (Script tool), `rg` (fast search). Details: [Getting started](docs/en/getting-started.md).
 
 ## Usage
 
@@ -84,6 +92,12 @@ Measured with `qwen3-vl-30b` on 2026-10-29 using the gateway's own `count_tokens
 | Share served from the prompt cache on a second request       | **49% – 97%** depending on the workload                                      |
 | Same change in 8 files                                       | 3 model turns, one script, 3.8k prompt tokens (64% cached)                   |
 
+<p align="center"><img src="docs/assets/chart-script-ab.en.svg" alt="Script cuts the tokens of bulk edits by 56%" width="720"></p>
+
+<p align="center"><img src="docs/assets/chart-subagents.en.svg" alt="Subagents cut both ways" width="720"></p>
+
+Details and method: [Token economy](docs/en/token-economy.md). Real A/B results: [Evaluation report](docs/en/evals.md).
+
 ## Security model
 
 - Every tool call goes through the permission engine; **deny always wins**, even in `bypass` mode.
@@ -94,7 +108,9 @@ Measured with `qwen3-vl-30b` on 2026-10-29 using the gateway's own `count_tokens
 
 ## Roadmap
 
-M0–M6 are done (skeleton, core, TUI, security, token economy, localization, subagents, auto mode, skills, MCP, plugins). Next: M7 single-file binary and v0.1.0. See [docs/en/roadmap.md](docs/en/roadmap.md).
+<p align="center"><img src="docs/assets/roadmap.en.svg" alt="Roadmap: M0–M7 done" width="720"></p>
+
+All stages M0–M7 are done (skeleton, core, TUI, security, token economy, localization, subagents, auto mode, skills, MCP, plugins, `@file`, evals, single-file binary). `v0.1.0` is ready to be tagged. See [docs/en/roadmap.md](docs/en/roadmap.md).
 
 ## Contributing and license
 

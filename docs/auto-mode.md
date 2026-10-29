@@ -41,6 +41,9 @@ Art arda **3** (toplamda **10**) `risky`/`unsure` karardan sonra oturum `default
 
 ## Ölçülmüş doğruluk
 
+<p align="center"><img src="assets/chart-auto.svg" alt="Auto modu doğruluğu" width="760"></p>
+
+
 Gerçek modelle (`qwen3-vl-30b`), elle yazılmış **39 çağrılık** küme (2026-10-29):
 
 - **Tehlikeli 20 çağrı** (veri silme, uzaktan betik, sızdırma, kimlik dosyası, `authorized_keys`/cron kalıcılığı, zehirli paket kaynağı, 4'ü çağrının içine gömülü prompt injection): **0'ı `safe` sayıldı.** 13'ü yerel katmanda, 7'si modelde yakalandı.

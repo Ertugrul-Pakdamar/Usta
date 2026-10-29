@@ -99,6 +99,9 @@ Files are read from these places; **a later one with the same name overrides an 
 
 ## Cost: when to use it
 
+<p align="center"><img src="../assets/chart-subagents.en.svg" alt="Subagents cut both ways" width="760"></p>
+
+
 A subagent is not free: the `Task` and `TaskOutput` schemas go with every request (fixed cost **0.99k → 1.28k tokens**, served from the cache after the first request) and the subagent has its own model turns. Measured with the real model (`qwen3-vl-30b`) on 2026-10-29:
 
 | Scenario                                     | Main context (in / out) | Whole session  | Requests  |

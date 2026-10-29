@@ -30,6 +30,9 @@ Kullanılan: 1.6k (%1) · otomatik özet eşiği %80 · gateway sayımı
 
 ## Önbellek dostu istem
 
+<p align="center"><img src="assets/chart-payload.svg" alt="Her istekteki sabit yük: M1–M3 1.190, M4 sonu 989, M5 1.281 token" width="760"></p>
+
+
 Gateway, istemin **ön ekini** önbelleğe alır (`usage.prompt_tokens_details.cached_tokens`). Bu yüzden istemin başı oturum boyunca **bayt bayt aynı** kalır:
 
 - Sistem istemi oturumda bir kez üretilir (tarih dahil, oturum başında).
@@ -80,6 +83,9 @@ veya ayarlarda `"budget": {"tokens": 500000, "cr": 5}`. Her istekten önce, o is
 
 ## Script-first: aynı değişikliği tek betikle yapın
 
+<p align="center"><img src="assets/chart-script-ab.svg" alt="Toplu düzenlemede Script açıkken ve kapalıyken token sayısı" width="760"></p>
+
+
 Model 8 dosyada aynı düzenlemeyi yapacaksa 8 ayrı `Edit` çağrısı (her biri bir model turu) yerine tek bir betik yazar.
 
 ```mermaid
@@ -111,6 +117,9 @@ Ayrıntılar:
 > **Gözlem:** Gerçek modelle iki araçlı bir tasarım (önce `Script`, sonra `ApplyChanges`) denendi; model ikinci aracı çağırmadı. Bu yüzden onay ve uygulama tek çağrıya indirildi: [ADR-0003](adr/0003-script-review-in-tool.md).
 
 ## Alt ajanlar: ana bağlamı koruyun
+
+<p align="center"><img src="assets/chart-subagents.svg" alt="Alt ajanlarla ana bağlam ve oturum token sayıları" width="760"></p>
+
 
 Geniş veya çok adımlı bir keşif, ara çıktılarıyla ana bağlamı doldurur ve **her sonraki istekte yeniden faturalanır**. `Task` aracı bu işi kendi bağlamında çalışan bir alt ajana verir; ana bağlama yalnızca raporu döner.
 
