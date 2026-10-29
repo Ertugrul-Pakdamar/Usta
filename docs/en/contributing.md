@@ -22,7 +22,7 @@ _Turkish version: [CONTRIBUTING.md](../../CONTRIBUTING.md)._
 - For **small fixes** (a typo, docs, an obvious bug) you can open a PR directly.
 - For a **new feature or a behavior change** open an [issue](https://github.com/Ertugrul-Pakdamar/Usta/issues/new/choose) first, so your effort does not go in a direction that conflicts with the [roadmap](roadmap.md).
 - **Found a security vulnerability?** Do not open a public issue; see [SECURITY.md](../../SECURITY.md).
-- To see what you can work on look at the `good first issue` and `help wanted` labels and at the next milestone in the [roadmap](roadmap.md).
+- To see what you can work on look at the `good first issue` and `help wanted` labels at the [roadmap](roadmap.md) and at the [candidate work list](comparison.md#next-steps-candidate-list) (N1–N12).
 
 ## Development environment
 
