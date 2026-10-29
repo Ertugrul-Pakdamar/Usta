@@ -4,6 +4,7 @@ usta'nın "daha az token" iddiasını tahminle değil **ölçümle** göstermek 
 
 ## Yöntem
 
+> Aynı eval paketiyle usta ile **Claude Code'u aynı modelde** karşılaştırdık: [Claude Code ile aynı modelde karşılaştırma](vs-claude-code.md).
 - **Model:** `qwen3-vl-30b` (gateway'in tek modeli); tüm koşular 2026-10-29.
 - **9 görev**, her biri temp dizinde taze bir projeyle başlar ve **otomatik denetlenir** (dosya içeriği, çalıştırılan test, cevap metni). Görevler: 4 toplu düzenleme (12 dosyada yeniden adlandırma, 15 dosyaya başlık, 10 JSON'da sürüm, CSV→JSON), hata düzeltme, özellik ekleme, sıfırdan betik yazma, kod tabanında cevap bulma, 700 satırlık günlükte sayım.
 - **İki varyant:** `baseline` (tüm araçlar) ve `no-script` (`--disable-tools Script`; sistem isteminden ve ipuçlarından Script de çıkar). Her görev × varyant **3 kez** koşuldu (54 koşu). Koşular `-y` (bypass) ile yalıtılmış temp dizinde yapıldı.

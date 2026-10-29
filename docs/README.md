@@ -4,19 +4,20 @@ Bu dizin hem kullanıcılar hem katkıcılar içindir. Proje alfa aşamasındad�
 
 ## Kullanıcılar için
 
-| Belge                                 | İçerik                                                                                    |
-| ------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [Başlangıç](getting-started.md)       | Kurulum, yapılandırma, kullanım şartları, ilk oturum, headless kullanım                   |
-| [Yapılandırma](configuration.md)      | Ortam değişkenleri, ayar dosyaları ve katmanları, tüm CLI bayrakları, `~/.usta` içeriği   |
-| [İzinler ve güvenlik](permissions.md) | Modlar, kural sözdizimi, Bash güvenliği, proje güven kapısı, plan modu, hook'lar, rewind  |
-| [Token ekonomisi](token-economy.md)   | Maliyet görünürlüğü, önbellek, çıktı sınırlama, özetleme, bütçe, Script-first             |
-| [Plugin'ler](plugins.md)              | `usta-plugin.json`, kurulum, onay ve bütünlük, örnekler                                   |
-| [Değerlendirme raporu](evals.md)      | Script A/B ölçümü: yöntem, sonuç, bulunan hatalar, sınırlar                               |
-| [MCP connector'ları](mcp.md)          | `usta mcp`, yapılandırma, token maliyeti, güvenlik                                        |
-| [Skill'ler ve komutlar](skills.md)    | `SKILL.md`, `commands/*.md`, aşamalı yükleme, güven kapısı                                |
-| [Auto modu](auto-mode.md)             | Sınıflandırıcı destekli izin modu, yerel katman, devre kesici, denetim, ölçülmüş doğruluk |
-| [Alt ajanlar](subagents.md)           | `Task`, dahili ve özel ajanlar, arka plan görevleri, izinler, ölçülmüş maliyet            |
-| [Sorun giderme](troubleshooting.md)   | Sık karşılaşılan hatalar ve çözümleri                                                     |
+| Belge                                                           | İçerik                                                                                    |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [Başlangıç](getting-started.md)                                 | Kurulum, yapılandırma, kullanım şartları, ilk oturum, headless kullanım                   |
+| [Yapılandırma](configuration.md)                                | Ortam değişkenleri, ayar dosyaları ve katmanları, tüm CLI bayrakları, `~/.usta` içeriği   |
+| [İzinler ve güvenlik](permissions.md)                           | Modlar, kural sözdizimi, Bash güvenliği, proje güven kapısı, plan modu, hook'lar, rewind  |
+| [Token ekonomisi](token-economy.md)                             | Maliyet görünürlüğü, önbellek, çıktı sınırlama, özetleme, bütçe, Script-first             |
+| [Plugin'ler](plugins.md)                                        | `usta-plugin.json`, kurulum, onay ve bütünlük, örnekler                                   |
+| [Claude Code ile aynı modelde karşılaştırma](vs-claude-code.md) | Başarı ve token: usta %91, Claude Code %80; 13,5× az token; yöntem, ham veri, sınırlar    |
+| [Değerlendirme raporu](evals.md)                                | Script A/B ölçümü: yöntem, sonuç, bulunan hatalar, sınırlar                               |
+| [MCP connector'ları](mcp.md)                                    | `usta mcp`, yapılandırma, token maliyeti, güvenlik                                        |
+| [Skill'ler ve komutlar](skills.md)                              | `SKILL.md`, `commands/*.md`, aşamalı yükleme, güven kapısı                                |
+| [Auto modu](auto-mode.md)                                       | Sınıflandırıcı destekli izin modu, yerel katman, devre kesici, denetim, ölçülmüş doğruluk |
+| [Alt ajanlar](subagents.md)                                     | `Task`, dahili ve özel ajanlar, arka plan görevleri, izinler, ölçülmüş maliyet            |
+| [Sorun giderme](troubleshooting.md)                             | Sık karşılaşılan hatalar ve çözümleri                                                     |
 
 ## Katkıcılar için
 

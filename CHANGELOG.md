@@ -4,6 +4,10 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 
 ## [Yayımlanmamış]
 
+### Eklendi
+
+- **Aynı modelde Claude Code ile karşılaştırma:** `qwen3-vl-30b` ile 10 görev × 3 tekrar: usta %91 ↔ Claude Code %80 başarı, çalıştırma başına **13,5× daha az token** (önbelleksiz 7,9×). Ham veri `evals/results/*-claude-code-*.jsonl`, koşturucu `evals/run-claude-code.mjs`, tablo `evals/compare.mjs`, grafik, `docs/vs-claude-code.md` (TR/EN) ve README'lerde vurgu. Sınırlar (ev sahibi avantajı, küçük örneklem, farklı izin modları, sonradan düzeltilen tur sınırı, tek model) belgede açıkça yazılı.
+
 ## [0.1.1] — 2026-10-29
 
 ### Düzeltildi

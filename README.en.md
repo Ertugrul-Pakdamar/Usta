@@ -6,6 +6,10 @@
 
 Plan, analyse code, edit files and run commands with **the fewest tokens and the least effort**.
 
+#### 🏆 Higher success than Claude Code on the same model, ~13× fewer tokens
+
+With `qwen3-vl-30b` on our own eval set: **91% vs 80% success** and **13.5× fewer tokens** per run — [method, raw data and limits](docs/en/vs-claude-code.md)
+
 [![CI](https://github.com/Ertugrul-Pakdamar/Usta/actions/workflows/ci.yml/badge.svg)](https://github.com/Ertugrul-Pakdamar/Usta/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%E2%89%A5%2022-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
@@ -27,7 +31,9 @@ Plan, analyse code, edit files and run commands with **the fewest tokens and the
 
 Coding agents are powerful but can be expensive and unsupervised. **usta** tackles three things together:
 
-- **Token economy is a feature, not an afterthought.** A stable prompt prefix lets the gateway cache 50–95% of the prompt; large tool output goes to disk instead of the context; the context is summarized automatically when it fills; and when the same change is needed in many files the model writes one script.
+<p align="center"><img src="docs/assets/chart-vs-claude-code.en.svg" alt="usta and Claude Code on the same model: success 91% vs 80%, 13.5x fewer tokens" width="720"></p>
+
+- **Token economy is a feature, not an afterthought.** Measured against Claude Code on the same model: **13.5× fewer tokens and higher success** ([report](docs/en/vs-claude-code.md)). A stable prompt prefix lets the gateway cache 50–95% of the prompt; large tool output goes to disk instead of the context; the context is summarized automatically when it fills; and when the same change is needed in many files the model writes one script.
 - **Safe by default.** Every tool call passes a permission gate: rules, plan mode, diff-based approval, protected paths, hooks. Settings that ship inside a repository do not take effect until you approve them.
 - **Built for sensitive environments.** No telemetry, data only goes to your own EVREN gateway, needs nothing but access to your gateway, secret files are hidden from the model by default.
 

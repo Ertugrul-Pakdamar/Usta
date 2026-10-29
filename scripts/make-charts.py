@@ -141,6 +141,38 @@ T = {
 }
 
 
+def vs_claude_code(lang):
+    """usta vs Claude Code on the same model; numbers come from `node evals/compare.mjs --json`."""
+    import subprocess
+
+    data = json.loads(subprocess.check_output(["node", str(ROOT / "evals/compare.mjs"), "--json"], cwd=ROOT))
+    o = data["overall"]
+    tr = lang == "tr"
+    title = "Aynı modelde Claude Code'a karşı: daha yüksek başarı, 13 kat az token" if tr else "Against Claude Code on the same model: higher success, 13× fewer tokens"
+    sub = "qwen3-vl-30b · 10 görev × 3 tekrar · kendi eval setimiz, sınırları docs/vs-claude-code.md'de" if tr else "qwen3-vl-30b · 10 tasks × 3 runs · our own eval set, limits in docs/en/vs-claude-code.md"
+    svg = Svg(820, 330, title, sub)
+    svg.header(title, sub)
+    svg.legend(28, 88, [("usta", GREEN), ("Claude Code", MUTED)])
+    panels = [
+        ("Başarı" if tr else "Success", o["usta"]["ok"] / o["usta"]["n"] * 100, o["cc"]["ok"] / o["cc"]["n"] * 100, lambda v: f"%{round(v)}" if tr else f"{round(v)}%", 100),
+        ("Çalıştırma başına token" if tr else "Tokens per run", o["usta"]["tokensPerRun"], o["cc"]["tokensPerRun"], lambda v: fmt(v, lang), None),
+        ("  önbelleksiz" if tr else "  uncached", o["usta"]["freshPerRun"], o["cc"]["freshPerRun"], lambda v: fmt(v, lang), None),
+    ]
+    y = 112
+    for label, a, b, f, vmax in panels:
+        vmax = vmax or max(a, b)
+        scale = 330 / vmax
+        svg.text(28, y + 31, label, 13, TEXT, weight="600")
+        svg.rect(250, y, a * scale, 20, GREEN)
+        svg.text(250 + a * scale + 8, y + 15, f(a), 12, TEXT, mono=True)
+        svg.rect(250, y + 24, b * scale, 20, MUTED)
+        svg.text(250 + b * scale + 8, y + 39, f(b), 12, TEXT, mono=True)
+        y += 62
+    ratio = f"{o['tokenRatio']:.1f}".replace(".", ",") if tr else f"{o['tokenRatio']:.1f}"
+    svg.text(792, 204, f"{ratio}× " + ("az token" if tr else "fewer tokens"), 15, GREEN, anchor="end", weight="700")
+    svg.save(f"chart-vs-claude-code{'' if tr else '.en'}.svg")
+
+
 def script_ab(lang):
     t = T[lang]
     rows_data = [json.loads(line) for line in (ROOT / "evals/results/2026-10-29-final.jsonl").read_text().splitlines()]
@@ -233,6 +265,7 @@ if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
     for lang in ("tr", "en"):
         script_ab(lang)
+        vs_claude_code(lang)
         payload(lang)
         subagents(lang)
         auto(lang)
