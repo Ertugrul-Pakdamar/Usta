@@ -1,6 +1,6 @@
 {
   "name": "@usta/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "usta: a token-aware, permission-gated terminal coding agent for the EVREN LLM Gateway.",
   "type": "module",
   "license": "Apache-2.0",

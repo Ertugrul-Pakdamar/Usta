@@ -1,6 +1,6 @@
 name: Release
 
-# Push a tag like v0.1.0 to publish single-file binaries for Linux, macOS and Windows.
+# Push a tag like v0.1.1 to publish single-file binaries for Linux, macOS and Windows.
 on:
   push:
     tags: ["v*"]

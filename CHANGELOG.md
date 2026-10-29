@@ -1,6 +1,6 @@
 # Değişiklik günlüğü
 
-Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, sürümleme [Anlamsal Sürümleme](https://semver.org/lang/tr/) kurallarını izler. `0.1.0` hazırdır ve `v0.1.0` etiketiyle yayımlanır; proje alfa aşamasındadır.
+Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, sürümleme [Anlamsal Sürümleme](https://semver.org/lang/tr/) kurallarını izler. `0.1.1` hazırdır ve `v0.1.1` etiketiyle yayımlanır; proje alfa aşamasındadır.
 
 ## [Yayımlanmamış]
 
