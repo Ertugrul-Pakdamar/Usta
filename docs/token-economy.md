@@ -36,12 +36,12 @@ Gateway, istemin **ön ekini** önbelleğe alır (`usage.prompt_tokens_details.c
 - Araç listesi sabittir. `ExitPlanMode` yalnızca plan modunda listeye girer; mod değişince tek seferlik önbellek kaçırılır.
 - Moda bağlı uyarı (plan modu) sistem istemine değil, isteğin **sonuna** geçici bir mesaj olarak eklenir ve geçmişe kaydedilmez.
 
-| Ölçüm                              | Sonuç                                      |
-| ---------------------------------- | ------------------------------------------ |
-| Sabit yük (sistem + 8 araç şeması) | **1.07k token** (iyileştirme öncesi 1.19k) |
-| 2 istekli bir tur                  | önbellekten %49                            |
-| 3 istekli Script turu              | %64                                        |
-| 6 istekli oturum (`/cost`)         | %97                                        |
+| Ölçüm                              | Sonuç                                                                             |
+| ---------------------------------- | --------------------------------------------------------------------------------- |
+| Sabit yük (sistem + 7 araç şeması) | **0.99k token** (iyileştirme öncesi 1.19k); alt ajan araçları (M5) +0.29k → 1.28k |
+| 2 istekli bir tur                  | önbellekten %49                                                                   |
+| 3 istekli Script turu              | %64                                                                               |
+| 6 istekli oturum (`/cost`)         | %97                                                                               |
 
 Sabit yükün azaltılması: araç açıklamaları kısa İngilizce (Türkçe daha çok token tüketir), JSON şemasından gereksiz alanlar atılır (`additionalProperties:false`, güvenli-tamsayı sınırları; argümanları zaten kendimiz doğruluyoruz).
 
@@ -110,6 +110,19 @@ Ayrıntılar:
 >
 > **Gözlem:** Gerçek modelle iki araçlı bir tasarım (önce `Script`, sonra `ApplyChanges`) denendi; model ikinci aracı çağırmadı. Bu yüzden onay ve uygulama tek çağrıya indirildi: [ADR-0003](adr/0003-script-review-in-tool.md).
 
+## Alt ajanlar: ana bağlamı koruyun
+
+Geniş veya çok adımlı bir keşif, ara çıktılarıyla ana bağlamı doldurur ve **her sonraki istekte yeniden faturalanır**. `Task` aracı bu işi kendi bağlamında çalışan bir alt ajana verir; ana bağlama yalnızca raporu döner.
+
+| Senaryo (gerçek model, 2026-10-29)     | Ana bağlam (girdi) | Oturum toplamı (girdi + çıktı) |
+| -------------------------------------- | ------------------ | ------------------------------ |
+| Büyük dosyayı oku ve özetle, satır içi | 7406               | 7610                           |
+| Aynısı `Task(explore)` ile             | **2973** (−%60)    | **5925**                       |
+| Tek küçük `grep`, satır içi            | 3316               | 3440                           |
+| Aynısı `Task(explore)` ile             | 3545               | **6268** (daha pahalı)         |
+
+Devretmek büyük/çok adımlı işte ana bağlamı küçültür ve toplamda bile ucuz olabilir; **küçük tek bir arama için daha pahalıdır**. Ayrıca `Task` + `TaskOutput` şemaları sabit yüke ~0.29k token ekler (0.99k → 1.28k; önbellekten gelir). Ayrıntı ve sınırlar: [Alt ajanlar](subagents.md#maliyet-ne-zaman-kullanmalı).
+
 ## Model yönlendirme
 
-`models.main` (ana iş) ve `models.fast` (özet gibi hafif işler) ayrı ayarlanabilir; ikisi de varsayılan olarak `EVREN_DEFAULT_MODEL`'dir. Gateway'de şu an tek model olduğundan `fast` yalnızca özetlemede kullanılır; gerçek yönlendirme (arama/keşif subagent'ları) [M5](roadmap.md) ile gelir.
+`models.main` (ana iş) ve `models.fast` (özet ve `explore` alt ajanı gibi hafif işler) ayrı ayarlanabilir; ikisi de varsayılan olarak `EVREN_DEFAULT_MODEL`'dir. Gateway'de şu an tek model olduğundan fark henüz etkisizdir, ama yönlendirme bağlıdır: ikinci bir model eklendiğinde `explore` ve özetleme otomatik olarak ona gider.

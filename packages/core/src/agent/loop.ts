@@ -63,6 +63,13 @@ export interface AgentOptions {
   onEvent?: (event: AgentEvent) => void;
   /** Called for every assistant/tool message the run produces (e.g. to persist it). */
   onMessage?: (message: Message) => void;
+  /**
+   * Messages to add to the conversation at the start of each turn, e.g. "a background task
+   * finished". They are stored like any other message (and reported through `onMessage`).
+   */
+  pendingMessages?: () => Message[];
+  /** Receives `ctx.progress` reports of long-running tools. */
+  onToolProgress?: (call: ToolCall, text: string) => void;
 }
 
 export interface AgentResult {
@@ -154,6 +161,9 @@ async function execute(
         review: opts.review
           ? (req) => (opts.review as NonNullable<typeof opts.review>)(tool, call, req)
           : undefined,
+        progress: opts.onToolProgress
+          ? (text) => (opts.onToolProgress as NonNullable<typeof opts.onToolProgress>)(call, text)
+          : undefined,
       }),
       isError: false,
     };
@@ -194,6 +204,7 @@ export async function runAgent(
   for (let turn = 1; turn <= maxTurns; turn++) {
     if (opts.signal?.aborted)
       return { messages, text, turns: turn - 1, usage, stopReason: "aborted" };
+    for (const pending of opts.pendingMessages?.() ?? []) push(pending);
 
     if (history[0]?.role !== "system") messages[0] = { role: "system", content: systemOf() };
     const tools = toolsOf();

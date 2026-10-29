@@ -33,7 +33,7 @@ If the decision is "ask" and no interactive approval exists (`-p` with no termin
 
 ## Rule syntax
 
-`Tool` or `Tool(specifier)`. Tool names: `Read` `Write` `Edit` `Glob` `Grep` `Bash` `Script` `ExitPlanMode`.
+`Tool` or `Tool(specifier)`. Tool names: `Read` `Write` `Edit` `Glob` `Grep` `Bash` `Script` `Task` `TaskOutput` `ExitPlanMode`.
 
 ```
 Bash                       every Bash call
@@ -43,6 +43,7 @@ Read(.env)                 .env in any directory
 Edit(src/**)               every file under src/
 Read(~/.ssh/**)            a path in the home directory
 Script(python)             python scripts
+Task(general)              delegating to the general subagent
 ```
 
 **Path specifiers** work like gitignore: a pattern without `/` (`.env`) matches by name in any directory; a pattern with `/` is relative to the working directory; `~/` is the home directory; a directory name covers everything inside it. Paths are compared **with symlinks resolved**: a `harmless.txt` that points to `.env` is caught by a `Read(.env)` rule too.
@@ -88,13 +89,14 @@ The plan-mode reminder is added to the **end** of the prompt (so the cacheable p
 
 Hooks are shell commands run at certain points of the lifecycle.
 
-| Event              | When                                                   | Can block          |
-| ------------------ | ------------------------------------------------------ | ------------------ |
-| `PreToolUse`       | Before a tool runs (after the permission rules passed) | yes                |
-| `PostToolUse`      | After a tool ran                                       | no (adds feedback) |
-| `UserPromptSubmit` | When the user submits a prompt                         | yes                |
-| `SessionStart`     | At the first prompt of a session                       | no (adds context)  |
-| `Stop`             | When the model finishes a turn                         | no                 |
+| Event              | When                                                                    | Can block          |
+| ------------------ | ----------------------------------------------------------------------- | ------------------ |
+| `PreToolUse`       | Before a tool runs (after the permission rules passed)                  | yes                |
+| `PostToolUse`      | After a tool ran                                                        | no (adds feedback) |
+| `UserPromptSubmit` | When the user submits a prompt                                          | yes                |
+| `SessionStart`     | At the first prompt of a session                                        | no (adds context)  |
+| `Stop`             | When the model finishes a turn                                          | no                 |
+| `SubagentStop`     | When a subagent finishes (with `agent`, `description`, `result` fields) | no                 |
 
 **Protocol.** The command gets one line of JSON on stdin and `USTA_PROJECT_DIR` in its environment:
 
@@ -129,6 +131,10 @@ if [[ "$cmd" == *"git push"*"--force"* ]]; then
   exit 2
 fi
 ```
+
+## Subagents
+
+Subagents go through **the same gate**: the mode (plan mode included), rules, hooks and checkpoints apply to every tool they use; you can restrict which agents may be used with `Task(agent)` rules. Even when many subagents ask at once, only one approval box is open at a time; background tasks cannot ask, so a call that needs approval is denied. Details: [Subagents](subagents.md#permissions-and-approval).
 
 ## Checkpoints and `/rewind`
 

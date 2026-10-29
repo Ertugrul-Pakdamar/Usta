@@ -37,9 +37,10 @@ Coding agents are powerful but can be expensive and unsupervised. **usta** tackl
 - **Planning:** read-only plan mode → plan approval with `ExitPlanMode` → implementation; ⇧Tab cycles modes.
 - **Permissions:** `default` · `acceptEdits` · `plan` · `bypass`; rules such as `Bash(git status:*)`, `Edit(src/**)`, `Read(.env)`; layered settings; project trust gate.
 - **Undo:** a checkpoint before every Write/Edit/Script; `/rewind N` restores files **and** the conversation.
-- **Hooks:** `PreToolUse` `PostToolUse` `UserPromptSubmit` `SessionStart` `Stop`.
+- **Hooks:** `PreToolUse` `PostToolUse` `UserPromptSubmit` `SessionStart` `Stop` `SubagentStop`.
 - **Token economy:** `/cost` `/context` `/compact`, budgets (`--budget`, `--token-budget`), cache-friendly prompts, output limiter, read cache.
 - **Sessions:** private JSONL files, resume with `usta -c` / `usta -r <id>`.
+- **Subagents:** delegate wide exploration to a separate context with `Task` (parallel, background, `/tasks`); built-in `explore`/`plan`/`general` plus your own `agents/*.md`; the same permission gate. Measured: reading a big file through a subagent cut the main context by 60%, but one small search is cheaper inline ([details](docs/en/subagents.md)).
 - **Localization:** Turkish and English interface (`--lang`, `USTA_LANG`, `/lang`); everything sent to the model stays English regardless of the interface language.
 - **Headless:** `usta -p "..." --output-format json` for CI and scripts, with meaningful exit codes (`0` ok, `1` error, `2` unfinished, `3` budget).
 - **Extensibility:** tools via `@usta/sdk` today; skills, plugins and MCP connectors in [M6](docs/en/roadmap.md).
@@ -77,11 +78,11 @@ usta --budget 5 --token-budget 200k
 
 Measured with `qwen3-vl-30b` on 2026-10-29 using the gateway's own `count_tokens` and `usage`:
 
-| Measurement                                                  | Value                                                          |
-| ------------------------------------------------------------ | -------------------------------------------------------------- |
-| Fixed cost of every request (system prompt + 8 tool schemas) | **~1.07k tokens** (was 1.19k before M4, despite two new tools) |
-| Share served from the prompt cache on a second request       | **49% – 97%** depending on the workload                        |
-| Same change in 8 files                                       | 3 model turns, one script, 3.8k prompt tokens (64% cached)     |
+| Measurement                                                  | Value                                                                        |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| Fixed cost of every request (system prompt + 7 tool schemas) | **~0.99k tokens** (was 1.19k before M4); ~1.28k with the subagent tools (M5) |
+| Share served from the prompt cache on a second request       | **49% – 97%** depending on the workload                                      |
+| Same change in 8 files                                       | 3 model turns, one script, 3.8k prompt tokens (64% cached)                   |
 
 ## Security model
 
@@ -93,7 +94,7 @@ Measured with `qwen3-vl-30b` on 2026-10-29 using the gateway's own `count_tokens
 
 ## Roadmap
 
-M0–M4 are done (skeleton, core, TUI, security, token economy). M4.5 (localization, incl. English documentation) is done. Next: M5 subagents, M5.5 auto mode, M6 skills/plugins/MCP, M7 single-file binary and v0.1.0. See [docs/roadmap.md](docs/en/roadmap.md).
+M0–M5 are done (skeleton, core, TUI, security, token economy, localization, subagents). Next: M5.5 auto mode, M6 skills/plugins/MCP, M7 single-file binary and v0.1.0. See [docs/en/roadmap.md](docs/en/roadmap.md).
 
 ## Contributing and license
 

@@ -111,6 +111,18 @@ The permission engine (`permissions.ts`) behaves like a pure function: the same 
 
 The UI (`cli`) builds `Economy` and wires its callbacks (`callbacks`) to its own needs (show a warning, ask about the budget, save a summary). The accounting logic is in the core, not in the UI.
 
+## Subagents
+
+Under `core/src/agents`: `definitions.ts` (built-in and custom `agents/*.md` agents, trust digest), `runner.ts` (`runSubagent`: `runAgent` in a fresh context), `manager.ts` (`TaskManager`: queue, concurrency, background, notices) and `task-tool.ts` (`Task`, `TaskOutput`).
+
+- **Isolation:** A subagent's messages, tool list (`resolveAgentTools`), state (`state`) and read cache belong to it; only the `formatReport` output returns to the main conversation.
+- **Shared gate:** `runSubagent` builds `createToolGate`/`createReviewer` with the same `PermissionEngine`; in the background no `ask` is given, so a call that needs approval is denied. Foreground questions are collected into one queue with `serializeAsk`.
+- **Concurrency:** `TaskManager` uses a counting semaphore (at most 3) and a separate lock (1) for writer-capable agents.
+- **Cost:** `Economy.trackSubagentUsage` adds usage to the session totals but does not touch the main context's measurement; `subagentGuard` checks the budget.
+- **Delivery:** A finished background task is added to the conversation through `pendingMessages` at the start of the next turn via `drainNotices()`.
+
+Reasoning and measurements: [ADR-0007](adr/0007-subagents.md).
+
 ## Localization (i18n)
 
 Every piece of text in usta falls into **one of two classes**, and this split is the foundation of the design:
@@ -162,7 +174,7 @@ The loader replays the lines in order; it ignores a half-written last line and d
 | Interface        | `ink-testing-library`: keystrokes are sent, screen text is awaited. Text and Enter are written separately (because of paste handling)                                                            |
 | Real environment | Unit tests cannot catch layout bugs, so interface changes are also verified by hand in a **pty** against the real gateway (example: the banner truncation on a long path was only seen that way) |
 
-No test needs a real API key or the network; gateway calls are tested with a fake `fetch`.
+When the main agent and a subagent share one fake provider the order of requests races; tests route requests by system prompt. No test needs a real API key or the network; gateway calls are tested with a fake `fetch`.
 
 ## Design principles
 

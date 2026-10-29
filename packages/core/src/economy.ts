@@ -114,6 +114,43 @@ export class Economy {
     return this.opts.registry.get(this.modelId);
   }
 
+  /** The cheaper model (summaries, exploration subagents). */
+  get fastModelId(): string {
+    return this.opts.fastModel?.() ?? this.modelId;
+  }
+
+  /** `fast` / `main` / a concrete model id → the model id to call. */
+  resolveModel(choice: string): string {
+    return choice === "fast" ? this.fastModelId : choice === "main" ? this.modelId : choice;
+  }
+
+  /**
+   * Counts a subagent's usage in the session totals (cost, cache) WITHOUT touching the
+   * main conversation's context measurement: a subagent has its own context window.
+   */
+  trackSubagentUsage(usage: Usage, modelId: string): void {
+    this.tracker.add(usage, this.opts.registry.get(modelId));
+  }
+
+  /**
+   * `beforeRequest` for subagents: they cannot ask the user, so an exceeded budget simply
+   * stops them (unless the user already agreed to go over it in the main conversation).
+   */
+  subagentGuard = async (info: { messages: Message[]; tools: ToolSpec[] }) => {
+    if (!this.opts.budget || this.budgetAllowed) return undefined;
+    const projected = this.estimator.messages(info.messages) + this.estimator.tools(info.tools);
+    const check = checkBudget(this.opts.budget, this.tracker, projected, this.model);
+    if (check.level === "exceeded") {
+      throw new BudgetExceededError(
+        t(check.kind === "cr" ? "economy.budgetExceededCr" : "economy.budgetExceededTokens", {
+          limit: formatNumber(check.limit ?? 0),
+          projected: formatNumber(projected, 0),
+        }),
+      );
+    }
+    return undefined;
+  };
+
   /** Fraction of the window at which history is compacted. */
   get compactAt(): number {
     return this.opts.compactAt ?? 0.8;

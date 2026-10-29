@@ -42,7 +42,8 @@ type Line =
 
 const dirOf = (home: string) => join(home, ".usta", "sessions");
 
-function mask(json: string): string {
+/** Replaces the API key in text that is about to be written to disk. */
+export function maskSecrets(json: string): string {
   const key = process.env.EVREN_API_KEY;
   return key && key.length >= 8 ? json.split(key).join("***") : json;
 }
@@ -64,7 +65,7 @@ export function createSession(cwd: string, model: string, home = homedir()): Ses
 export function appendMessage(session: Session, message: Message): void {
   appendFileSync(
     session.path,
-    `${mask(JSON.stringify({ type: "message", message } satisfies Line))}\n`,
+    `${maskSecrets(JSON.stringify({ type: "message", message } satisfies Line))}\n`,
   );
 }
 
@@ -76,7 +77,7 @@ export function truncateSession(session: Session, length: number): void {
 export function appendCompaction(session: Session, summary: string, keepFrom: number): void {
   appendFileSync(
     session.path,
-    `${mask(JSON.stringify({ type: "compact", summary, keepFrom } satisfies Line))}\n`,
+    `${maskSecrets(JSON.stringify({ type: "compact", summary, keepFrom } satisfies Line))}\n`,
   );
 }
 

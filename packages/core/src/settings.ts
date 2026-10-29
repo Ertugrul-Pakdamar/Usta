@@ -73,13 +73,23 @@ function readTrust(home: string): Record<string, string> {
   }
 }
 
-/** Remembers the current content of this project's settings file as trusted. */
-export function trustProject(info: ProjectSettingsInfo, cwd: string, home = homedir()): void {
+/** Is this exact content (digest) already trusted under `key`? */
+export function isDigestTrusted(key: string, hash: string, home = homedir()): boolean {
+  return readTrust(home)[key] === hash;
+}
+
+/** Remembers a content digest as trusted under `key` (a project path, or `<path>::agents`). */
+export function trustDigest(key: string, hash: string, home = homedir()): void {
   const file = trustFile(home);
   mkdirSync(dirname(file), { recursive: true, mode: 0o700 });
-  writeFileSync(file, JSON.stringify({ ...readTrust(home), [cwd]: info.hash }, null, 2), {
+  writeFileSync(file, JSON.stringify({ ...readTrust(home), [key]: hash }, null, 2), {
     mode: 0o600,
   });
+}
+
+/** Remembers the current content of this project's settings file as trusted. */
+export function trustProject(info: ProjectSettingsInfo, cwd: string, home = homedir()): void {
+  trustDigest(cwd, info.hash, home);
 }
 
 function readLayer(path: string): { settings: RawSettings; hash: string } | undefined {

@@ -7,6 +7,7 @@ export const HOOK_EVENTS = [
   "UserPromptSubmit",
   "SessionStart",
   "Stop",
+  "SubagentStop",
 ] as const;
 export type HookEvent = (typeof HOOK_EVENTS)[number];
 
@@ -27,6 +28,10 @@ export interface HookPayload {
   toolOutput?: string;
   isError?: boolean;
   prompt?: string;
+  /** SubagentStop: which agent ran, what it was asked to do, and its final report. */
+  agent?: string;
+  description?: string;
+  result?: string;
 }
 
 export interface HookResult {

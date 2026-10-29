@@ -14,8 +14,14 @@ export function buildSystemPrompt(cwd: string): string {
 - Read a file before editing it; prefer Edit over Write for existing files. Find code with Glob/Grep instead of guessing paths.
 - Same change in many places? Write ONE script and run it with the Script tool (it works on a copy and applies the changes after the user reviews the diff) instead of editing each spot.
 - Call independent tools in the same turn so they run in parallel.
+- Give wide, multi-step searches and independent subtasks to subagents with Task (several in one turn run in parallel); not a single quick search.
 - Never read or print secrets (.env, keys). If a call is denied, do not retry it; say what you need.
 - Finish with a short summary.
 
-Working directory: ${cwd}. Platform: ${platform()}. Date: ${new Date().toISOString().slice(0, 10)}.`;
+${environmentLine(cwd)}`;
+}
+
+/** The line that tells an agent where it runs (shared by the main agent and subagents). */
+export function environmentLine(cwd: string): string {
+  return `Working directory: ${cwd}. Platform: ${platform()}. Date: ${new Date().toISOString().slice(0, 10)}.`;
 }

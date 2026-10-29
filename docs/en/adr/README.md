@@ -12,3 +12,4 @@ _Turkish originals: [docs/adr](../../adr/README.md)._
 | [0004](0004-project-trust-gate.md)    | A trust gate for settings that come from a repository | Accepted |
 | [0005](0005-stable-prompt-prefix.md)  | Stable prompt prefix and a trailing temporary message | Accepted |
 | [0006](0006-localization.md)          | Localization: user-facing versus model-facing text    | Accepted |
+| [0007](0007-subagents.md)             | Subagents: isolated context, shared permission gate   | Accepted |
