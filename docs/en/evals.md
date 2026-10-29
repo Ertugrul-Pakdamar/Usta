@@ -11,6 +11,9 @@ To show usta's "fewer tokens" claim by **measurement** rather than estimate, the
 
 ## Result
 
+<p align="center"><img src="../assets/chart-script-ab.en.svg" alt="Script A/B result" width="760"></p>
+
+
 #### Overall
 
 | Variant   | Runs |      Success | Median tokens / run | Total tokens | Median tool calls | Median seconds |

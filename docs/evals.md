@@ -11,6 +11,9 @@ usta'nın "daha az token" iddiasını tahminle değil **ölçümle** göstermek 
 
 ## Sonuç
 
+<p align="center"><img src="assets/chart-script-ab.svg" alt="Script A/B sonucu" width="760"></p>
+
+
 #### Overall
 
 | Variant   | Runs |      Success | Median tokens / run | Total tokens | Median tool calls | Median seconds |

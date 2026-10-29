@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="226" viewBox="0 0 820 226" role="img" aria-label="Roadmap: M0–M7 done">
+<title>Roadmap: M0–M7 done</title><desc>one PR per stage · every PR verified with the real model and a clean clone</desc>
+<rect width="820" height="226" rx="14" fill="#0d1117" stroke="#30363d"/>
+<text x="28" y="38" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="18" fill="#c9d1d9" text-anchor="start" font-weight="700">Roadmap: M0–M7 done</text>
+<text x="28" y="60" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#8b949e" text-anchor="start" font-weight="400">one PR per stage · every PR verified with the real model and a clean clone</text>
+<rect x="28.0" y="84.0" width="148.0" height="46" rx="10" fill="#161b22" opacity="1"/>
+<rect x="28" y="84" width="148" height="46" rx="10" fill="none" stroke="#30363d"/>
+<text x="42" y="104" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="11.5" fill="#56d4dd" text-anchor="start" font-weight="700">M0</text>
+<text x="42" y="121" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#c9d1d9" text-anchor="start" font-weight="600">Skeleton</text>
+<text x="162" y="104" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" fill="#3fb950" text-anchor="end" font-weight="700">✓</text>
+<rect x="184.0" y="84.0" width="148.0" height="46" rx="10" fill="#161b22" opacity="1"/>
+<rect x="184" y="84" width="148" height="46" rx="10" fill="none" stroke="#30363d"/>
+<text x="198" y="104" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="11.5" fill="#56d4dd" text-anchor="start" font-weight="700">M1</text>
+<text x="198" y="121" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#c9d1d9" text-anchor="start" font-weight="600">Core</text>
+<text x="318" y="104" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" fill="#3fb950" text-anchor="end" font-weight="700">✓</text>
+<rect x="340.0" y="84.0" width="148.0" height="46" rx="10" fill="#161b22" opacity="1"/>
+<rect x="340" y="84" width="148" height="46" rx="10" fill="none" stroke="#30363d"/>
+<text x="354" y="104" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="11.5" fill="#56d4dd" text-anchor="start" font-weight="700">M2</text>
+<text x="354" y="121" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#c9d1d9" text-anchor="start" font-weight="600">Interface</text>
+<text x="474" y="104" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" fill="#3fb950" text-anchor="end" font-weight="700">✓</text>
+<rect x="496.0" y="84.0" width="148.0" height="46" rx="10" fill="#161b22" opacity="1"/>
+<rect x="496" y="84" width="148" height="46" rx="10" fill="none" stroke="#30363d"/>
+<text x="510" y="104" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="11.5" fill="#56d4dd" text-anchor="start" font-weight="700">M3</text>
+<text x="510" y="121" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#c9d1d9" text-anchor="start" font-weight="600">Security</text>
+<text x="630" y="104" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" fill="#3fb950" text-anchor="end" font-weight="700">✓</text>
+<rect x="652.0" y="84.0" width="148.0" height="46" rx="10" fill="#161b22" opacity="1"/>
+<rect x="652" y="84" width="148" height="46" rx="10" fill="none" stroke="#30363d"/>
+<text x="666" y="104" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="11.5" fill="#56d4dd" text-anchor="start" font-weight="700">M4</text>
+<text x="666" y="121" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#c9d1d9" text-anchor="start" font-weight="600">Token economy</text>
+<text x="786" y="104" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" fill="#3fb950" text-anchor="end" font-weight="700">✓</text>
+<rect x="28.0" y="144.0" width="148.0" height="46" rx="10" fill="#161b22" opacity="1"/>
+<rect x="28" y="144" width="148" height="46" rx="10" fill="none" stroke="#30363d"/>
+<text x="42" y="164" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="11.5" fill="#56d4dd" text-anchor="start" font-weight="700">M4.5</text>
+<text x="42" y="181" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#c9d1d9" text-anchor="start" font-weight="600">Localization</text>
+<text x="162" y="164" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" fill="#3fb950" text-anchor="end" font-weight="700">✓</text>
+<rect x="184.0" y="144.0" width="148.0" height="46" rx="10" fill="#161b22" opacity="1"/>
+<rect x="184" y="144" width="148" height="46" rx="10" fill="none" stroke="#30363d"/>
+<text x="198" y="164" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="11.5" fill="#56d4dd" text-anchor="start" font-weight="700">M5</text>
+<text x="198" y="181" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#c9d1d9" text-anchor="start" font-weight="600">Subagents</text>
+<text x="318" y="164" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" fill="#3fb950" text-anchor="end" font-weight="700">✓</text>
+<rect x="340.0" y="144.0" width="148.0" height="46" rx="10" fill="#161b22" opacity="1"/>
+<rect x="340" y="144" width="148" height="46" rx="10" fill="none" stroke="#30363d"/>
+<text x="354" y="164" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="11.5" fill="#56d4dd" text-anchor="start" font-weight="700">M5.5</text>
+<text x="354" y="181" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#c9d1d9" text-anchor="start" font-weight="600">Auto mode</text>
+<text x="474" y="164" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" fill="#3fb950" text-anchor="end" font-weight="700">✓</text>
+<rect x="496.0" y="144.0" width="148.0" height="46" rx="10" fill="#161b22" opacity="1"/>
+<rect x="496" y="144" width="148" height="46" rx="10" fill="none" stroke="#30363d"/>
+<text x="510" y="164" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="11.5" fill="#56d4dd" text-anchor="start" font-weight="700">M6</text>
+<text x="510" y="181" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#c9d1d9" text-anchor="start" font-weight="600">Extensibility</text>
+<text x="630" y="164" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" fill="#3fb950" text-anchor="end" font-weight="700">✓</text>
+<rect x="652.0" y="144.0" width="148.0" height="46" rx="10" fill="#161b22" opacity="1"/>
+<rect x="652" y="144" width="148" height="46" rx="10" fill="none" stroke="#30363d"/>
+<text x="666" y="164" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="11.5" fill="#56d4dd" text-anchor="start" font-weight="700">M7</text>
+<text x="666" y="181" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#c9d1d9" text-anchor="start" font-weight="600">Evals + binary</text>
+<text x="786" y="164" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" fill="#3fb950" text-anchor="end" font-weight="700">✓</text>
+</svg>

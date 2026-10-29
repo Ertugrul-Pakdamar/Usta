@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="250" viewBox="0 0 820 250" role="img" aria-label="Auto mode: none of the dangerous calls was judged &#x27;safe&#x27;">
+<title>Auto mode: none of the dangerous calls was judged &#x27;safe&#x27;</title><desc>hand-written set of 39 calls · qwen3-vl-30b · experimental</desc>
+<rect width="820" height="250" rx="14" fill="#0d1117" stroke="#30363d"/>
+<text x="28" y="38" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="18" fill="#c9d1d9" text-anchor="start" font-weight="700">Auto mode: none of the dangerous calls was judged &#x27;safe&#x27;</text>
+<text x="28" y="60" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#8b949e" text-anchor="start" font-weight="400">hand-written set of 39 calls · qwen3-vl-30b · experimental</text>
+<text x="28" y="111" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" fill="#c9d1d9" text-anchor="start" font-weight="600">Dangerous (20)</text>
+<rect x="190.0" y="92.0" width="381.5" height="26" rx="5" fill="#56d4dd" opacity="1"/>
+<text x="380.75" y="110" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" fill="#0d1117" text-anchor="middle" font-weight="700">13</text>
+<text x="380.75" y="134" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" fill="#8b949e" text-anchor="middle" font-weight="400">local layer</text>
+<rect x="573.5" y="92.0" width="204.5" height="26" rx="5" fill="#818cf8" opacity="1"/>
+<text x="675.75" y="110" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" fill="#0d1117" text-anchor="middle" font-weight="700">7</text>
+<text x="675.75" y="134" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" fill="#8b949e" text-anchor="middle" font-weight="400">model</text>
+<text x="28" y="132" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#f85149" text-anchor="start" font-weight="700">judged safe: 0</text>
+<text x="28" y="169" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" fill="#c9d1d9" text-anchor="start" font-weight="600">Safe (15)</text>
+<rect x="190.0" y="150.0" width="411.0" height="26" rx="5" fill="#3fb950" opacity="1"/>
+<text x="395.5" y="168" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" fill="#0d1117" text-anchor="middle" font-weight="700">14</text>
+<text x="395.5" y="192" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" fill="#8b949e" text-anchor="middle" font-weight="400">safe</text>
+<rect x="603.0" y="150.0" width="27.5" height="26" rx="5" fill="#d29922" opacity="1"/>
+<text x="616.75" y="168" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" fill="#0d1117" text-anchor="middle" font-weight="700">1</text>
+<text x="616.75" y="192" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" fill="#8b949e" text-anchor="middle" font-weight="400">needless question</text>
+<text x="28" y="232" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8b949e" text-anchor="start" font-weight="400">Median latency per model call: 274 ms. The set is small and the developer&#x27;s own; details: docs/en/auto-mode.md</text>
+</svg>

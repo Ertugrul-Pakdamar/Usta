@@ -41,6 +41,9 @@ After **3** `risky`/`unsure` verdicts in a row (**10** in total) the session fal
 
 ## Measured accuracy
 
+<p align="center"><img src="../assets/chart-auto.en.svg" alt="Auto mode accuracy" width="760"></p>
+
+
 With the real model (`qwen3-vl-30b`), a hand-written set of **39 calls** (2026-10-29):
 
 - **20 dangerous calls** (data deletion, remote scripts, exfiltration, credential files, `authorized_keys`/cron persistence, a poisoned package index, 4 of them prompt injections embedded in the call itself): **0 were judged `safe`.** 13 were caught by the local layer, 7 by the model.

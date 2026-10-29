@@ -45,25 +45,32 @@ Kod ajanları güçlüdür ama pahalı ve denetimsiz olabilir. **usta** üç şe
 | **Alt ajanlar**         | `Task` ile geniş keşfi ayrı bağlamda yürüt (paralel, arka plan, `/tasks`); dahili `explore`/`plan`/`general` ve kendi `agents/*.md` ajanların; aynı izin kapısı                                                                  |
 | **Dil**                 | Türkçe ve İngilizce arayüz ve belgeler (`--lang`, `USTA_LANG`, `/lang`); modele giden metin dilden bağımsız, sabit İngilizce                                                                                                     |
 | **Headless**            | `usta -p "..." --output-format json` — CI ve betikler için; çıkış kodları anlamlı                                                                                                                                                |
+| **Kurulum ve giriş**    | Tek dosya binary (Node gerekmez); `usta login` ile gateway adresi ve API anahtarı gizli girilir, `~/.usta/credentials`'a 0600 ile yazılır                                                                                        |
 | **Genişletilebilirlik** | `@usta/sdk` ile araç tanımlama, Markdown **skill'leri** ve **özel komutlar** ([docs](docs/skills.md)) bugün; **MCP connector'ları** ([docs](docs/mcp.md)), modül **hook'ları** ve **plugin**'ler ([docs](docs/plugins.md)) bugün |
 
 ## Hızlı başlangıç
 
-**Gereksinimler:** Node.js ≥ 22, [pnpm](https://pnpm.io) 12, bir EVREN LLM Gateway hesabı. İsteğe bağlı: `python3` (Script aracı), `rg` (hızlı arama).
+**Tek dosya (önerilen):** [Sürümler](https://github.com/Ertugrul-Pakdamar/Usta/releases) sayfasından platformunuza uygun `usta` arşivini indirin; **Node.js gerekmez**.
 
 ```sh
-git clone https://github.com/Ertugrul-Pakdamar/Usta.git
-cd Usta
-pnpm install && pnpm build
-
-cp .env.example .env        # EVREN_API_KEY ve EVREN_BASE_URL değerlerini doldurun
-pnpm usta doctor            # bağlantı, anahtar, şart kabulü, kota
-pnpm usta terms             # kullanım şartlarını okuyun
-pnpm usta terms accept      # ... ve kabul ediyorsanız onaylayın (siz yazarsınız, otomatik kabul yok)
-pnpm usta                   # etkileşimli oturum
+tar -xzf usta-linux-x64.tar.gz && sudo mv usta /usr/local/bin/
+usta login        # gateway adresi ve API anahtarı (anahtar ekrana yazılmaz); ilk çalıştırmada kendiliğinden sorulur
+usta doctor       # bağlantı, anahtar, şart kabulü, kota
+usta terms        # kullanım şartlarını okuyun
+usta terms accept # ... ve kabul ediyorsanız onaylayın (siz yazarsınız, otomatik kabul yok)
+usta              # etkileşimli oturum
 ```
 
-`usta` komutunu her yerden çalıştırmak için: `cd packages/cli && npm link` (anahtar bilgilerini `~/.usta/credentials` dosyasına koyabilirsiniz, bkz. [Başlangıç](docs/getting-started.md)).
+**Kaynaktan** (geliştirme): Node.js ≥ 22 ve [pnpm](https://pnpm.io) 12 ile:
+
+```sh
+git clone https://github.com/Ertugrul-Pakdamar/Usta.git && cd Usta
+pnpm install && pnpm build
+pnpm usta login   # ya da: cp .env.example .env ve değerleri doldurun
+pnpm usta
+```
+
+İsteğe bağlı: `python3` (Script aracı), `rg` (hızlı arama). Ayrıntılar: [Başlangıç](docs/getting-started.md).
 
 ## Kullanım
 
@@ -138,6 +145,10 @@ Aşağıdaki sayılar `qwen3-vl-30b` ile, gateway'in kendi `count_tokens` ve `us
 | 8 dosyada aynı değişiklik                               | 3 model turu, tek betik, 3.8k girdi token'ı (%64 önbellekten)                   |
 | 80 KB'lık komut çıktısı                                 | Bağlama ~12k karakter girer, tamamı diske kaydedilir, model `Read` ile açabilir |
 
+<p align="center"><img src="docs/assets/chart-script-ab.svg" alt="Toplu düzenlemede Script ile −%56 token" width="720"></p>
+
+<p align="center"><img src="docs/assets/chart-subagents.svg" alt="Alt ajanlar iki kenarlı" width="720"></p>
+
 Ayrıntılar ve yöntem: [Token ekonomisi](docs/token-economy.md). Gerçek A/B sonuçları: [Değerlendirme raporu](docs/evals.md) (toplu düzenlemede Script ile −%56 token, aynı başarı).
 
 ## Güvenlik modeli
@@ -152,6 +163,8 @@ Ayrıntılar: [İzinler ve güvenlik](docs/permissions.md) · Zafiyet bildirimi:
 
 ## Durum ve yol haritası
 
+<p align="center"><img src="docs/assets/roadmap.svg" alt="Yol haritası: M0–M7 tamam" width="720"></p>
+
 usta **alfa** aşamasındadır: çekirdek, arayüz, güvenlik ve token ekonomisi tamamlandı.
 
 |     | Aşama                                             | Durum      |
@@ -163,7 +176,7 @@ usta **alfa** aşamasındadır: çekirdek, arayüz, güvenlik ve token ekonomisi
 | ✅  | M5 Subagent'lar ve arka plan görevleri            | Tamamlandı |
 | ✅  | M5.5 Auto modu (sınıflandırıcı destekli izin)     | Tamamlandı |
 | ✅  | M6 Skill, komut, MCP, plugin, modül hook'ları     | Tamamlandı |
-| 🔜  | M7 Tek dosya binary, eval raporu, v0.1.0          | Planlandı  |
+| ✅  | M7 `@dosya`, eval raporu, tek dosya binary, 0.1.0 | Tamamlandı |
 
 Tam liste: [docs/roadmap.md](docs/roadmap.md).
 

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="362" viewBox="0 0 820 362" role="img" aria-label="Subagents cut both ways: they pay off on big jobs and cost on small ones">
+<title>Subagents cut both ways: they pay off on big jobs and cost on small ones</title><desc>input tokens in the main context / the whole session · real model</desc>
+<rect width="820" height="362" rx="14" fill="#0d1117" stroke="#30363d"/>
+<text x="28" y="38" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="18" fill="#c9d1d9" text-anchor="start" font-weight="700">Subagents cut both ways: they pay off on big jobs and cost on small ones</text>
+<text x="28" y="60" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#8b949e" text-anchor="start" font-weight="400">input tokens in the main context / the whole session · real model</text>
+<rect x="28.0" y="78.0" width="12.0" height="12" rx="3" fill="#8b949e" opacity="1"/>
+<text x="46" y="88" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8b949e" text-anchor="start" font-weight="400">Inline</text>
+<rect x="98.0" y="78.0" width="12.0" height="12" rx="3" fill="#818cf8" opacity="1"/>
+<text x="116" y="88" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8b949e" text-anchor="start" font-weight="400">Delegated with Task</text>
+<text x="28" y="131" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" fill="#c9d1d9" text-anchor="start" font-weight="600">Summarize a big file</text>
+<rect x="243.0" y="112.0" width="388.3" height="17" rx="4" fill="#8b949e" opacity="1"/>
+<text x="639.304073587385" y="125" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="12" fill="#c9d1d9" text-anchor="start" font-weight="400">7,406</text>
+<rect x="243.0" y="134.0" width="155.9" height="17" rx="4" fill="#818cf8" opacity="1"/>
+<text x="406.87739816031535" y="147" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="12" fill="#c9d1d9" text-anchor="start" font-weight="400">2,973</text>
+<text x="784" y="135.5" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" fill="#3fb950" text-anchor="end" font-weight="700">−60%</text>
+<text x="28" y="189" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" fill="#c9d1d9" text-anchor="start" font-weight="600">  session total</text>
+<rect x="243.0" y="170.0" width="399.0" height="17" rx="4" fill="#8b949e" opacity="1"/>
+<text x="650.0" y="183" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="12" fill="#c9d1d9" text-anchor="start" font-weight="400">7,610</text>
+<rect x="243.0" y="192.0" width="310.7" height="17" rx="4" fill="#818cf8" opacity="1"/>
+<text x="561.6537450722733" y="205" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="12" fill="#c9d1d9" text-anchor="start" font-weight="400">5,925</text>
+<text x="784" y="193.5" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" fill="#3fb950" text-anchor="end" font-weight="700">−22%</text>
+<text x="28" y="247" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" fill="#c9d1d9" text-anchor="start" font-weight="600">One small grep</text>
+<rect x="243.0" y="228.0" width="173.9" height="17" rx="4" fill="#8b949e" opacity="1"/>
+<text x="424.86123521682" y="241" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="12" fill="#c9d1d9" text-anchor="start" font-weight="400">3,316</text>
+<rect x="243.0" y="250.0" width="185.9" height="17" rx="4" fill="#818cf8" opacity="1"/>
+<text x="436.86793692509855" y="263" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="12" fill="#c9d1d9" text-anchor="start" font-weight="400">3,545</text>
+<text x="784" y="251.5" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" fill="#d29922" text-anchor="end" font-weight="700">+7%</text>
+<text x="28" y="305" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" fill="#c9d1d9" text-anchor="start" font-weight="600">  session total</text>
+<rect x="243.0" y="286.0" width="180.4" height="17" rx="4" fill="#8b949e" opacity="1"/>
+<text x="431.3626806833114" y="299" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="12" fill="#c9d1d9" text-anchor="start" font-weight="400">3,440</text>
+<rect x="243.0" y="308.0" width="328.6" height="17" rx="4" fill="#818cf8" opacity="1"/>
+<text x="579.6375821287779" y="321" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="12" fill="#c9d1d9" text-anchor="start" font-weight="400">6,268</text>
+<text x="784" y="309.5" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" fill="#f85149" text-anchor="end" font-weight="700">+82%</text>
+</svg>

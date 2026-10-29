@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="262" viewBox="0 0 820 262" role="img" aria-label="Fixed payload of every request (system prompt + tool schemas)">
+<title>Fixed payload of every request (system prompt + tool schemas)</title><desc>measured with the gateway&#x27;s count_tokens · the unchanged prefix is served from the cache</desc>
+<rect width="820" height="262" rx="14" fill="#0d1117" stroke="#30363d"/>
+<text x="28" y="38" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="18" fill="#c9d1d9" text-anchor="start" font-weight="700">Fixed payload of every request (system prompt + tool schemas)</text>
+<text x="28" y="60" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#8b949e" text-anchor="start" font-weight="400">measured with the gateway&#x27;s count_tokens · the unchanged prefix is served from the cache</text>
+<text x="28" y="107" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" fill="#c9d1d9" text-anchor="start" font-weight="400">M1–M3 · 7 tools, Turkish descriptions</text>
+<rect x="330.0" y="92.0" width="306.6" height="22" rx="4" fill="#8b949e" opacity="1"/>
+<text x="646.5573770491803" y="108" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="13" fill="#c9d1d9" text-anchor="start" font-weight="400">1,190 token</text>
+<text x="28" y="153" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" fill="#c9d1d9" text-anchor="start" font-weight="400">End of M4 · short English descriptions</text>
+<rect x="330.0" y="138.0" width="254.8" height="22" rx="4" fill="#3fb950" opacity="1"/>
+<text x="594.7775175644028" y="154" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="13" fill="#c9d1d9" text-anchor="start" font-weight="400">989 token</text>
+<text x="28" y="199" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" fill="#c9d1d9" text-anchor="start" font-weight="400">M5 · + Task, TaskOutput</text>
+<rect x="330.0" y="184.0" width="330.0" height="22" rx="4" fill="#56d4dd" opacity="1"/>
+<text x="670.0" y="200" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="13" fill="#c9d1d9" text-anchor="start" font-weight="400">1,281 token</text>
+<text x="28" y="240" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#8b949e" text-anchor="start" font-weight="400">The real saving is the cache: on a second request in a session 49–97% of the prefix is cached.</text>
+</svg>
