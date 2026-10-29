@@ -1,0 +1,30 @@
+{
+  "name": "@usta/sdk",
+  "version": "0.0.0",
+  "description": "Public API for usta tool and plugin authors.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ertugrul-Pakdamar/Usta.git",
+    "directory": "packages/sdk"
+  },
+  "homepage": "https://github.com/Ertugrul-Pakdamar/Usta#readme",
+  "bugs": {
+    "url": "https://github.com/Ertugrul-Pakdamar/Usta/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "@usta/core",
+  "version": "0.0.0",
+  "description": "UI-independent core of usta: agent loop, tools, permissions, token economy.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "@usta/sdk": "workspace:*",
+    "diff": "^9.0.0",
+    "fast-glob": "^3.3.3",
+    "openai": "^7.45.1",
+    "picomatch": "^4.0.7",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/picomatch": "^4.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ertugrul-Pakdamar/Usta.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/Ertugrul-Pakdamar/Usta#readme",
+  "bugs": {
+    "url": "https://github.com/Ertugrul-Pakdamar/Usta/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
