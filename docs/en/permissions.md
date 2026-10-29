@@ -28,7 +28,7 @@ The permission engine decides for a tool call in this order; the first match win
 8. A path outside the working directory → asks (except `~/.usta/outputs/**`, which may be read freely).
 9. A read-only tool → allowed.
 10. `acceptEdits` + a file tool → allowed.
-11. Otherwise → asks. (In `auto` mode this step is **classified**: `safe` is allowed, `risky`/`unsure` asks; the classifier cannot loosen any step above. See [Auto mode](auto-mode.md).)
+11. Otherwise → asks. (A rule `mcp__server` covers all MCP tools of that server: [MCP](mcp.md).) (In `auto` mode this step is **classified**: `safe` is allowed, `risky`/`unsure` asks; the classifier cannot loosen any step above. See [Auto mode](auto-mode.md).)
 
 If the decision is "ask" and no interactive approval exists (`-p` with no terminal), the call is **denied** and the reason is passed to the model.
 

@@ -10,6 +10,7 @@ Bu dizin hem kullanıcılar hem katkıcılar içindir. Proje alfa aşamasındad�
 | [Yapılandırma](configuration.md)      | Ortam değişkenleri, ayar dosyaları ve katmanları, tüm CLI bayrakları, `~/.usta` içeriği   |
 | [İzinler ve güvenlik](permissions.md) | Modlar, kural sözdizimi, Bash güvenliği, proje güven kapısı, plan modu, hook'lar, rewind  |
 | [Token ekonomisi](token-economy.md)   | Maliyet görünürlüğü, önbellek, çıktı sınırlama, özetleme, bütçe, Script-first             |
+| [MCP connector'ları](mcp.md)          | `usta mcp`, yapılandırma, token maliyeti, güvenlik                                        |
 | [Skill'ler ve komutlar](skills.md)    | `SKILL.md`, `commands/*.md`, aşamalı yükleme, güven kapısı                                |
 | [Auto modu](auto-mode.md)             | Sınıflandırıcı destekli izin modu, yerel katman, devre kesici, denetim, ölçülmüş doğruluk |
 | [Alt ajanlar](subagents.md)           | `Task`, dahili ve özel ajanlar, arka plan görevleri, izinler, ölçülmüş maliyet            |

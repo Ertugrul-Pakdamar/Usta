@@ -131,6 +131,7 @@ Inside a session, `/lang en` or `/lang tr` switches the language immediately (fo
 | `cache/models.json`     | Cache of gateway model info                    | Valid for 1 hour                               |
 | `agents/*.md`           | The user's custom subagents                    | [Subagents](subagents.md#custom-agents)        |
 | `subagents/<session>/`  | Subagent conversation records                  | 0600; for auditing                             |
+| `mcp.json`              | MCP servers (0600)                             | [MCP](mcp.md)                                  |
 | `skills/`, `commands/`  | User skills and custom commands                | [Skills](skills.md)                            |
 | `audit/<session>.jsonl` | Auto mode decisions                            | 0600; [Auto mode](auto-mode.md#audit-and-cost) |
 

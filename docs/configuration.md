@@ -131,6 +131,7 @@ Oturum içinde `/lang en` veya `/lang tr` dili anında değiştirir (o oturum i�
 | `cache/models.json`    | Gateway model bilgisi önbelleği        | 1 saat geçerli                                     |
 | `agents/*.md`          | Kullanıcının özel alt ajanları         | [Alt ajanlar](subagents.md#özel-ajanlar)           |
 | `subagents/<oturum>/`  | Alt ajan konuşma kayıtları             | 0600; denetim için                                 |
+| `mcp.json`             | MCP sunucuları (0600)                  | [MCP](mcp.md)                                      |
 | `skills/`, `commands/` | Kullanıcı skill'leri ve özel komutları | [Skill'ler](skills.md)                             |
 | `audit/<oturum>.jsonl` | Auto modu kararları                    | 0600; [Auto modu](auto-mode.md#denetim-ve-maliyet) |
 

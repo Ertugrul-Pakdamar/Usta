@@ -44,9 +44,11 @@ import {
   truncateSession,
   type UstaConfig,
 } from "@usta/core";
+import type { McpManager } from "@usta/mcp";
 import type { Tool } from "@usta/sdk";
 import { Box, Static, Text, useApp, useInput, useStdout } from "ink";
 import { useEffect, useRef, useState } from "react";
+import { formatMcpStatus } from "../mcp-cmd.js";
 import { describeCommand, parseSlash, slashCommands } from "../slash.js";
 import { Approval } from "./Approval.js";
 import { Confirm } from "./Confirm.js";
@@ -78,6 +80,8 @@ export interface AppProps {
   agents?: AgentDefinition[];
   /** Skills and custom commands. */
   extensions?: LoadedExtensions;
+  /** Connected MCP servers (their tools are already in `tools`). */
+  mcp?: McpManager;
   /** Existing transcript when resuming. */
   resume?: { session: Session; messages: Message[] };
   initialPrompt?: string;
@@ -542,6 +546,8 @@ export function App(props: AppProps) {
         describePermissions: () => describe(engine, hooks),
         autoReport: () => formatAutoReport(auto),
         extensionsReport: () => formatExtensions(props.extensions),
+        mcpReport: () =>
+          props.mcp?.status.length ? formatMcpStatus(props.mcp).join("\n") : t("mcp.none"),
         rewindList,
         rewind,
         costReport: () => formatCostReport(economy),

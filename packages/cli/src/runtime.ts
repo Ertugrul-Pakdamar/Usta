@@ -28,6 +28,7 @@ import {
   trustProject,
   type UstaConfig,
 } from "@usta/core";
+import { loadMcpConfig, McpManager, mcpTrustKey } from "@usta/mcp";
 
 export interface RuntimeFlags {
   permissionMode?: string;
@@ -196,4 +197,26 @@ export async function loadSessionExtensions(
     }
   }
   return loaded;
+}
+
+/** Connects the configured MCP servers; project servers need approval of the exact config file first. */
+export async function loadSessionMcp(
+  cwd: string,
+  flags: Pick<RuntimeFlags, "trustProject">,
+  canPrompt: boolean,
+) {
+  let config = loadMcpConfig(cwd, undefined, { trustProject: flags.trustProject });
+  const info = config.project;
+  if (info && !info.trusted && canPrompt) {
+    console.error(`\n${t("trust.mcpHeader", { file: info.file })}`);
+    for (const line of info.summary) console.error(`  - ${line}`);
+    console.error(t("trust.mcpWarning"));
+    if (await askYesNo(t("trust.mcpQuestion"))) {
+      trustDigest(mcpTrustKey(cwd), info.hash);
+      config = loadMcpConfig(cwd, undefined);
+    }
+  }
+  const manager = new McpManager();
+  await manager.connect(config.servers);
+  return { manager, warnings: config.warnings };
 }

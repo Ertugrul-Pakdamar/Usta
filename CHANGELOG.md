@@ -6,6 +6,12 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) kurallarını, s
 
 ### Eklendi
 
+**M6b: MCP connector'ları**
+- `@usta/mcp`: stdio ve HTTP (streamable) MCP sunucularına bağlanır; araçlar `mcp__<sunucu>__<araç>` adıyla, sunucunun kendi JSON Şemasıyla (`Tool.jsonSchema`) modele sunulur ve aynı izin kapısından geçer. `mcp__sunucu` kuralı sunucunun tüm araçlarını kapsar.
+- `usta mcp add|list|remove`, oturumda `/mcp`; yapılandırma `~/.usta/mcp.json` (0600, Claude Code ile aynı `mcpServers` biçimi), `${VAR}` ile gizliler dosyaya yazılmaz, `tools` ile daraltma.
+- Güvenlik: `<proje>/.usta/mcp.json` güven kapısında (program başlatabildiği için tam içeriğe bağlı onay); stdio sunucuya ortam sızdırılmaz; `readOnlyHint` yalnızca sorma davranışını etkiler; sunucu hatası oturumu düşürmez.
+- Belgeler: `docs/mcp.md` (TR/EN), ADR-0009; gerçek modelle uçtan uca doğrulandı; token maliyeti `usta mcp list`'te.
+
 **M6a: Skill'ler ve özel komutlar**
 - Skill: `skills/<ad>/SKILL.md` (`name`, `description`); yalnızca ad+açıklama `Skill` aracının açıklamasında gider, gövde model çağırınca yüklenir. Skill yoksa araç eklenmez (sabit yük artmaz).
 - Özel komut: `commands/<ad>.md`, `/ad argümanlar`, `$ARGUMENTS`; başsız modda `-p "/ad …"` de çalışır. `/skills` yükleneni listeler; öneri listesi özel komutları da gösterir.

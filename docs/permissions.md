@@ -27,7 +27,7 @@ Bir araç çağrısı için izin motoru şu sırayla karar verir; ilk eşleşen 
 8. Çalışma dizini dışında bir yol → sorar (okunması serbest olan `~/.usta/outputs/**` hariç).
 9. Salt okuma aracı → izin verir.
 10. `acceptEdits` + dosya aracı → izin verir.
-11. Aksi halde → sorar. (`auto` modunda bu adım **sınıflandırılır**: `safe` ise izin, `risky`/`unsure` ise sorar; sınıflandırıcı yukarıdaki hiçbir adımı gevşetemez. Bkz. [Auto modu](auto-mode.md).)
+11. Aksi halde → sorar. (`mcp__sunucu` kuralı o sunucunun tüm MCP araçlarını kapsar: [MCP](mcp.md).) (`auto` modunda bu adım **sınıflandırılır**: `safe` ise izin, `risky`/`unsure` ise sorar; sınıflandırıcı yukarıdaki hiçbir adımı gevşetemez. Bkz. [Auto modu](auto-mode.md).)
 
 Karar "sor" ise ve etkileşimli onay yoksa (`-p` ve terminal yok) çağrı **reddedilir**; sebep modele iletilir.
 

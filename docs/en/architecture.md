@@ -123,6 +123,10 @@ Under `core/src/agents`: `definitions.ts` (built-in and custom `agents/*.md` age
 
 Reasoning and measurements: [ADR-0007](adr/0007-subagents.md).
 
+## MCP
+
+`packages/mcp`: `config.ts` (`~/.usta/mcp.json` plus the project file behind the trust gate, `${VAR}` expansion) and `manager.ts` (`McpManager`: connects with the SDK client and turns each remote tool into a `Tool` via `adaptTool`). Tools carry the server's schema in `Tool.jsonSchema`; `mutating` defaults to true and `readOnlyHint` only affects whether the user is asked. The CLI connects at session start (`loadSessionMcp`), adds the tools to `tools` and closes on exit. Rationale: [ADR-0009](adr/0009-mcp.md).
+
 ## Auto mode
 
 Under `core/src/auto`: `rules.ts` (local dangerous-pattern and read-only lists), `classifier.ts` (`AutoClassifier`: input narrowing, the `models.fast` call, circuit breaker, audit log), `factory.ts` (wiring to the session), `report.ts` (`/auto`).

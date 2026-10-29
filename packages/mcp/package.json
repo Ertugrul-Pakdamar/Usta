@@ -13,8 +13,9 @@
     "build": "tsc -b"
   },
   "dependencies": {
-    "@usta/sdk": "workspace:*",
-    "@usta/core": "workspace:*"
+    "@modelcontextprotocol/sdk": "1.32.0",
+    "@usta/core": "workspace:*",
+    "@usta/sdk": "workspace:*"
   },
   "repository": {
     "type": "git",
