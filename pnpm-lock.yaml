@@ -237,8 +237,8 @@ importers:
         specifier: ^3.3.3
         version: 3.3.3
       openai:
-        specifier: ^7.45.1
-        version: 7.45.1(zod@4.6.7)
+        specifier: ^7.47.0
+        version: 7.47.0(zod@4.6.7)
       picomatch:
         specifier: ^4.0.7
         version: 4.0.7
@@ -1419,8 +1419,8 @@ packages:
     resolution: {integrity: sha512-kbpaSSGJTWdAY5KPVeMOKXSrPtr8C8C7wodJbcsd51jRnmD+GZu8Y0VoU6Dm5Z4vWr0Ig/1NKuWRKf7j5aaYSg==}
     engines: {node: '>=6'}
 
-  openai@7.45.1:
-    resolution: {integrity: sha512-mutrJXwhJIMZ24Lab2COFtNp44OcpZSnV4O2O7q38wAHUa2m2fQqUO5pj1XS3PqLfOTeODBUS9YoadqDnnGk5A==}
+  openai@7.47.0:
+    resolution: {integrity: sha512-BYa2RYgocAv9WjPUJmNu8fICuA1fFhkTBEpiR3sC5L1K6v8Hnhc8pcnQEhu8l/+W1XKA+JUaBa7HpT+AK1s77w==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       '@aws-sdk/credential-provider-node': '>=3.972.0 <4'
@@ -2742,7 +2742,7 @@ snapshots:
     dependencies:
       mimic-fn: 2.1.0
 
-  openai@7.45.1(zod@4.6.7):
+  openai@7.47.0(zod@4.6.7):
     optionalDependencies:
       zod: 4.6.7
 
