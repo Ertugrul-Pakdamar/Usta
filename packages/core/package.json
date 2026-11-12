@@ -16,7 +16,7 @@
     "@usta/sdk": "workspace:*",
     "diff": "^9.0.0",
     "fast-glob": "^3.3.3",
-    "openai": "^7.45.1",
+    "openai": "^7.53.0",
     "picomatch": "^4.0.7",
     "zod": "^4.6.7"
   },
